@@ -1,0 +1,168 @@
+/* ORGANIZATION DASHBOARD */
+
+.organization-overview {
+    padding: 28px;
+    margin-bottom: 52px;
+    background: white;
+    border: 1px solid #e8ede8;
+    border-radius: 15px;
+}
+
+.organization-overview-header {
+    margin-bottom: 26px;
+}
+
+.organization-overview-header h2 {
+    margin: 0 0 9px;
+    font-size: 22px;
+}
+
+.organization-overview-header p {
+    margin: 0;
+    color: #879087;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.organization-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 26px;
+}
+
+.organization-overview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: #f8faf8;
+    border: 1px solid #edf1ed;
+    border-radius: 12px;
+}
+
+.organization-overview-label {
+    color: #778277;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.organization-overview-item strong {
+    color: #263026;
+    font-size: 32px;
+    letter-spacing: -1px;
+}
+
+.organization-overview-item strong.organization-yes-number {
+    color: #199b2a;
+}
+
+.organization-overview-item strong.organization-no-number {
+    color: #d46c6c;
+}
+
+.organization-overall-bar {
+    display: flex;
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #eef2ee;
+}
+
+.organization-overall-yes {
+    height: 100%;
+    width: 0;
+    background: #28db25;
+    transition: width 0.3s ease;
+}
+
+.organization-overall-no {
+    height: 100%;
+    width: 0;
+    background: #ef9292;
+    transition: width 0.3s ease;
+}
+
+.organization-overview-note {
+    margin: 14px 0 0;
+    color: #879087;
+    font-size: 12px;
+}
+
+.organization-proposal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 17px;
+    border-top: 1px solid #edf1ed;
+}
+
+.organization-proposal-footer span {
+    color: #758075;
+    font-size: 12px;
+}
+
+.organization-proposal-outcome {
+    font-weight: 800;
+}
+
+.organization-proposal-outcome.positive {
+    color: #16812a;
+}
+
+.organization-proposal-outcome.negative {
+    color: #bd4646;
+}
+
+.organization-proposal-outcome.neutral {
+    color: #8b7580;
+}
+
+.organization-dashboard-page .dashboard-empty {
+    padding: 55px 25px;
+}
+
+.organization-empty-icon {
+    display: block;
+    margin-bottom: 16px;
+    font-size: 35px;
+}
+
+.organization-dashboard-page .dashboard-empty h3 {
+    margin-bottom: 12px;
+}
+
+.organization-dashboard-page [hidden] {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .organization-overview {
+        padding: 20px;
+        margin-bottom: 38px;
+    }
+
+    .organization-overview-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .organization-overview-item {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+    }
+
+    .organization-overview-item strong {
+        font-size: 25px;
+    }
+
+    .organization-overview-header h2 {
+        font-size: 20px;
+    }
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Account | Instant Democracy</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/studentDashboard.css">
+
+    <script src="js/script.js" defer></script>
+    <script src="js/studentDashboard.js" defer></script>
+</head>
+
+<body class="student-dashboard-page">
+
+    <header class="dashboard-header">
+        <a href="index.html" class="dashboard-brand">
+            <span class="dashboard-brand-icon">D</span>
+            <span>Instant Democracy</span>
+        </a>
+
+        <nav class="dashboard-header-links">
+            <a href="index.html">Home</a>
+            <a href="vote.html">Vote</a>
+            <a href="createProposal.html">Create Proposal</a>
+        </nav>
+
+        <div class="account-container">
+            <button
+                type="button"
+                id="accountButton"
+                class="dashboard-account-button"
+                aria-label="Account menu"
+                aria-expanded="false"
+            >
+                <span>👤</span>
+            </button>
+
+            <div
+                id="accountDropdown"
+                class="account-dropdown"
+            ></div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+
+        <section class="dashboard-intro">
+            <div>
+                <p class="dashboard-eyebrow">MY ACCOUNT</p>
+                <h1 id="dashboardWelcome">Welcome back!</h1>
+                <p class="dashboard-subtitle">
+                    Track your proposals, follow their progress
+                    and review your voting history.
+                </p>
+            </div>
+
+            <a
+                href="createProposal.html"
+                class="dashboard-create-button"
+            >
+                + Create Proposal
+            </a>
+        </section>
+
+        <div
+            id="dashboardMessage"
+            class="dashboard-message"
+            role="status"
+            aria-live="polite"
+        >
+            Loading your dashboard...
+        </div>
+
+        <div id="dashboardContent" hidden>
+
+            <section
+                class="dashboard-stats"
+                aria-label="Account statistics"
+            >
+                <article class="dashboard-stat-card">
+                    <span class="stat-label">Total Proposals</span>
+                    <strong id="statTotalProposals">0</strong>
+                    <span class="stat-description">
+                        Ideas you've submitted
+                    </span>
+                </article>
+
+                <article class="dashboard-stat-card">
+                    <span class="stat-label">Pending Review</span>
+                    <strong id="statPending">0</strong>
+                    <span class="stat-description">
+                        Awaiting moderation
+                    </span>
+                </article>
+
+                <article class="dashboard-stat-card">
+                    <span class="stat-label">Approved Proposals</span>
+                    <strong id="statApproved">0</strong>
+                    <span class="stat-description">
+                        Accepted by administrators
+                    </span>
+                </article>
+
+                <article class="dashboard-stat-card">
+                    <span class="stat-label">Votes Cast</span>
+                    <strong id="statVotes">0</strong>
+                    <span class="stat-description">
+                        Your participation
+                    </span>
+                </article>
+            </section>
+
+            <section class="dashboard-section">
+
+                <div class="dashboard-section-header">
+                    <div>
+                        <h2>My Proposals</h2>
+                        <p>
+                            Follow the status and results
+                            of your submitted ideas.
+                        </p>
+                    </div>
+
+                    <span
+                        id="proposalCount"
+                        class="dashboard-count"
+                    >0 proposals</span>
+                </div>
+
+                <div
+                    id="myProposals"
+                    class="dashboard-card-list"
+                ></div>
+
+            </section>
+
+            <section class="dashboard-section">
+
+                <div class="dashboard-section-header">
+                    <div>
+                        <h2>My Votes</h2>
+                        <p>
+                            See the proposals you've voted on
+                            and their current results.
+                        </p>
+                    </div>
+
+                    <span
+                        id="voteCount"
+                        class="dashboard-count"
+                    >0 votes</span>
+                </div>
+
+                <div
+                    id="myVotes"
+                    class="dashboard-card-list"
+                ></div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
