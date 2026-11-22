@@ -1,133 +1,317 @@
-/* LOGIN PAGE */
 
-.login-page {
-    min-height: 75vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 80px 24px;
-}
+/* =========================================================
+   AUTHENTICATION PAGES
+   Login and Create Account
+   ========================================================= */
 
-.login-card {
-    width: 100%;
-    max-width: 480px;
-    padding: 48px;
+/* ---------- GENERAL ---------- */
+
+.auth-body {
+    margin: 0;
     background: #ffffff;
-    border: 1px solid #e9e9e9;
-    border-radius: 18px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+    color: #222b24;
 }
 
-.login-card .welcome-label {
-    display: block;
-    margin-bottom: 14px;
-    color: #b47b42;
+.auth-body .header {
+    background: #ffffff;
+    border-bottom: 1px solid #edf0ed;
+}
+
+.auth-body .logo span {
+    color: #397d46;
+}
+
+/* ---------- PAGE LAYOUT ---------- */
+
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: calc(100vh - 85px);
+    padding: 55px 24px 75px;
+
+    background: #ffffff;
+}
+
+.auth-page,
+.auth-page * {
+    box-sizing: border-box;
+}
+
+.auth-panel {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* ---------- LOGIN / REGISTER TABS ---------- */
+
+.auth-tabs {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    margin-bottom: 32px;
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid #e6ebe7;
+}
+
+.auth-tab {
+    position: relative;
+
+    color: #858d86;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+
+    transition: color 0.2s ease;
 }
 
-.login-card h1 {
-    margin: 0 0 16px;
-    font-size: clamp(30px, 4vw, 40px);
-    line-height: 1.15;
-    letter-spacing: -1.5px;
+.auth-tab:hover {
+    color: #397d46;
 }
 
-.login-card h1 span {
-    color: #b47b42;
+.auth-tab--active {
+    color: #397d46;
 }
 
-.login-description {
-    margin-bottom: 32px;
-    color: #666666;
+.auth-tab--active::after {
+    position: absolute;
+    right: 0;
+    bottom: -16px;
+    left: 0;
+
+    height: 2px;
+
+    background: #397d46;
+    content: "";
+}
+
+.auth-tab-divider {
+    color: #c2c8c3;
+    font-size: 14px;
+}
+
+/* ---------- INTRODUCTION ---------- */
+
+.auth-intro {
+    margin-bottom: 29px;
+}
+
+.auth-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+
+    color: #397d46;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.auth-intro h1 {
+    margin: 0 0 10px;
+
+    color: #222b24;
+    font-size: clamp(26px, 4vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+}
+
+.auth-intro p {
+    margin: 0;
+
+    color: #747e76;
+    font-size: 13px;
     line-height: 1.7;
-    font-size: 15px;
 }
 
-.form-group {
+/* ---------- FORM ---------- */
+
+.auth-form {
+    width: 100%;
+}
+
+.auth-field {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    margin-bottom: 22px;
+    gap: 8px;
+
+    margin-bottom: 20px;
 }
 
-.form-group label {
-    font-size: 14px;
-    font-weight: 600;
+.auth-field label {
+    color: #397d46;
+    font-size: 12px;
+    font-weight: 650;
 }
 
-.form-group input {
+.auth-field input {
     width: 100%;
-    padding: 14px 16px;
-    border: 1px solid #dddddd;
-    border-radius: 9px;
-    background: #ffffff;
-    color: #222222;
+    min-height: 45px;
+    padding: 12px 14px;
+
+    background: #f4f5f4;
+    border: 1px solid #e8ece8;
+    border-radius: 7px;
+
+    color: #222b24;
     font: inherit;
-    font-size: 15px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
 }
 
-.form-group input:focus {
+.auth-field input::placeholder {
+    color: #a1aaa3;
+}
+
+.auth-field input:hover {
+    border-color: #cbd9ce;
+}
+
+.auth-field input:focus {
     outline: none;
-    border-color: #b47b42;
-    box-shadow: 0 0 0 3px rgba(180, 123, 66, 0.12);
+
+    background: #ffffff;
+    border-color: #397d46;
+    box-shadow: 0 0 0 3px rgba(57, 125, 70, 0.11);
 }
 
-.login-message {
-    min-height: 20px;
-    margin: 0 0 14px;
-    font-size: 13px;
+/* ---------- FEEDBACK MESSAGES ---------- */
+
+.auth-message {
+    margin: 0;
     color: #b42318;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
-.login-submit {
+.auth-message:empty {
+    display: none;
+}
+
+.auth-message:not(:empty) {
+    margin: 4px 0 16px;
+}
+
+/* ---------- SUBMIT BUTTON ---------- */
+
+.auth-submit {
+    display: block;
     width: 100%;
-    padding: 15px 20px;
-    border: none;
-    border-radius: 9px;
-    background: #222222;
+    min-height: 44px;
+
+    padding: 12px 18px;
+
+    background: #397d46;
+    border: 1px solid #397d46;
+    border-radius: 7px;
+
     color: #ffffff;
     font: inherit;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
+
     cursor: pointer;
-    transition: background 0.2s;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
 }
 
-.login-submit:hover {
-    background: #b47b42;
+.auth-submit:hover {
+    background: #286035;
+    border-color: #286035;
 }
 
-.login-submit:disabled {
-    opacity: 0.6;
+.auth-submit:focus-visible {
+    outline: 3px solid #a5d5ab;
+    outline-offset: 3px;
+}
+
+.auth-submit:disabled {
+    opacity: 0.65;
     cursor: not-allowed;
 }
 
-.register-prompt {
-    margin: 26px 0 0;
+/* ---------- BOTTOM LINK ---------- */
+
+.auth-bottom-link {
+    margin: 23px 0 0;
+
+    color: #747e76;
+    font-size: 12px;
+    line-height: 1.6;
     text-align: center;
-    font-size: 14px;
-    color: #666666;
 }
 
-.register-prompt a {
-    color: #b47b42;
-    font-weight: 600;
+.auth-bottom-link a {
+    color: #397d46;
+    font-weight: 700;
     text-decoration: none;
 }
 
-.register-prompt a:hover {
+.auth-bottom-link a:hover {
     text-decoration: underline;
 }
 
+/* ---------- ACCESSIBILITY ---------- */
+
+.auth-tab:focus-visible,
+.auth-bottom-link a:focus-visible {
+    outline: 3px solid #a5d5ab;
+    outline-offset: 4px;
+}
+
+/* ---------- MOBILE ---------- */
+
 @media (max-width: 600px) {
-    .login-page {
-        padding: 50px 18px;
+
+    .auth-page {
+        min-height: calc(100vh - 75px);
+        padding: 45px 22px 65px;
     }
 
-    .login-card {
-        padding: 32px 24px;
+    .auth-panel {
+        max-width: 100%;
     }
+
+    .auth-tabs {
+        margin-bottom: 27px;
+    }
+
+    .auth-intro {
+        margin-bottom: 25px;
+    }
+
+    .auth-intro h1 {
+        font-size: 27px;
+    }
+
+    .auth-field {
+        margin-bottom: 18px;
+    }
+
+    .auth-field input {
+        font-size: 16px;
+    }
+
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .auth-tab,
+    .auth-field input,
+    .auth-submit {
+        transition: none;
+    }
+
 }

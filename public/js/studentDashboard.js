@@ -1,3 +1,11 @@
+
+/* =========================================================
+   STUDENT DASHBOARD
+   - My Proposals
+   - My Debates
+   - My Votes
+   ========================================================= */
+
 (() => {
     const $ = id => document.getElementById(id);
 
@@ -5,6 +13,17 @@
     const content = $("dashboardContent");
 
     if (!message || !content) return;
+
+    const CATEGORIES = {
+        "academic-life": "Academic Life",
+        "canteens-and-food": "Canteens and Food",
+        "campus-mobility": "Campus Mobility",
+        "events-and-traditions": "Events and Traditions",
+        "sports-and-culture": "Sports and Culture",
+        "student-well-being": "Student Well-Being",
+        "study-spaces": "Study Spaces",
+        "workshops-and-skills": "Workshops and Skills"
+    };
 
     function el(tag, props = {}, ...children) {
         const node = Object.assign(
@@ -16,10 +35,18 @@
         return node;
     }
 
+    function setText(id, value) {
+        const node = $(id);
+
+        if (node) {
+            node.textContent = value ?? "";
+        }
+    }
+
     function formatDate(value) {
         if (!value) return "Not available";
 
-        const datePart = value.slice(0, 10);
+        const datePart = String(value).slice(0, 10);
         const date = new Date(`${datePart}T12:00:00Z`);
 
         if (Number.isNaN(date.getTime())) {
@@ -53,11 +80,21 @@
             getPortugalToday() > deadline;
     }
 
-    function capitalize(value) {
-        if (!value) return "";
+    function categoryName(value) {
+        return CATEGORIES[value] || value || "Other";
+    }
 
-        return value.charAt(0).toUpperCase() +
-            value.slice(1);
+    function normalizeStatus(value) {
+        return ["pending", "approved", "rejected"].includes(value)
+            ? value
+            : "pending";
+    }
+
+    function statusLabel(status) {
+        if (status === "approved") return "Published";
+        if (status === "rejected") return "Rejected";
+
+        return "Pending Review";
     }
 
     function showError(text) {
@@ -65,6 +102,44 @@
         message.textContent = text;
         content.hidden = true;
     }
+
+    function emptyState(title, description) {
+        return el(
+            "div",
+            { className: "dashboard-empty" },
+
+            el("h3", { textContent: title }),
+            el("p", { textContent: description })
+        );
+    }
+
+    function createStatus(status) {
+        const normalized = normalizeStatus(status);
+
+        return el("span", {
+            className: `dashboard-status ${normalized}`,
+            textContent: statusLabel(normalized)
+        });
+    }
+
+    function createRejectionReason(reason) {
+        if (!reason) return null;
+
+        return el(
+            "div",
+            { className: "dashboard-rejection-reason" },
+
+            el("strong", {
+                textContent: "Reason for rejection"
+            }),
+
+            el("p", {
+                textContent: reason
+            })
+        );
+    }
+
+    /* VOTING RESULTS */
 
     function createResults(item) {
         const yes = Number(item.yes_votes) || 0;
@@ -87,9 +162,11 @@
             el(
                 "div",
                 { className: "dashboard-results-heading" },
+
                 el("span", {
                     textContent: "Voting Results"
                 }),
+
                 el("span", {
                     textContent:
                         `${total} ${total === 1 ? "vote" : "votes"}`
@@ -105,15 +182,15 @@
                 className: "dashboard-result-row"
             });
 
-            row.append(
-                el(
-                    "div",
-                    { className: "dashboard-result-label" },
-                    el("span", { textContent: label }),
-                    el("span", {
-                        textContent: `${count} (${percent}%)`
-                    })
-                )
+            const heading = el(
+                "div",
+                { className: "dashboard-result-label" },
+
+                el("span", { textContent: label }),
+
+                el("span", {
+                    textContent: `${count} (${percent}%)`
+                })
             );
 
             const track = el("div", {
@@ -127,37 +204,34 @@
             fill.style.width = `${percent}%`;
 
             track.append(fill);
-            row.append(track);
+            row.append(heading, track);
             wrapper.append(row);
         });
 
         return wrapper;
     }
 
+    /* MY PROPOSALS */
+
     function createProposalCard(proposal) {
         const card = el("article", {
             className: "dashboard-item"
         });
 
-        const status = proposal.status || "pending";
-
-        const top = el(
-            "div",
-            { className: "dashboard-item-top" },
-
-            el("h3", {
-                textContent: proposal.title
-            }),
-
-            el("span", {
-                className: `dashboard-status ${status}`,
-                textContent: capitalize(status)
-            })
-        );
-
-        card.append(top);
+        const status = normalizeStatus(proposal.status);
 
         card.append(
+            el(
+                "div",
+                { className: "dashboard-item-top" },
+
+                el("h3", {
+                    textContent: proposal.title
+                }),
+
+                createStatus(status)
+            ),
+
             el("p", {
                 className: "dashboard-item-description",
                 textContent: proposal.description
@@ -170,7 +244,8 @@
 
         meta.append(
             el("span", {
-                textContent: `Category: ${proposal.category}`
+                textContent:
+                    `Category: ${categoryName(proposal.category)}`
             }),
 
             el("span", {
@@ -179,9 +254,10 @@
             }),
 
             el("span", {
-                textContent: Number(proposal.anonymous) === 1
-                    ? "Anonymous proposal"
-                    : "Public author"
+                textContent:
+                    Number(proposal.anonymous) === 1
+                        ? "Anonymous submission"
+                        : "Public author"
             })
         );
 
@@ -198,17 +274,36 @@
 
         card.append(meta);
 
+        if (status === "rejected") {
+            const reason = createRejectionReason(
+                proposal.rejection_reason
+            );
+
+            if (reason) card.append(reason);
+        }
+
         if (status === "approved") {
+            card.append(createResults(proposal));
+
             if (isVotingClosed(proposal.voting_deadline)) {
+                const yes = Number(proposal.yes_votes) || 0;
+                const no = Number(proposal.no_votes) || 0;
+
+                const passed = yes > no;
+
                 card.append(
                     el("p", {
-                        className: "dashboard-my-vote",
-                        textContent: "Voting closed"
+                        className:
+                            `dashboard-outcome ${
+                                passed ? "positive" : "negative"
+                            }`,
+
+                        textContent: passed
+                            ? "Community outcome: Approved"
+                            : "Community outcome: Unsuccessful"
                     })
                 );
             }
-
-            card.append(createResults(proposal));
         }
 
         return card;
@@ -217,27 +312,23 @@
     function renderProposals(proposals) {
         const container = $("myProposals");
 
-        $("proposalCount").textContent =
+        setText(
+            "proposalCount",
             `${proposals.length} ${
                 proposals.length === 1
                     ? "proposal"
                     : "proposals"
-            }`;
+            }`
+        );
 
         if (proposals.length === 0) {
             container.replaceChildren(
-                el(
-                    "div",
-                    { className: "dashboard-empty" },
-                    el("h3", {
-                        textContent: "No proposals yet"
-                    }),
-                    el("p", {
-                        textContent:
-                            "Your submitted proposals will appear here."
-                    })
+                emptyState(
+                    "No proposals yet",
+                    "The proposals you create will appear here."
                 )
             );
+
             return;
         }
 
@@ -245,6 +336,158 @@
             ...proposals.map(createProposalCard)
         );
     }
+
+    /* MY DEBATES */
+
+    function createDebateCard(debate) {
+        const card = el("article", {
+            className: "dashboard-item"
+        });
+
+        const status = normalizeStatus(debate.status);
+        const id = Number(debate.id);
+
+        let title;
+
+        if (
+            status === "approved" &&
+            Number.isSafeInteger(id) &&
+            id > 0
+        ) {
+            title = el(
+                "h3",
+                {},
+
+                el("a", {
+                    className: "dashboard-item-title-link",
+                    href: `debate.html?id=${id}`,
+                    textContent: debate.title
+                })
+            );
+        } else {
+            title = el("h3", {
+                textContent: debate.title
+            });
+        }
+
+        card.append(
+            el(
+                "div",
+                { className: "dashboard-item-top" },
+
+                title,
+                createStatus(status)
+            ),
+
+            el("p", {
+                className: "dashboard-item-description",
+                textContent: debate.description
+            })
+        );
+
+        const meta = el("div", {
+            className: "dashboard-item-meta"
+        });
+
+        meta.append(
+            el("span", {
+                textContent:
+                    `Category: ${categoryName(debate.category)}`
+            }),
+
+            el("span", {
+                textContent:
+                    `Created: ${formatDate(
+                        debate.createdAt || debate.created_at
+                    )}`
+            })
+        );
+
+        card.append(meta);
+
+        if (status === "rejected") {
+            const reason = createRejectionReason(
+                debate.rejectionReason ||
+                debate.rejection_reason
+            );
+
+            if (reason) card.append(reason);
+        }
+
+        return card;
+    }
+
+    function renderDebates(debates) {
+        const container = $("myDebates");
+
+        if (!container) return;
+
+        setText(
+            "debateCount",
+            `${debates.length} ${
+                debates.length === 1 ? "debate" : "debates"
+            }`
+        );
+
+        if (debates.length === 0) {
+            container.replaceChildren(
+                emptyState(
+                    "No debates yet",
+                    "When you start a debate, you'll be able " +
+                    "to follow its approval status here."
+                )
+            );
+
+            return;
+        }
+
+        container.replaceChildren(
+            ...debates.map(createDebateCard)
+        );
+    }
+
+    async function loadDebates() {
+        const container = $("myDebates");
+
+        if (!container) return;
+
+        container.replaceChildren(
+            emptyState(
+                "Loading debates...",
+                "Checking your submitted discussions."
+            )
+        );
+
+        try {
+            const response = await fetch("/api/debates/mine", {
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error("Unable to load your debates.");
+            }
+
+            const data = await response.json();
+
+            renderDebates(
+                Array.isArray(data.debates) ? data.debates : []
+            );
+
+        } catch (error) {
+            console.error("My Debates error:", error);
+
+            container.replaceChildren(
+                emptyState(
+                    "Debates unavailable",
+                    "Your proposals and votes are still available. " +
+                    "Please try refreshing the page."
+                )
+            );
+        }
+    }
+
+    /* MY VOTES */
 
     function createVoteCard(vote) {
         const card = el("article", {
@@ -255,27 +498,27 @@
             vote.voting_deadline
         );
 
-        const top = el(
-            "div",
-            { className: "dashboard-item-top" },
-
-            el("h3", {
-                textContent: vote.title
-            }),
-
-            el("span", {
-                className:
-                    `dashboard-status ${
-                        closed ? "closed" : "approved"
-                    }`,
-                textContent:
-                    closed ? "Voting closed" : "Voting open"
-            })
-        );
-
-        card.append(top);
-
         card.append(
+            el(
+                "div",
+                { className: "dashboard-item-top" },
+
+                el("h3", {
+                    textContent: vote.title
+                }),
+
+                el("span", {
+                    className:
+                        `dashboard-status ${
+                            closed ? "closed" : "approved"
+                        }`,
+
+                    textContent: closed
+                        ? "Voting Closed"
+                        : "Voting Open"
+                })
+            ),
+
             el("p", {
                 className: "dashboard-my-vote",
                 textContent:
@@ -291,7 +534,8 @@
 
         meta.append(
             el("span", {
-                textContent: `Category: ${vote.category}`
+                textContent:
+                    `Category: ${categoryName(vote.category)}`
             }),
 
             el("span", {
@@ -316,25 +560,21 @@
     function renderVotes(votes) {
         const container = $("myVotes");
 
-        $("voteCount").textContent =
+        setText(
+            "voteCount",
             `${votes.length} ${
                 votes.length === 1 ? "vote" : "votes"
-            }`;
+            }`
+        );
 
         if (votes.length === 0) {
             container.replaceChildren(
-                el(
-                    "div",
-                    { className: "dashboard-empty" },
-                    el("h3", {
-                        textContent: "No votes yet"
-                    }),
-                    el("p", {
-                        textContent:
-                            "Proposals you vote on will appear here."
-                    })
+                emptyState(
+                    "No votes yet",
+                    "Proposals you vote on will appear here."
                 )
             );
+
             return;
         }
 
@@ -343,12 +583,15 @@
         );
     }
 
+    /* LOAD DASHBOARD */
+
     async function loadDashboard() {
         try {
             const response = await fetch(
                 "/api/student/dashboard",
                 {
-                    credentials: "same-origin"
+                    credentials: "same-origin",
+                    cache: "no-store"
                 }
             );
 
@@ -372,28 +615,44 @@
 
             const data = await response.json();
 
-            const student = data.student;
-            const stats = data.stats;
+            const student = data.student || {};
+            const stats = data.stats || {};
+
             const proposals = data.proposals || [];
             const votes = data.votes || [];
 
-            const firstName =
-                student.name.trim().split(/\s+/)[0];
+            const firstName = String(student.name || "")
+                .trim()
+                .split(/\s+/)[0];
 
-            $("dashboardWelcome").textContent =
-                `Welcome back, ${firstName}!`;
+            setText(
+                "dashboardWelcome",
+                firstName
+                    ? `Welcome back, ${firstName}!`
+                    : "Welcome back!"
+            );
 
-            $("statTotalProposals").textContent =
-                stats.total_proposals;
+            setText("accountEmail", student.email || "");
 
-            $("statPending").textContent =
-                stats.pending_proposals;
+            setText(
+                "statTotalProposals",
+                stats.total_proposals ?? 0
+            );
 
-            $("statApproved").textContent =
-                stats.approved_proposals;
+            setText(
+                "statPending",
+                stats.pending_proposals ?? 0
+            );
 
-            $("statVotes").textContent =
-                stats.total_votes;
+            setText(
+                "statApproved",
+                stats.approved_proposals ?? 0
+            );
+
+            setText(
+                "statVotes",
+                stats.total_votes ?? 0
+            );
 
             renderProposals(proposals);
             renderVotes(votes);
@@ -401,17 +660,20 @@
             message.hidden = true;
             content.hidden = false;
 
+            // Debates load independently so an error here
+            // never prevents proposals and votes from appearing.
+            await loadDebates();
+
         } catch (error) {
-            console.error(
-                "Student dashboard error:",
-                error
-            );
+            console.error("Student dashboard error:", error);
 
             showError(
-                "Unable to load your dashboard. Please refresh the page."
+                "Unable to load your account. " +
+                "Please refresh the page."
             );
         }
     }
 
     loadDashboard();
+
 })();

@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,19 +17,24 @@
 
 <body class="student-dashboard-page">
 
+    <!-- HEADER -->
+
     <header class="dashboard-header">
+
         <a href="index.html" class="dashboard-brand">
             <span class="dashboard-brand-icon">D</span>
             <span>Instant Democracy</span>
         </a>
 
-        <nav class="dashboard-header-links">
+        <nav class="dashboard-header-links" aria-label="Main navigation">
             <a href="index.html">Home</a>
+            <a href="debates.html">Debates</a>
             <a href="vote.html">Vote</a>
             <a href="createProposal.html">Create Proposal</a>
         </nav>
 
         <div class="account-container">
+
             <button
                 type="button"
                 id="accountButton"
@@ -42,18 +49,29 @@
                 id="accountDropdown"
                 class="account-dropdown"
             ></div>
+
         </div>
+
     </header>
+
+    <!-- MAIN -->
 
     <main class="dashboard-main">
 
+        <!-- INTRODUCTION -->
+
         <section class="dashboard-intro">
+
             <div>
                 <p class="dashboard-eyebrow">MY ACCOUNT</p>
-                <h1 id="dashboardWelcome">Welcome back!</h1>
+
+                <h1 id="dashboardWelcome">
+                    Welcome back!
+                </h1>
+
                 <p class="dashboard-subtitle">
-                    Track your proposals, follow their progress
-                    and review your voting history.
+                    Your space to manage proposals, follow debates
+                    and keep track of your participation in campus decisions.
                 </p>
             </div>
 
@@ -63,7 +81,10 @@
             >
                 + Create Proposal
             </a>
+
         </section>
+
+        <!-- LOADING / ACCESS -->
 
         <div
             id="dashboardMessage"
@@ -71,63 +92,108 @@
             role="status"
             aria-live="polite"
         >
-            Loading your dashboard...
+            Loading your account...
         </div>
 
         <div id="dashboardContent" hidden>
+
+            <!-- ACCOUNT INFORMATION -->
+
+            <div class="dashboard-identity">
+
+                <span class="dashboard-identity-label">
+                    SIGNED IN AS
+                </span>
+
+                <span
+                    id="accountEmail"
+                    class="dashboard-identity-email"
+                ></span>
+
+                <span class="dashboard-identity-role">
+                    Student Account
+                </span>
+
+            </div>
+
+            <!-- STATISTICS -->
 
             <section
                 class="dashboard-stats"
                 aria-label="Account statistics"
             >
+
                 <article class="dashboard-stat-card">
-                    <span class="stat-label">Total Proposals</span>
+                    <span class="stat-label">
+                        My Proposals
+                    </span>
+
                     <strong id="statTotalProposals">0</strong>
+
                     <span class="stat-description">
-                        Ideas you've submitted
+                        Total proposals submitted
                     </span>
                 </article>
 
                 <article class="dashboard-stat-card">
-                    <span class="stat-label">Pending Review</span>
+                    <span class="stat-label">
+                        Pending Review
+                    </span>
+
                     <strong id="statPending">0</strong>
+
                     <span class="stat-description">
-                        Awaiting moderation
+                        Proposals awaiting approval
                     </span>
                 </article>
 
                 <article class="dashboard-stat-card">
-                    <span class="stat-label">Approved Proposals</span>
+                    <span class="stat-label">
+                        Published Proposals
+                    </span>
+
                     <strong id="statApproved">0</strong>
+
                     <span class="stat-description">
-                        Accepted by administrators
+                        Proposals available to vote
                     </span>
                 </article>
 
                 <article class="dashboard-stat-card">
-                    <span class="stat-label">Votes Cast</span>
+                    <span class="stat-label">
+                        Votes Cast
+                    </span>
+
                     <strong id="statVotes">0</strong>
+
                     <span class="stat-description">
-                        Your participation
+                        Your voting participation
                     </span>
                 </article>
+
             </section>
+
+            <!-- MY PROPOSALS -->
 
             <section class="dashboard-section">
 
                 <div class="dashboard-section-header">
+
                     <div>
                         <h2>My Proposals</h2>
                         <p>
-                            Follow the status and results
-                            of your submitted ideas.
+                            Follow your submitted proposals,
+                            publication decisions and voting results.
                         </p>
                     </div>
 
                     <span
                         id="proposalCount"
                         class="dashboard-count"
-                    >0 proposals</span>
+                    >
+                        0 proposals
+                    </span>
+
                 </div>
 
                 <div
@@ -137,21 +203,68 @@
 
             </section>
 
+            <!-- MY DEBATES -->
+
             <section class="dashboard-section">
 
                 <div class="dashboard-section-header">
+
+                    <div>
+                        <h2>My Debates</h2>
+                        <p>
+                            Track the discussions you've started
+                            and their moderation status.
+                        </p>
+                    </div>
+
+                    <div class="dashboard-section-actions">
+
+                        <a
+                            href="debates.html"
+                            class="dashboard-section-link"
+                        >
+                            Browse debates →
+                        </a>
+
+                        <span
+                            id="debateCount"
+                            class="dashboard-count"
+                        >
+                            0 debates
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="myDebates"
+                    class="dashboard-card-list"
+                ></div>
+
+            </section>
+
+            <!-- MY VOTES -->
+
+            <section class="dashboard-section">
+
+                <div class="dashboard-section-header">
+
                     <div>
                         <h2>My Votes</h2>
                         <p>
-                            See the proposals you've voted on
-                            and their current results.
+                            Review the proposals you've voted on
+                            and their community results.
                         </p>
                     </div>
 
                     <span
                         id="voteCount"
                         class="dashboard-count"
-                    >0 votes</span>
+                    >
+                        0 votes
+                    </span>
+
                 </div>
 
                 <div

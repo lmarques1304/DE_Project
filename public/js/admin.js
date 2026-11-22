@@ -1,48 +1,131 @@
-/* ADMIN DASHBOARD */
+
+/* =========================================================
+   ADMIN DASHBOARD — INSTANT DEMOCRACY
+   ========================================================= */
 
 (() => {
-    const accessMessage = document.getElementById("adminAccessMessage");
-    const adminContent = document.getElementById("adminContent");
-    const proposalList = document.getElementById("adminProposalList");
-    const statusFilter = document.getElementById("adminStatusFilter");
-    const feedback = document.getElementById("adminFeedback");
-    const logoutButton = document.getElementById("adminLogout");
+
+    /* =====================================================
+       ELEMENTS
+       ===================================================== */
+
+    const accessMessage =
+        document.getElementById("adminAccessMessage");
+
+    const adminContent =
+        document.getElementById("adminContent");
+
+    const pageTitle =
+        document.getElementById("adminPageTitle");
+
+    const pageSubtitle =
+        document.getElementById("adminPageSubtitle");
+
+    const adminName =
+        document.getElementById("adminName");
+
+    const logoutButton =
+        document.getElementById("adminLogout");
+
+    const navigationButtons =
+        document.querySelectorAll("[data-view]");
+
+    const proposalSection =
+        document.getElementById("adminProposalsSection");
+
+    const debateSection =
+        document.getElementById("adminDebatesSection");
+
+    const proposalList =
+        document.getElementById("adminProposalList");
+
+    const debateList =
+        document.getElementById("adminDebateList");
+
+    const proposalFilter =
+        document.getElementById("adminStatusFilter");
+
+    const debateFilter =
+        document.getElementById("adminDebateStatusFilter");
+
+    const proposalFeedback =
+        document.getElementById("adminFeedback");
+
+    const debateFeedback =
+        document.getElementById("adminDebateFeedback");
+
+    const navProposalCount =
+        document.getElementById("navProposalCount");
+
+    const navDebateCount =
+        document.getElementById("navDebateCount");
+
+    /* =====================================================
+       STATE
+       ===================================================== */
 
     let proposals = [];
+    let debates = [];
+
+    let currentView = "proposals";
     let busy = false;
 
+    /* =====================================================
+       CATEGORY NAMES
+       ===================================================== */
+
+    const CATEGORIES = {
+        "academic-life": "Academic Life",
+        "campus-mobility": "Campus Mobility",
+        "canteens-and-food": "Canteens and Food",
+        "events-and-traditions": "Events and Traditions",
+        "sports-and-culture": "Sports and Culture",
+        "student-well-being": "Student Well-Being",
+        "study-spaces": "Study Spaces",
+        "workshops-and-skills": "Workshops and Skills"
+    };
+
+    /* =====================================================
+       HELPERS
+       ===================================================== */
+
     function escapeHTML(value) {
-        return String(value ?? "").replace(/[&<>"']/g, character => {
-            const entities = {
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            };
+        return String(value ?? "").replace(
+            /[&<>"']/g,
+            character => {
 
-            return entities[character];
-        });
-    }
+                const entities = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                };
 
-    function showFeedback(message, type = "") {
-        feedback.textContent = message;
-        feedback.className = `admin-feedback ${type}`;
-    }
-
-    function updateStats(stats) {
-        document.getElementById("statTotal").textContent = stats.total;
-        document.getElementById("statPending").textContent = stats.pending;
-        document.getElementById("statApproved").textContent = stats.approved;
-        document.getElementById("statRejected").textContent = stats.rejected;
+                return entities[character];
+            }
+        );
     }
 
     function formatDate(value) {
-        if (!value) return "Unknown date";
+        if (!value) {
+            return "Unknown date";
+        }
 
-        const date = new Date(value.replace(" ", "T") + "Z");
+        let normalized = String(value);
 
-        if (Number.isNaN(date.getTime())) return value;
+        if (
+            /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)
+        ) {
+            normalized =
+                normalized.replace(" ", "T") + "Z";
+        }
+
+        const date = new Date(normalized);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
 
         return date.toLocaleDateString("en-GB", {
             day: "numeric",
@@ -52,11 +135,17 @@
     }
 
     function formatDeadline(value) {
-        if (!value) return "Not specified";
+        if (!value) {
+            return "Not specified";
+        }
 
-        const date = new Date(`${value}T12:00:00Z`);
+        const date = new Date(
+            `${value}T12:00:00Z`
+        );
 
-        if (Number.isNaN(date.getTime())) return value;
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
 
         return date.toLocaleDateString("en-GB", {
             day: "numeric",
@@ -67,222 +156,699 @@
     }
 
     function getPortugalToday() {
-        return new Intl.DateTimeFormat("en-CA", {
-            timeZone: "Europe/Lisbon",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
-        }).format(new Date());
+        const parts = new Intl.DateTimeFormat(
+            "en-GB",
+            {
+                timeZone: "Europe/Lisbon",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }
+        ).formatToParts(new Date());
+
+        const get = type =>
+            parts.find(part => part.type === type).value;
+
+        return `${get("year")}-${get("month")}-${get("day")}`;
     }
 
-    function getPublicationStatusLabel(status) {
-        if (status === "approved") return "Published";
-        if (status === "rejected") return "Publication Rejected";
+    function getCategoryName(category) {
+        return CATEGORIES[category] || category;
+    }
+
+    function getStatusLabel(status) {
+        if (status === "approved") {
+            return "Published";
+        }
+
+        if (status === "rejected") {
+            return "Rejected";
+        }
+
         return "Pending Review";
     }
 
-    function renderProposals() {
-        const selectedStatus = statusFilter.value;
+    function showFeedback(kind, message, type = "") {
+        const element =
+            kind === "proposal"
+                ? proposalFeedback
+                : debateFeedback;
 
-        const visibleProposals = proposals.filter(proposal => {
-            return selectedStatus === "all" ||
-                proposal.status === selectedStatus;
+        element.textContent = message;
+        element.className =
+            `admin-feedback ${type}`;
+    }
+
+    async function fetchJSON(url, options = {}) {
+        const response = await fetch(url, {
+            credentials: "same-origin",
+            cache: "no-store",
+            ...options
         });
 
-        if (visibleProposals.length === 0) {
+        const data = await response.json().catch(
+            () => ({})
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Something went wrong. Please try again."
+            );
+        }
+
+        return data;
+    }
+
+    /* =====================================================
+       STATISTICS
+       ===================================================== */
+
+    function updateStats() {
+        const items =
+            currentView === "proposals"
+                ? proposals
+                : debates;
+
+        const total = items.length;
+
+        const pending = items.filter(
+            item => item.status === "pending"
+        ).length;
+
+        const approved = items.filter(
+            item => item.status === "approved"
+        ).length;
+
+        const rejected = items.filter(
+            item => item.status === "rejected"
+        ).length;
+
+        document.getElementById(
+            "statTotalLabel"
+        ).textContent =
+            currentView === "proposals"
+                ? "Total proposals"
+                : "Total debates";
+
+        document.getElementById(
+            "statTotal"
+        ).textContent = total;
+
+        document.getElementById(
+            "statPending"
+        ).textContent = pending;
+
+        document.getElementById(
+            "statApproved"
+        ).textContent = approved;
+
+        document.getElementById(
+            "statRejected"
+        ).textContent = rejected;
+
+        navProposalCount.textContent =
+            proposals.filter(
+                item => item.status === "pending"
+            ).length;
+
+        navDebateCount.textContent =
+            debates.filter(
+                item => item.status === "pending"
+            ).length;
+    }
+
+    /* =====================================================
+       SWITCH DASHBOARD VIEW
+       ===================================================== */
+
+    function switchView(view) {
+        if (!["proposals", "debates"].includes(view)) {
+            return;
+        }
+
+        currentView = view;
+
+        proposalSection.hidden =
+            view !== "proposals";
+
+        debateSection.hidden =
+            view !== "debates";
+
+        navigationButtons.forEach(button => {
+            const active =
+                button.dataset.view === view;
+
+            button.classList.toggle(
+                "active",
+                active
+            );
+
+            button.setAttribute(
+                "aria-pressed",
+                String(active)
+            );
+        });
+
+        if (view === "proposals") {
+            pageTitle.textContent =
+                "Proposal Management";
+
+            pageSubtitle.textContent =
+                "Review proposals submitted by the community.";
+
+        } else {
+            pageTitle.textContent =
+                "Debate Management";
+
+            pageSubtitle.textContent =
+                "Review and moderate student discussions.";
+        }
+
+        updateStats();
+    }
+
+    navigationButtons.forEach(button => {
+        button.addEventListener(
+            "click",
+            () => {
+                switchView(
+                    button.dataset.view
+                );
+            }
+        );
+    });
+
+    /* =====================================================
+       REJECTION REASON DISPLAY
+       ===================================================== */
+
+    function renderRejectionReason(reason) {
+        if (!reason) {
+            return "";
+        }
+
+        return `
+            <div class="admin-rejection-reason">
+
+                <strong>
+                    Reason for rejection
+                </strong>
+
+                <p>${escapeHTML(reason)}</p>
+
+            </div>
+        `;
+    }
+
+    /* =====================================================
+       SHARED MODERATION CONTROLS
+       ===================================================== */
+
+    function renderModerationControls(
+        kind,
+        id,
+        approvalDisabled = false
+    ) {
+        const safeId = Number(id);
+
+        if (
+            !Number.isSafeInteger(safeId) ||
+            safeId <= 0
+        ) {
+            return "";
+        }
+
+        const itemName =
+            kind === "proposal"
+                ? "Proposal"
+                : "Debate";
+
+        return `
+            <div class="admin-actions">
+
+                <button
+                    type="button"
+                    class="admin-action-button admin-approve"
+                    data-action="approve"
+                    data-kind="${kind}"
+                    data-id="${safeId}"
+                    ${approvalDisabled ? "disabled" : ""}
+                >
+                    Publish ${itemName}
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-action-button admin-reject"
+                    data-action="reject"
+                    data-kind="${kind}"
+                    data-id="${safeId}"
+                >
+                    Reject Publication
+                </button>
+
+            </div>
+
+            <div
+                class="admin-rejection-form"
+                id="rejection-${kind}-${safeId}"
+                hidden
+            >
+
+                <label for="reason-${kind}-${safeId}">
+                    Reason for rejection
+                </label>
+
+                <textarea
+                    id="reason-${kind}-${safeId}"
+                    rows="4"
+                    minlength="10"
+                    maxlength="500"
+                    placeholder="Explain why this submission cannot be published..."
+                ></textarea>
+
+                <p>
+                    This explanation will be visible to
+                    the student. Minimum 10 characters,
+                    maximum 500.
+                </p>
+
+                <div class="admin-rejection-controls">
+
+                    <button
+                        type="button"
+                        class="admin-action-button admin-reject"
+                        data-action="confirm-reject"
+                        data-kind="${kind}"
+                        data-id="${safeId}"
+                    >
+                        Confirm Rejection
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-action-button"
+                        data-action="cancel-reject"
+                        data-kind="${kind}"
+                        data-id="${safeId}"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+    /* =====================================================
+       RENDER PROPOSALS
+       ===================================================== */
+
+    function renderProposals() {
+        const selectedStatus =
+            proposalFilter.value;
+
+        const visible = proposals.filter(
+            proposal =>
+                selectedStatus === "all" ||
+                proposal.status === selectedStatus
+        );
+
+        if (visible.length === 0) {
             proposalList.innerHTML = `
                 <div class="admin-empty">
                     No proposals found for this status.
                 </div>
             `;
+
             return;
         }
 
         const today = getPortugalToday();
 
-        proposalList.innerHTML = visibleProposals.map(proposal => {
-            const isPending = proposal.status === "pending";
-            const isAnonymous = proposal.anonymous === 1;
+        proposalList.innerHTML = visible.map(
+            proposal => {
 
-            const deadlineExpired =
-                !proposal.voting_deadline ||
-                proposal.voting_deadline < today;
+                const isPending =
+                    proposal.status === "pending";
 
-            const rejectionReason = proposal.rejection_reason
-                ? `
-                    <div class="admin-rejection-reason">
-                        <strong>Reason for publication rejection</strong>
-                        <p>${escapeHTML(proposal.rejection_reason)}</p>
-                    </div>
-                `
-                : "";
+                const isAnonymous =
+                    Number(proposal.anonymous) === 1;
 
-            return `
-                <article class="admin-proposal-card">
+                const isStudent =
+                    proposal.source === "student";
 
-                    <div class="admin-proposal-top">
-                        <div>
-                            <h3>${escapeHTML(proposal.title)}</h3>
+                const deadlineExpired =
+                    !proposal.voting_deadline ||
+                    proposal.voting_deadline < today;
 
-                            <div class="admin-proposal-meta">
-                                <span class="admin-tag">
-                                    ${escapeHTML(proposal.category)}
-                                </span>
+                const controls =
+                    isPending && isStudent
+                        ? renderModerationControls(
+                            "proposal",
+                            proposal.id,
+                            deadlineExpired
+                        )
+                        : "";
 
-                                <span class="admin-tag">
-                                    ${escapeHTML(proposal.source)}
-                                </span>
+                return `
+                    <article class="admin-proposal-card">
 
-                                <span class="admin-tag">
-                                    ${escapeHTML(formatDate(proposal.created_at))}
-                                </span>
+                        <div class="admin-proposal-top">
 
-                                ${isAnonymous
-                                    ? '<span class="admin-tag">Anonymous</span>'
-                                    : ""}
-                            </div>
-                        </div>
+                            <div>
 
-                        <span class="admin-tag ${escapeHTML(proposal.status)}">
-                            ${getPublicationStatusLabel(proposal.status)}
-                        </span>
-                    </div>
+                                <h3>
+                                    ${escapeHTML(proposal.title)}
+                                </h3>
 
-                    <p class="admin-proposal-description">
-                        ${escapeHTML(proposal.description)}
-                    </p>
+                                <div class="admin-proposal-meta">
 
-                    <div class="admin-author-info">
-                        <strong>Author information — Admin only</strong>
-                        <span>Name: ${escapeHTML(proposal.author_name)}</span>
-                        <span>Email: ${escapeHTML(proposal.author_email)}</span>
-                        <span>Account ID: ${escapeHTML(proposal.author_id)}</span>
-                        <span>Anonymous submission: ${isAnonymous ? "Yes" : "No"}</span>
-                        <span>Voting deadline: ${escapeHTML(formatDeadline(proposal.voting_deadline))}</span>
-                    </div>
+                                    <span class="admin-tag">
+                                        ${escapeHTML(
+                                            getCategoryName(proposal.category)
+                                        )}
+                                    </span>
 
-                    ${rejectionReason}
+                                    <span class="admin-tag">
+                                        ${escapeHTML(proposal.source)}
+                                    </span>
 
-                    ${isPending ? `
-                        <div class="admin-actions">
+                                    <span class="admin-tag">
+                                        ${escapeHTML(
+                                            formatDate(proposal.created_at)
+                                        )}
+                                    </span>
 
-                            <button
-                                type="button"
-                                class="admin-action-button admin-approve"
-                                data-id="${proposal.id}"
-                                data-status="approved"
-                                ${deadlineExpired ? "disabled" : ""}>
-                                Publish Proposal
-                            </button>
+                                    ${isAnonymous
+                                        ? '<span class="admin-tag">Anonymous</span>'
+                                        : ""}
 
-                            <button
-                                type="button"
-                                class="admin-action-button admin-reject"
-                                data-id="${proposal.id}"
-                                data-status="rejected">
-                                Reject Publication
-                            </button>
+                                </div>
 
-                        </div>
-
-                        ${deadlineExpired ? `
-                            <p class="admin-deadline-warning">
-                                The voting deadline has expired or is missing.
-                                This proposal cannot be published.
-                            </p>
-                        ` : ""}
-
-                        <div
-                            class="admin-rejection-form"
-                            id="rejectionForm-${proposal.id}"
-                            hidden>
-
-                            <label for="rejectionReason-${proposal.id}">
-                                Reason for rejection
-                            </label>
-
-                            <textarea
-                                id="rejectionReason-${proposal.id}"
-                                rows="4"
-                                minlength="10"
-                                maxlength="500"
-                                placeholder="Explain why this proposal cannot be published..."
-                            ></textarea>
-
-                            <p>
-                                This explanation will be visible to the student.
-                                Minimum 10 characters, maximum 500.
-                            </p>
-
-                            <div class="admin-rejection-controls">
-                                <button
-                                    type="button"
-                                    class="admin-action-button admin-reject"
-                                    data-confirm-rejection="${proposal.id}">
-                                    Confirm Rejection
-                                </button>
-
-                                <button
-                                    type="button"
-                                    class="admin-action-button"
-                                    data-cancel-rejection="${proposal.id}">
-                                    Cancel
-                                </button>
                             </div>
 
-                        </div>
-                    ` : ""}
+                            <span class="admin-tag ${escapeHTML(proposal.status)}">
+                                ${getStatusLabel(proposal.status)}
+                            </span>
 
-                </article>
-            `;
-        }).join("");
+                        </div>
+
+                        <p class="admin-proposal-description">${escapeHTML(proposal.description)}</p>
+
+                        <div class="admin-author-info">
+
+                            <strong>
+                                Author information — Admin only
+                            </strong>
+
+                            <span>
+                                Name: ${escapeHTML(proposal.author_name)}
+                            </span>
+
+                            <span>
+                                Email: ${escapeHTML(proposal.author_email)}
+                            </span>
+
+                            <span>
+                                Account ID: ${escapeHTML(proposal.author_id)}
+                            </span>
+
+                            <span>
+                                Anonymous submission:
+                                ${isAnonymous ? "Yes" : "No"}
+                            </span>
+
+                            <span>
+                                Voting deadline:
+                                ${escapeHTML(
+                                    formatDeadline(proposal.voting_deadline)
+                                )}
+                            </span>
+
+                        </div>
+
+                        ${renderRejectionReason(
+                            proposal.rejection_reason
+                        )}
+
+                        ${controls}
+
+                        ${isPending && isStudent && deadlineExpired
+                            ? `
+                                <p class="admin-deadline-warning">
+                                    The voting deadline has expired or is
+                                    missing. This proposal cannot be published.
+                                </p>
+                            `
+                            : ""}
+
+                        ${isPending && !isStudent
+                            ? `
+                                <p class="admin-inline-note">
+                                    This submission is not eligible for
+                                    student proposal moderation.
+                                </p>
+                            `
+                            : ""}
+
+                    </article>
+                `;
+            }
+        ).join("");
     }
+
+    /* =====================================================
+       RENDER DEBATES
+       ===================================================== */
+
+    function renderDebates() {
+        const selectedStatus =
+            debateFilter.value;
+
+        const visible = debates.filter(
+            debate =>
+                selectedStatus === "all" ||
+                debate.status === selectedStatus
+        );
+
+        if (visible.length === 0) {
+            debateList.innerHTML = `
+                <div class="admin-empty">
+                    No debates found for this status.
+                </div>
+            `;
+
+            return;
+        }
+
+        debateList.innerHTML = visible.map(
+            debate => {
+
+                const isPending =
+                    debate.status === "pending";
+
+                const isAnonymous =
+                    Number(debate.anonymous) === 1;
+
+                const controls = isPending
+                    ? renderModerationControls(
+                        "debate",
+                        debate.id
+                    )
+                    : "";
+
+                return `
+                    <article class="admin-proposal-card">
+
+                        <div class="admin-proposal-top">
+
+                            <div>
+
+                                <h3>
+                                    ${escapeHTML(debate.title)}
+                                </h3>
+
+                                <div class="admin-proposal-meta">
+
+                                    <span class="admin-tag">
+                                        ${escapeHTML(
+                                            getCategoryName(debate.category)
+                                        )}
+                                    </span>
+
+                                    <span class="admin-tag">
+                                        ${escapeHTML(
+                                            formatDate(debate.created_at)
+                                        )}
+                                    </span>
+
+                                    ${isAnonymous
+                                        ? '<span class="admin-tag">Anonymous</span>'
+                                        : ""}
+
+                                </div>
+
+                            </div>
+
+                            <span class="admin-tag ${escapeHTML(debate.status)}">
+                                ${getStatusLabel(debate.status)}
+                            </span>
+
+                        </div>
+
+                        <p class="admin-proposal-description">${escapeHTML(debate.description)}</p>
+
+                        <div class="admin-author-info">
+
+                            <strong>
+                                Author information — Admin only
+                            </strong>
+
+                            <span>
+                                Name: ${escapeHTML(debate.author_name)}
+                            </span>
+
+                            <span>
+                                Email: ${escapeHTML(debate.author_email)}
+                            </span>
+
+                            <span>
+                                Account ID: ${escapeHTML(debate.author_id)}
+                            </span>
+
+                            <span>
+                                Anonymous submission:
+                                ${isAnonymous ? "Yes" : "No"}
+                            </span>
+
+                        </div>
+
+                        ${renderRejectionReason(
+                            debate.rejection_reason
+                        )}
+
+                        <a
+                            class="admin-debate-link"
+                            href="debate.html?id=${Number(debate.id)}"
+                        >
+                            View Debate
+                        </a>
+
+                        ${controls}
+
+                    </article>
+                `;
+            }
+        ).join("");
+    }
+
+    /* =====================================================
+       LOAD PROPOSALS
+       ===================================================== */
 
     async function loadProposals() {
-        const response = await fetch("/api/admin/proposals", {
-            credentials: "same-origin",
-            cache: "no-store"
-        });
+        const data = await fetchJSON(
+            "/api/admin/proposals"
+        );
 
-        if (!response.ok) {
-            throw new Error("Unable to load proposals.");
-        }
+        proposals = data.proposals || [];
 
-        const data = await response.json();
-
-        proposals = data.proposals;
-        updateStats(data.stats);
         renderProposals();
+        updateStats();
     }
 
-    async function moderateProposal(id, status, rejectionReason = "") {
-        if (busy) return;
+    /* =====================================================
+       LOAD DEBATES
+       ===================================================== */
 
-        if (status === "approved") {
-            const confirmed = window.confirm(
-                "Publish this proposal and make it available for community voting?"
-            );
+    async function loadDebates() {
+        const data = await fetchJSON(
+            "/api/admin/debates"
+        );
 
-            if (!confirmed) return;
-        }
+        debates = data.debates || [];
 
-        busy = true;
+        renderDebates();
+        updateStats();
+    }
 
-        proposalList.querySelectorAll(
+    /* =====================================================
+       BUSY STATE
+       ===================================================== */
+
+    function setBusy(value) {
+        busy = value;
+
+        document.querySelectorAll(
             ".admin-action-button"
         ).forEach(button => {
-            button.disabled = true;
+
+            if (value) {
+                if (!button.disabled) {
+                    button.disabled = true;
+                    button.dataset.busyDisabled = "true";
+                }
+            } else if (
+                button.dataset.busyDisabled === "true"
+            ) {
+                button.disabled = false;
+                delete button.dataset.busyDisabled;
+            }
+
         });
+    }
+
+    /* =====================================================
+       MODERATE SUBMISSION
+       ===================================================== */
+
+    async function moderateItem(
+        kind,
+        id,
+        status,
+        rejectionReason = ""
+    ) {
+        if (busy) {
+            return;
+        }
+
+        if (status === "approved") {
+            const itemName =
+                kind === "proposal"
+                    ? "proposal"
+                    : "debate";
+
+            const confirmed = window.confirm(
+                `Publish this ${itemName} and make it visible to the community?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+        }
+
+        const endpoint =
+            kind === "proposal"
+                ? `/api/admin/proposals/${id}/status`
+                : `/api/admin/debates/${id}/status`;
+
+        setBusy(true);
+        showFeedback(kind, "");
 
         try {
-            const response = await fetch(
-                `/api/admin/proposals/${id}/status`,
+
+            const data = await fetchJSON(
+                endpoint,
                 {
                     method: "PATCH",
+
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    credentials: "same-origin",
+
                     body: JSON.stringify({
                         status,
                         rejectionReason
@@ -290,149 +856,273 @@
                 }
             );
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "Unable to review proposal."
-                );
-            }
-
-            await loadProposals();
-
-            showFeedback(data.message, "success");
-        } catch (error) {
-            showFeedback(error.message, "error");
-
-            try {
+            if (kind === "proposal") {
                 await loadProposals();
-            } catch (refreshError) {
-                console.error(refreshError);
+            } else {
+                await loadDebates();
             }
+
+            showFeedback(
+                kind,
+                data.message ||
+                    "Submission reviewed successfully.",
+                "success"
+            );
+
+        } catch (error) {
+
+            showFeedback(
+                kind,
+                error.message,
+                "error"
+            );
+
         } finally {
-            busy = false;
-
-            proposalList.querySelectorAll(
-                ".admin-action-button"
-            ).forEach(button => {
-                button.disabled = false;
-            });
-
-            renderProposals();
+            setBusy(false);
         }
     }
 
-    proposalList.addEventListener("click", event => {
-        const button = event.target.closest("button");
+    /* =====================================================
+       HANDLE MODERATION BUTTONS
+       ===================================================== */
 
-        if (!button || busy) return;
-
-        const id = Number(
-            button.dataset.id ||
-            button.dataset.confirmRejection ||
-            button.dataset.cancelRejection
+    function handleModerationClick(event) {
+        const button = event.target.closest(
+            "button[data-action]"
         );
 
-        if (!Number.isSafeInteger(id) || id <= 0) return;
-
-        if (button.dataset.cancelRejection) {
-            const form = document.getElementById(
-                `rejectionForm-${id}`
-            );
-
-            if (form) form.hidden = true;
+        if (!button || busy || button.disabled) {
             return;
         }
 
-        if (button.dataset.confirmRejection) {
-            const textarea = document.getElementById(
-                `rejectionReason-${id}`
-            );
+        const kind = button.dataset.kind;
+        const action = button.dataset.action;
 
-            const reason = textarea?.value.trim() || "";
+        const id = Number(
+            button.dataset.id
+        );
 
-            if (reason.length < 10 || reason.length > 500) {
-                showFeedback(
-                    "Please provide a rejection reason between 10 and 500 characters.",
-                    "error"
-                );
-                textarea?.focus();
-                return;
-            }
-
-            moderateProposal(id, "rejected", reason);
+        if (
+            !["proposal", "debate"].includes(kind) ||
+            !Number.isSafeInteger(id) ||
+            id <= 0
+        ) {
             return;
         }
 
-        if (button.dataset.status === "rejected") {
-            const form = document.getElementById(
-                `rejectionForm-${id}`
-            );
+        const form = document.getElementById(
+            `rejection-${kind}-${id}`
+        );
 
+        /* ---------------------------------
+           SHOW REJECTION FORM
+           --------------------------------- */
+
+        if (action === "reject") {
             if (form) {
                 form.hidden = false;
 
                 document.getElementById(
-                    `rejectionReason-${id}`
+                    `reason-${kind}-${id}`
                 )?.focus();
             }
 
             return;
         }
 
-        if (button.dataset.status === "approved") {
-            moderateProposal(id, "approved");
-        }
-    });
+        /* ---------------------------------
+           CANCEL REJECTION
+           --------------------------------- */
 
-    statusFilter.addEventListener("change", renderProposals);
-
-    logoutButton.addEventListener("click", async () => {
-        try {
-            const response = await fetch("/api/auth/logout", {
-                method: "POST",
-                credentials: "same-origin"
-            });
-
-            if (!response.ok) {
-                throw new Error("Logout failed.");
+        if (action === "cancel-reject") {
+            if (form) {
+                form.hidden = true;
             }
 
-            window.location.href = "login.html";
-        } catch (error) {
-            showFeedback(
-                "Unable to log out. Please try again.",
-                "error"
-            );
+            return;
         }
-    });
 
-    async function initializeDashboard() {
-        try {
-            const response = await fetch("/api/auth/me", {
-                credentials: "same-origin"
-            });
+        /* ---------------------------------
+           CONFIRM REJECTION
+           --------------------------------- */
 
-            if (!response.ok) {
-                window.location.replace("login.html");
+        if (action === "confirm-reject") {
+            const textarea = document.getElementById(
+                `reason-${kind}-${id}`
+            );
+
+            const reason =
+                textarea?.value.trim() || "";
+
+            if (
+                reason.length < 10 ||
+                reason.length > 500
+            ) {
+                showFeedback(
+                    kind,
+                    "Please provide a rejection reason between 10 and 500 characters.",
+                    "error"
+                );
+
+                textarea?.focus();
                 return;
             }
 
-            const data = await response.json();
-            const user = data.user || data;
+            moderateItem(
+                kind,
+                id,
+                "rejected",
+                reason
+            );
+
+            return;
+        }
+
+        /* ---------------------------------
+           APPROVE
+           --------------------------------- */
+
+        if (action === "approve") {
+            moderateItem(
+                kind,
+                id,
+                "approved"
+            );
+        }
+    }
+
+    proposalList.addEventListener(
+        "click",
+        handleModerationClick
+    );
+
+    debateList.addEventListener(
+        "click",
+        handleModerationClick
+    );
+
+    /* =====================================================
+       STATUS FILTERS
+       ===================================================== */
+
+    proposalFilter.addEventListener(
+        "change",
+        renderProposals
+    );
+
+    debateFilter.addEventListener(
+        "change",
+        renderDebates
+    );
+
+    /* =====================================================
+       LOGOUT
+       ===================================================== */
+
+    logoutButton.addEventListener(
+        "click",
+        async () => {
+
+            logoutButton.disabled = true;
+
+            try {
+
+                await fetchJSON(
+                    "/api/auth/logout",
+                    {
+                        method: "POST"
+                    }
+                );
+
+                window.location.replace(
+                    "login.html"
+                );
+
+            } catch (error) {
+
+                showFeedback(
+                    currentView === "proposals"
+                        ? "proposal"
+                        : "debate",
+
+                    "Unable to log out. Please try again.",
+                    "error"
+                );
+
+                logoutButton.disabled = false;
+            }
+        }
+    );
+
+    /* =====================================================
+       INITIALIZE DASHBOARD
+       ===================================================== */
+
+    async function initializeDashboard() {
+        try {
+
+            const authData = await fetchJSON(
+                "/api/auth/me"
+            );
+
+            const user = authData.user;
+
+            if (!user) {
+                window.location.replace(
+                    "login.html"
+                );
+
+                return;
+            }
 
             if (user.role !== "admin") {
                 accessMessage.textContent =
                     "Access denied. This page is only available to administrators.";
+
                 return;
             }
 
-            await loadProposals();
+            adminName.textContent =
+                user.name || "Administrator";
+
+            const results = await Promise.allSettled([
+                loadProposals(),
+                loadDebates()
+            ]);
+
+            if (results[0].status === "rejected") {
+                showFeedback(
+                    "proposal",
+                    results[0].reason.message,
+                    "error"
+                );
+
+                proposalList.textContent =
+                    "Unable to load proposals.";
+            }
+
+            if (results[1].status === "rejected") {
+                showFeedback(
+                    "debate",
+                    results[1].reason.message,
+                    "error"
+                );
+
+                debateList.textContent =
+                    "Unable to load debates.";
+            }
+
+            switchView("proposals");
 
             accessMessage.hidden = true;
             adminContent.hidden = false;
+
         } catch (error) {
-            console.error("Dashboard error:", error);
+
+            console.error(
+                "Dashboard error:",
+                error
+            );
 
             accessMessage.textContent =
                 "Unable to load the dashboard. Please try again.";
@@ -440,4 +1130,5 @@
     }
 
     initializeDashboard();
+
 })();

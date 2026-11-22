@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,6 +18,8 @@
 
 <body class="student-dashboard-page organization-dashboard-page">
 
+    <!-- HEADER -->
+
     <header class="dashboard-header">
 
         <a href="index.html" class="dashboard-brand">
@@ -24,8 +27,9 @@
             <span>Instant Democracy</span>
         </a>
 
-        <nav class="dashboard-header-links">
+        <nav class="dashboard-header-links" aria-label="Main navigation">
             <a href="index.html">Home</a>
+            <a href="debates.html">Debates</a>
             <a href="vote.html">Vote</a>
             <a href="createProposal.html">Create Proposal</a>
         </nav>
@@ -51,7 +55,11 @@
 
     </header>
 
+    <!-- MAIN -->
+
     <main class="dashboard-main">
+
+        <!-- INTRODUCTION -->
 
         <section class="dashboard-intro">
 
@@ -70,7 +78,8 @@
 
                 <p class="dashboard-subtitle">
                     Manage your organization's proposals,
-                    monitor participation and follow voting results.
+                    monitor student participation and
+                    follow community voting results.
                 </p>
 
             </div>
@@ -85,6 +94,8 @@
 
         </section>
 
+        <!-- LOADING / ACCESS -->
+
         <div
             id="dashboardMessage"
             class="dashboard-message"
@@ -96,6 +107,8 @@
 
         <div id="dashboardContent" hidden>
 
+            <!-- STATISTICS -->
+
             <section
                 class="dashboard-stats"
                 aria-label="Organization statistics"
@@ -104,13 +117,13 @@
                 <article class="dashboard-stat-card">
 
                     <span class="stat-label">
-                        Total Proposals
+                        Published Proposals
                     </span>
 
                     <strong id="statTotal">0</strong>
 
                     <span class="stat-description">
-                        Published by your organization
+                        Proposals published by your organization
                     </span>
 
                 </article>
@@ -124,7 +137,7 @@
                     <strong id="statActive">0</strong>
 
                     <span class="stat-description">
-                        Currently open for voting
+                        Currently open to students
                     </span>
 
                 </article>
@@ -152,27 +165,25 @@
                     <strong id="statVotes">0</strong>
 
                     <span class="stat-description">
-                        Total student participation
+                        Total community participation
                     </span>
 
                 </article>
 
             </section>
 
+            <!-- PARTICIPATION OVERVIEW -->
+
             <section class="organization-overview">
 
                 <div class="organization-overview-header">
 
-                    <div>
+                    <h2>Participation Overview</h2>
 
-                        <h2>Participation Overview</h2>
-
-                        <p>
-                            A summary of how students have voted
-                            on your organization's proposals.
-                        </p>
-
-                    </div>
+                    <p>
+                        See how students have voted across
+                        your organization's published proposals.
+                    </p>
 
                 </div>
 
@@ -222,7 +233,10 @@
 
                 </div>
 
-                <div class="organization-overall-bar">
+                <div
+                    class="organization-overall-bar"
+                    aria-label="Overall voting distribution"
+                >
 
                     <div
                         id="overallYesBar"
@@ -245,6 +259,8 @@
 
             </section>
 
+            <!-- OUR PROPOSALS -->
+
             <section class="dashboard-section">
 
                 <div class="dashboard-section-header">
@@ -254,8 +270,8 @@
                         <h2>Our Proposals</h2>
 
                         <p>
-                            Track your published proposals,
-                            voting deadlines and community results.
+                            Follow your published proposals,
+                            voting deadlines and community decisions.
                         </p>
 
                     </div>

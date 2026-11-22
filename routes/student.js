@@ -1,3 +1,4 @@
+
 /* =========================================================
    STUDENT ROUTES
 
@@ -5,6 +6,7 @@
 
    - Student profile
    - Own proposals
+   - Proposal rejection reasons
    - Own voting history
    - Voting statistics
    ========================================================= */
@@ -13,6 +15,11 @@ const express = require("express");
 const db = require("../database/database");
 
 const router = express.Router();
+
+/* =========================================================
+   AUTHENTICATION
+   Only verified student accounts can access these routes.
+   ========================================================= */
 
 router.use((req, res, next) => {
     if (!req.session || !req.session.userId) {
@@ -46,9 +53,15 @@ router.use((req, res, next) => {
     next();
 });
 
+/* =========================================================
+   GET STUDENT DASHBOARD
+   ========================================================= */
+
 router.get("/dashboard", (req, res) => {
     try {
         const student = req.student;
+
+        /* MY PROPOSALS */
 
         const proposals = db.prepare(`
             SELECT
@@ -58,6 +71,7 @@ router.get("/dashboard", (req, res) => {
                 p.category,
                 p.anonymous,
                 p.status,
+                p.rejection_reason,
                 p.created_at,
                 p.voting_deadline,
 
@@ -80,6 +94,8 @@ router.get("/dashboard", (req, res) => {
               AND p.source = 'student'
             ORDER BY p.created_at DESC, p.id DESC
         `).all(student.id);
+
+        /* MY VOTES */
 
         const votes = db.prepare(`
             SELECT
@@ -114,6 +130,8 @@ router.get("/dashboard", (req, res) => {
             ORDER BY v.created_at DESC, v.id DESC
         `).all(student.id);
 
+        /* STATISTICS */
+
         const stats = {
             total_proposals: proposals.length,
 
@@ -132,12 +150,15 @@ router.get("/dashboard", (req, res) => {
             total_votes: votes.length
         };
 
+        /* RESPONSE */
+
         return res.json({
             student: {
                 id: student.id,
                 name: student.name,
                 email: student.email
             },
+
             stats,
             proposals,
             votes

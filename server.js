@@ -41,12 +41,14 @@ const proposalRoutes = require("./routes/proposals");
 const adminRoutes = require("./routes/admin");
 const studentRoutes = require("./routes/student");
 const organizationRoutes = require("./routes/organization");
+const debateRoutes = require("./routes/debates");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/proposals", proposalRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/organization", organizationRoutes);
+app.use("/api/debates", debateRoutes);
 
 /* =========================================================
    STATIC FILES

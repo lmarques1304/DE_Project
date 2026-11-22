@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,19 +6,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Community Platform</title>
+    <title>Home | Instant Democracy</title>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/home.css">
 </head>
 
-<body>
+<body class="home-page">
 
+    <!-- SHARED HEADER -->
     <header class="header">
 
-        <button class="icon-button" id="menuButton"
-                aria-label="Open navigation menu"
-                aria-expanded="false">
+        <button
+            class="icon-button"
+            id="menuButton"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="sidebar"
+        >
             <span></span>
             <span></span>
             <span></span>
@@ -29,194 +36,396 @@
 
         <div class="account-container">
 
-            <button class="account-button" id="accountButton"
-                    aria-label="Open account menu"
-                    aria-expanded="false">
-
-                <svg viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round" stroke-linejoin="round">
+            <button
+                class="account-button"
+                id="accountButton"
+                type="button"
+                aria-label="Open account menu"
+                aria-expanded="false"
+                aria-controls="accountDropdown"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                >
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
                 </svg>
-
             </button>
 
             <div class="account-dropdown" id="accountDropdown">
-                <a href="#">Sign in</a>
-                <a href="createProposal.html" class="nav-link">Create a Proposal</a>
+                <a href="login.html">Sign in</a>
+                <a href="register.html">Create account</a>
             </div>
 
         </div>
-
     </header>
 
+    <!-- SHARED NAVIGATION -->
     <div class="overlay" id="overlay"></div>
 
-    <nav class="sidebar" id="sidebar">
+    <nav
+        class="sidebar"
+        id="sidebar"
+        aria-label="Main navigation"
+    >
 
         <div class="sidebar-header">
+
             <h2>Explore</h2>
 
-            <button class="close-button" id="closeMenu">
+            <button
+                class="close-button"
+                id="closeMenu"
+                type="button"
+                aria-label="Close navigation menu"
+            >
                 &times;
             </button>
+
         </div>
 
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="vote.html" class="nav-link">Vote</a>
-        <a href="createProposal.html" class="nav-link">Create a Proposal</a>
-        <a href="approvedProposals.html" class="nav-link">Approved Proposals</a>
+        <!-- Navigation follows the user journey -->
+
+        <a href="index.html" class="nav-link">
+            Home
+        </a>
+
+        <a href="debates.html" class="nav-link">
+            Debates
+        </a>
+
+        <a href="createProposal.html" class="nav-link">
+            Create a Proposal
+        </a>
+
+        <a href="vote.html" class="nav-link">
+            Vote
+        </a>
+
+        <a href="approvedProposals.html" class="nav-link">
+            Approved Proposals
+        </a>
+
+        <a href="notPassedProposals.html" class="nav-link">
+            Unsuccessful Proposals
+        </a>
 
     </nav>
 
-    <main>
+    <!-- HOME CONTENT -->
+    <main class="home-main">
 
-        <section class="hero">
+        <!-- PAGE INTRODUCTION -->
+        <section class="home-intro">
 
-            <div class="hero-content">
+            <span class="home-eyebrow">
+                INSTANT DEMOCRACY
+            </span>
 
-                <span class="welcome-label">
-                    PARTICIPATE. CONNECT. MAKE A DIFFERENCE.
-                </span>
+            <h1>Your campus. Your voice.</h1>
 
-                <h1>
-                    Your voice.<br>
-                    Your community.<br>
-                    <span>Your future.</span>
-                </h1>
+            <p>
+                Explore discussions, share ideas and take part
+                in decisions that shape the University of Coimbra.
+            </p>
 
-                <p>
-                    A space where citizens come together to share ideas,
-                    participate in decisions and create positive change
-                    in their communities.
-                </p>
+        </section>
 
-                <a href="#participate" class="main-button">
-                    Get involved <span>→</span>
+        <!-- TOPICS TO DEBATE -->
+        <section
+            class="home-section topics-section"
+            id="topics"
+            aria-labelledby="topicsTitle"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <h2 id="topicsTitle">Topics to Debate</h2>
+
+                    <p>
+                        Discover conversations about student life.
+                    </p>
+                </div>
+
+            </div>
+
+            <details class="topics-disclosure">
+
+                <summary class="browse-topics-button">
+                    <span>Browse Topics</span>
+
+                    <span
+                        class="browse-arrow"
+                        aria-hidden="true"
+                    >
+                        &#8964;
+                    </span>
+                </summary>
+
+                <div class="topics-grid">
+
+                    <a
+                        href="debate.html?topic=academic-life"
+                        class="topic-card"
+                    >
+                        <span>Academic Life</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a
+                        href="debate.html?topic=campus-mobility"
+                        class="topic-card"
+                    >
+                        <span>Campus Mobility</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a
+                        href="debate.html?topic=canteens-and-food"
+                        class="topic-card"
+                    >
+                        <span>Canteens and Food</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a
+                        href="debate.html?topic=events-and-traditions"
+                        class="topic-card"
+                    >
+                        <span>Events and Traditions</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a
+                        href="debate.html?topic=sports-and-culture"
+                        class="topic-card"
+                    >
+                        <span>Sports and Culture</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a
+                        href="debate.html?topic=student-well-being"
+                        class="topic-card"
+                    >
+                        <span>Student Well-Being</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a
+                        href="debate.html?topic=study-spaces"
+                        class="topic-card"
+                    >
+                        <span>Study Spaces</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                    <a
+                        href="debate.html?topic=workshops-and-skills"
+                        class="topic-card"
+                    >
+                        <span>Workshops and Skills</span>
+                        <span aria-hidden="true">↗</span>
+                    </a>
+
+                </div>
+
+            </details>
+
+        </section>
+
+        <!-- COMMUNITY ACTIVITY -->
+        <div class="activity-heading">
+
+            <span class="home-eyebrow">
+                WHAT'S HAPPENING
+            </span>
+
+            <h2>Community Activity</h2>
+
+            <p>
+                Stay up to date with the latest discussions
+                and proposals.
+            </p>
+
+        </div>
+
+        <!-- RECENT DEBATES -->
+        <section
+            class="home-section activity-section"
+            id="recent-debates"
+            aria-labelledby="recentDebatesTitle"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <h2 id="recentDebatesTitle">
+                        Recent Debates
+                    </h2>
+
+                    <p>
+                        Join the latest campus conversations.
+                    </p>
+                </div>
+
+                <a href="debates.html" class="view-all">
+                    View all
+                    <span aria-hidden="true">→</span>
                 </a>
 
             </div>
 
-            <div class="hero-visual">
+            <div class="recent-grid" id="recentDebates">
 
-                <div class="visual-card">
-
-                    <span class="visual-label">YOUR COMMUNITY</span>
-
-                    <div class="visual-icon">✳</div>
-
-                    <h2>Change starts<br>with participation.</h2>
-
-                    <div class="visual-line"></div>
-
-                    <p>Every voice matters.</p>
-
+                <div class="empty-state">
+                    <p>
+                        Recent debates will appear here
+                        once connected to the database.
+                    </p>
                 </div>
-
-                <div class="visual-decoration"></div>
 
             </div>
 
         </section>
 
-        <section class="participate" id="participate">
+        <!-- PROPOSALS OPEN FOR VOTING -->
+        <section
+            class="home-section activity-section"
+            id="open-for-voting"
+            aria-labelledby="votingTitle"
+        >
 
             <div class="section-heading">
 
-                <span class="welcome-label">HOW TO PARTICIPATE</span>
+                <div>
+                    <h2 id="votingTitle">
+                        Proposals Open for Voting
+                    </h2>
 
-                <h2>Make your voice count.</h2>
+                    <p>
+                        Have your say on proposals currently
+                        being voted on.
+                    </p>
+                </div>
 
-                <p>
-                    Discover the different ways you can contribute
-                    to your community.
-                </p>
+                <a href="vote.html" class="view-all">
+                    View all
+                    <span aria-hidden="true">→</span>
+                </a>
 
             </div>
 
-            <div class="feature-cards">
+            <div
+                class="recent-grid"
+                id="recentVotingProposals"
+            >
 
-                <article class="feature-card">
-
-                    <span class="card-number">01</span>
-
-                    <div class="card-icon">✓</div>
-
-                    <h3>Vote</h3>
-
+                <div class="empty-state">
                     <p>
-                        Take part in community decisions and
-                        make your opinion heard.
+                        Recent voting proposals will appear here
+                        once connected to the database.
                     </p>
-
-                    <a href="vote.html">Explore voting →</a>
-
-                </article>
-
-                <article class="feature-card">
-
-                    <span class="card-number">02</span>
-
-                    <div class="card-icon">＋</div>
-
-                    <h3>Create a Proposal</h3>
-
-                    <p>
-                        Share your ideas and suggest solutions
-                        to improve your community.
-                    </p>
-                    <a href="createProposal.html">Share an idea →</a>
-
-                </article>
-
-                <article class="feature-card">
-
-                    <span class="card-number">03</span>
-
-                    <div class="card-icon">◎</div>
-
-                    <h3>Events</h3>
-
-                    <p>
-                        Discover local events and opportunities
-                        to connect with others.
-                    </p>
-
-                    <a href="approvedProposals.html">Discover events →</a>
-
-                </article>
+                </div>
 
             </div>
 
         </section>
 
-        <section class="about">
+        <!-- APPROVED PROPOSALS -->
+        <section
+            class="home-section activity-section"
+            id="approved-proposals"
+            aria-labelledby="approvedTitle"
+        >
 
-            <div class="about-content">
+            <div class="section-heading">
 
-                <span class="welcome-label">WHY IT MATTERS</span>
+                <div>
+                    <h2 id="approvedTitle">
+                        Approved Proposals
+                    </h2>
 
-                <h2>Better communities start with people.</h2>
+                    <p>
+                        Ideas that received a majority
+                        of favourable votes.
+                    </p>
+                </div>
 
-                <p>
-                    Meaningful change happens when people have
-                    the opportunity to participate. Our platform
-                    makes it easier for citizens to express their
-                    opinions, exchange ideas and help shape
-                    the future of their communities.
-                </p>
+                <a
+                    href="approvedProposals.html"
+                    class="view-all"
+                >
+                    View all
+                    <span aria-hidden="true">→</span>
+                </a>
 
             </div>
 
-            <div class="about-highlight">
+            <div
+                class="recent-grid"
+                id="recentApprovedProposals"
+            >
 
-                <span>YOUR OPINION</span>
-                <strong>MATTERS.</strong>
+                <div class="empty-state">
+                    <p>
+                        Recent approved proposals will appear here
+                        once connected to the database.
+                    </p>
+                </div>
 
-                <div class="highlight-line"></div>
+            </div>
 
-                <p>Be part of the decisions that shape your community.</p>
+        </section>
+
+        <!-- UNSUCCESSFUL PROPOSALS -->
+        <section
+            class="home-section activity-section"
+            id="unsuccessful-proposals"
+            aria-labelledby="unsuccessfulTitle"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <h2 id="unsuccessfulTitle">
+                        Unsuccessful Proposals
+                    </h2>
+
+                    <p>
+                        Proposals that did not receive
+                        a majority of favourable votes.
+                    </p>
+                </div>
+
+                <a
+                    href="notPassedProposals.html"
+                    class="view-all"
+                >
+                    View all
+                    <span aria-hidden="true">→</span>
+                </a>
+
+            </div>
+
+            <div
+                class="recent-grid"
+                id="recentNotPassedProposals"
+            >
+
+                <div class="empty-state">
+                    <p>
+                        Recent unsuccessful proposals will appear
+                        here once connected to the database.
+                    </p>
+                </div>
 
             </div>
 
@@ -224,20 +433,20 @@
 
     </main>
 
-    <footer>
+    <!-- FOOTER -->
+    <footer class="home-footer">
 
-        <a href="index.html" class="logo">
-            INSTANT<span>DEMOCRACY</span>
-        </a>
+        <p>
+            Instant Democracy · University of Coimbra
+        </p>
 
-        <p>Building stronger communities together.</p>
-
-        <span class="copyright">
-            © 2026 CivicSpace. All rights reserved.
-        </span>
+        <p>
+            © 2026 Instant Democracy
+        </p>
 
     </footer>
 
+    <!-- SHARED JAVASCRIPT -->
     <script src="js/script.js"></script>
 
 </body>

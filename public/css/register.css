@@ -1,15 +1,41 @@
-/* REGISTER PAGE — Instant Democracy */
+
+/* =========================================================
+   CREATE ACCOUNT PAGE
+   Additional styles for registration
+   ========================================================= */
+
+.auth-page--register {
+    padding-top: 45px;
+    padding-bottom: 65px;
+}
+
+.auth-page--register .auth-panel {
+    max-width: 420px;
+}
+
+.auth-page--register .auth-intro {
+    margin-bottom: 24px;
+}
+
+.auth-page--register .auth-field {
+    margin-bottom: 16px;
+}
+
+/* ---------- PASSWORD HINT ---------- */
 
 .register-hint {
     display: block;
-    margin-top: 7px;
-    color: var(--grey);
-    font-size: 12px;
+    margin-top: 2px;
+
+    color: #858e87;
+    font-size: 11px;
     line-height: 1.5;
 }
 
+/* ---------- REGISTRATION FEEDBACK ---------- */
+
 #registerMessage {
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 #registerMessage:empty {
@@ -19,11 +45,23 @@
 #registerSubmit:disabled {
     opacity: 0.65;
     cursor: not-allowed;
-    transform: none;
 }
 
+/* ---------- MOBILE ---------- */
+
 @media (max-width: 600px) {
+
+    .auth-page--register {
+        padding-top: 35px;
+        padding-bottom: 55px;
+    }
+
+    .auth-page--register .auth-panel {
+        max-width: 100%;
+    }
+
     .register-hint {
         font-size: 11px;
     }
+
 }

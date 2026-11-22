@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,126 +11,255 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
+
 <body class="admin-page">
 
     <div class="admin-layout">
 
         <!-- SIDEBAR -->
         <aside class="admin-sidebar">
+
             <a href="index.html" class="admin-brand">
-                <span class="brand-symbol">●</span>
-                <span>Instant Democracy</span>
+                INSTANT<span>DEMOCRACY</span>
             </a>
 
-            <div class="admin-sidebar-label">ADMINISTRATION</div>
+            <div class="admin-sidebar-label">
+                ADMINISTRATION
+            </div>
 
-            <nav class="admin-navigation">
-                <a href="admin.html" class="admin-nav-link active">
-                    Dashboard
-                </a>
+            <nav class="admin-navigation" aria-label="Admin navigation">
 
-                <a href="index.html" class="admin-nav-link">
+                <button
+                    type="button"
+                    class="admin-nav-link active"
+                    data-view="proposals"
+                    aria-pressed="true"
+                >
+                    <span>Proposals</span>
+                    <span class="admin-nav-count" id="navProposalCount">0</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-nav-link"
+                    data-view="debates"
+                    aria-pressed="false"
+                >
+                    <span>Debates</span>
+                    <span class="admin-nav-count" id="navDebateCount">0</span>
+                </button>
+
+                <a href="index.html" class="admin-nav-link admin-back-link">
                     Back to website
                 </a>
+
             </nav>
 
             <div class="admin-sidebar-bottom">
-                <span class="admin-role">Administrator</span>
-                <button id="adminLogout" class="admin-logout" type="button">
+
+                <div class="admin-account-info">
+                    <span class="admin-account-avatar">A</span>
+
+                    <div>
+                        <strong id="adminName">Administrator</strong>
+                        <span>Administrator account</span>
+                    </div>
+                </div>
+
+                <button
+                    id="adminLogout"
+                    class="admin-logout"
+                    type="button"
+                >
                     Log out
                 </button>
+
             </div>
+
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="admin-main">
 
-            <header class="admin-topbar">
-                <div>
-                    <p class="admin-eyebrow">MANAGEMENT AREA</p>
-                    <h1>Admin Dashboard</h1>
-                    <p class="admin-subtitle">
-                        Review proposals and manage community submissions.
-                    </p>
-                </div>
+            <div class="admin-main-inner">
 
-                <div class="admin-avatar" aria-label="Administrator">
-                    A
-                </div>
-            </header>
+                <!-- PAGE HEADER -->
+                <header class="admin-topbar">
 
-            <section id="adminAccessMessage"
-                     class="admin-access-message"
-                     role="status">
-                Checking administrator access...
-            </section>
+                    <div>
+                        <p class="admin-eyebrow">
+                            MANAGEMENT AREA
+                        </p>
 
-            <div id="adminContent" hidden>
+                        <h1 id="adminPageTitle">
+                            Proposal Management
+                        </h1>
 
-                <!-- STATISTICS -->
-                <section class="admin-stats" aria-label="Proposal statistics">
+                        <p
+                            class="admin-subtitle"
+                            id="adminPageSubtitle"
+                        >
+                            Review proposals submitted by the community.
+                        </p>
+                    </div>
 
-                    <article class="admin-stat-card">
-                        <span>Total proposals</span>
-                        <strong id="statTotal">0</strong>
-                        <small>All submissions</small>
-                    </article>
+                    <span class="admin-header-badge">
+                        ADMIN PANEL
+                    </span>
 
-                    <article class="admin-stat-card pending-stat">
-                        <span>Pending review</span>
-                        <strong id="statPending">0</strong>
-                        <small>Awaiting your decision</small>
-                    </article>
+                </header>
 
-                    <article class="admin-stat-card">
-                        <span>Approved</span>
-                        <strong id="statApproved">0</strong>
-                        <small>Accepted proposals</small>
-                    </article>
-
-                    <article class="admin-stat-card">
-                        <span>Rejected</span>
-                        <strong id="statRejected">0</strong>
-                        <small>Declined proposals</small>
-                    </article>
-
+                <!-- ACCESS CHECK -->
+                <section
+                    id="adminAccessMessage"
+                    class="admin-access-message"
+                    role="status"
+                >
+                    Checking administrator access...
                 </section>
 
-                <!-- PROPOSALS -->
-                <section class="admin-proposals">
+                <div id="adminContent" hidden>
 
-                    <div class="admin-section-heading">
-                        <div>
-                            <h2>Proposal Management</h2>
-                            <p>Review submissions from the community.</p>
+                    <!-- STATISTICS -->
+                    <section
+                        class="admin-stats"
+                        aria-label="Submission statistics"
+                    >
+
+                        <article class="admin-stat-card">
+                            <span id="statTotalLabel">
+                                Total proposals
+                            </span>
+
+                            <strong id="statTotal">0</strong>
+
+                            <small>All submissions</small>
+                        </article>
+
+                        <article class="admin-stat-card pending-stat">
+                            <span>Pending review</span>
+
+                            <strong id="statPending">0</strong>
+
+                            <small>Awaiting your decision</small>
+                        </article>
+
+                        <article class="admin-stat-card">
+                            <span>Approved</span>
+
+                            <strong id="statApproved">0</strong>
+
+                            <small>Published submissions</small>
+                        </article>
+
+                        <article class="admin-stat-card">
+                            <span>Rejected</span>
+
+                            <strong id="statRejected">0</strong>
+
+                            <small>Declined submissions</small>
+                        </article>
+
+                    </section>
+
+                    <!-- PROPOSALS VIEW -->
+                    <section
+                        id="adminProposalsSection"
+                        class="admin-management-section"
+                    >
+
+                        <div class="admin-section-heading">
+
+                            <div>
+                                <h2>Community Proposals</h2>
+
+                                <p>
+                                    Review proposals before they become
+                                    available for voting.
+                                </p>
+                            </div>
+
+                            <label class="admin-filter-label">
+                                Status
+
+                                <select id="adminStatusFilter">
+                                    <option value="pending">Pending</option>
+                                    <option value="all">All proposals</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </label>
+
                         </div>
 
-                        <label class="admin-filter-label">
-                            Status
-                            <select id="adminStatusFilter">
-                                <option value="pending">Pending</option>
-                                <option value="all">All proposals</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </label>
-                    </div>
+                        <p
+                            id="adminFeedback"
+                            class="admin-feedback"
+                            role="status"
+                            aria-live="polite"
+                        ></p>
 
-                    <div id="adminFeedback"
-                         class="admin-feedback"
-                         role="status"
-                         aria-live="polite"></div>
+                        <div
+                            id="adminProposalList"
+                            class="admin-proposal-list"
+                        ></div>
 
-                    <div id="adminProposalList" class="admin-proposal-list">
-                    </div>
+                    </section>
 
-                </section>
+                    <!-- DEBATES VIEW -->
+                    <section
+                        id="adminDebatesSection"
+                        class="admin-management-section"
+                        hidden
+                    >
+
+                        <div class="admin-section-heading">
+
+                            <div>
+                                <h2>Community Debates</h2>
+
+                                <p>
+                                    Approve new discussions before
+                                    students can participate.
+                                </p>
+                            </div>
+
+                            <label class="admin-filter-label">
+                                Status
+
+                                <select id="adminDebateStatusFilter">
+                                    <option value="pending">Pending</option>
+                                    <option value="all">All debates</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </label>
+
+                        </div>
+
+                        <p
+                            id="adminDebateFeedback"
+                            class="admin-feedback"
+                            role="status"
+                            aria-live="polite"
+                        ></p>
+
+                        <div
+                            id="adminDebateList"
+                            class="admin-proposal-list"
+                        ></div>
+
+                    </section>
+
+                </div>
 
             </div>
 
         </main>
+
     </div>
 
     <script src="js/admin.js"></script>
+
 </body>
 </html>
