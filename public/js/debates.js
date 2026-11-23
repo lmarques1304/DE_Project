@@ -1,9 +1,5 @@
-
 (() => {
-
-    /* =====================================================
-       CATEGORIES
-       ===================================================== */
+    "use strict";
 
     const CATEGORIES = [
         {
@@ -63,10 +59,6 @@
         ])
     );
 
-    /* =====================================================
-       ELEMENTS
-       ===================================================== */
-
     const overviewView =
         document.getElementById("overviewView");
 
@@ -125,12 +117,7 @@
         document.getElementById("submitDebateButton");
 
     const newDebateCategory =
-        document.getElementById("newDebateCategory");
-
-    /* =====================================================
-       PAGE STATE
-       ===================================================== */
-
+        document.getElementById
     const urlParams = new URLSearchParams(
         window.location.search
     );
@@ -147,11 +134,7 @@
     let currentUser = null;
     let authError = false;
 
-    /* =====================================================
-       HELPERS
-       ===================================================== */
-
-    function createElement(tag, className, text) {
+    function createElement(tag, className = "", text) {
         const element = document.createElement(tag);
 
         if (className) {
@@ -159,7 +142,7 @@
         }
 
         if (text !== undefined) {
-            element.textContent = text;
+            element.textContent = String(text);
         }
 
         return element;
@@ -170,7 +153,9 @@
             return "";
         }
 
-        const text = value.trim().replace(/\s+/g, " ");
+        const text = value
+            .trim()
+            .replace(/\s+/g, " ");
 
         if (text.length <= maxLength) {
             return text;
@@ -184,10 +169,17 @@
             return "";
         }
 
-        const date = new Date(
-            value.replace(" ", "T") +
-            (value.includes("Z") ? "" : "Z")
-        );
+        let dateValue = String(value).trim();
+
+        if (
+            /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(
+                dateValue
+            )
+        ) {
+            dateValue = dateValue.replace(" ", "T") + "Z";
+        }
+
+        const date = new Date(dateValue);
 
         if (Number.isNaN(date.getTime())) {
             return "";
@@ -196,20 +188,25 @@
         return new Intl.DateTimeFormat("en-GB", {
             day: "numeric",
             month: "short",
-            year: "numeric"
+            year: "numeric",
+            timeZone: "Europe/Lisbon"
         }).format(date);
     }
 
     function debateCountText(count) {
-        return count === 1
+        const total = Number(count) || 0;
+
+        return total === 1
             ? "1 debate"
-            : `${count} debates`;
+            : `${total} debates`;
     }
 
     function commentCountText(count) {
-        return count === 1
+        const total = Number(count) || 0;
+
+        return total === 1
             ? "1 comment"
-            : `${count} comments`;
+            : `${total} comments`;
     }
 
     function showPageMessage(message, isError = false) {
@@ -241,15 +238,10 @@
         return data;
     }
 
-    /* =====================================================
-       AUTHENTICATION
-       ===================================================== */
-
     const authPromise = fetchJSON("/api/auth/me")
         .then(data => {
             currentUser = data.user || null;
 
-            // Only students can start debates.
             if (
                 currentUser &&
                 currentUser.role !== "student"
@@ -261,48 +253,68 @@
             authError = true;
         });
 
-    /* =====================================================
-       RECENT DEBATE PREVIEW
-       ===================================================== */
-
     function createRecentDebate(debate) {
         const link = createElement(
             "a",
             "debates-recent-item"
         );
 
-        link.href = `debate.html?id=${debate.id}`;
+        link.href =
+            `debate.html?id=${encodeURIComponent(debate.id)}`;
 
         const title = createElement(
             "span",
             "debates-recent-title",
-            debate.title
+            debate.title || "Untitled debate"
         );
 
-        const previewText = debate.topComment
-            ? `Most liked comment: "${shorten(debate.topComment, 110)}"`
-            : shorten(debate.description, 120);
-
-        const preview = createElement(
+        const description = createElement(
             "p",
             "debates-recent-preview",
-            previewText
+            shorten(debate.description, 180)
         );
 
         const meta = createElement(
-            "span",
-            "debates-recent-meta",
-            commentCountText(debate.commentCount)
+            "div",
+            "debates-recent-meta"
         );
 
-        link.append(title, preview, meta);
+        const date = formatDate(debate.createdAt);
+
+        if (date) {
+            meta.append(
+                createElement(
+                    "span",
+                    "",
+                    date
+                )
+            );
+
+            meta.append(
+                createElement(
+                    "span",
+                    "debates-recent-separator",
+                    "·"
+                )
+            );
+        }
+
+        meta.append(
+            createElement(
+                "span",
+                "",
+                commentCountText(debate.commentCount)
+            )
+        );
+
+        link.append(
+            title,
+            description,
+            meta
+        );
 
         return link;
     }
-
-    /* =====================================================
-       CATEGORY CARD
-       ===================================================== */
 
     function createCategoryCard(categoryData) {
         const info = categoryMap.get(
@@ -318,7 +330,7 @@
             "debates-category-card"
         );
 
-        // Card heading
+
         const top = createElement(
             "div",
             "debates-card-top"
@@ -338,20 +350,24 @@
 
         top.append(heading, badge);
 
-        // Category description
         const description = createElement(
             "p",
             "debates-card-description",
             info.description
         );
 
-        // Three most recent debates
         const recentList = createElement(
             "div",
             "debates-recent-list"
         );
 
-        if (categoryData.recentDebates.length === 0) {
+        const recentDebates = Array.isArray(
+            categoryData.recentDebates
+        )
+            ? categoryData.recentDebates
+            : [];
+
+        if (recentDebates.length === 0) {
             recentList.append(
                 createElement(
                     "p",
@@ -360,16 +376,13 @@
                 )
             );
         } else {
-            categoryData.recentDebates.forEach(
-                debate => {
-                    recentList.append(
-                        createRecentDebate(debate)
-                    );
-                }
-            );
+            recentDebates.forEach(debate => {
+                recentList.append(
+                    createRecentDebate(debate)
+                );
+            });
         }
 
-        // View all link
         const footer = createElement(
             "div",
             "debates-card-footer"
@@ -396,27 +409,26 @@
         return card;
     }
 
-    /* =====================================================
-       LOAD ALL CATEGORIES
-       ===================================================== */
-
     async function loadCategories() {
         try {
             const data = await fetchJSON(
-                "/api/debates/categories"
+                "/api/debates/categories",
+                {
+                    cache: "no-store"
+                }
             );
 
-            categoriesGrid.replaceChildren();
-
-            data.categories.forEach(category => {
-                const card = createCategoryCard(
-                    category
+            if (!Array.isArray(data.categories)) {
+                throw new Error(
+                    "Invalid categories response."
                 );
+            }
 
-                if (card) {
-                    categoriesGrid.append(card);
-                }
-            });
+            const cards = data.categories
+                .map(createCategoryCard)
+                .filter(Boolean);
+
+            categoriesGrid.replaceChildren(...cards);
 
         } catch (error) {
             categoriesGrid.replaceChildren(
@@ -434,22 +446,19 @@
         }
     }
 
-    /* =====================================================
-       FULL DEBATE LIST ITEM
-       ===================================================== */
-
     function createDebateListItem(debate) {
         const link = createElement(
             "a",
             "debates-list-item"
         );
 
-        link.href = `debate.html?id=${debate.id}`;
+        link.href =
+            `debate.html?id=${encodeURIComponent(debate.id)}`;
 
         const title = createElement(
             "h3",
             "",
-            debate.title
+            debate.title || "Untitled debate"
         );
 
         const description = createElement(
@@ -460,12 +469,14 @@
 
         link.append(title, description);
 
-        // Most liked comment preview
         if (debate.topComment) {
             const comment = createElement(
                 "p",
                 "debates-top-comment",
-                `Most liked comment: "${shorten(debate.topComment, 190)}"`
+                `Most liked comment: "${shorten(
+                    debate.topComment,
+                    190
+                )}"`
             );
 
             link.append(comment);
@@ -478,7 +489,9 @@
         const metaText = [
             commentCountText(debate.commentCount),
             date
-        ].filter(Boolean).join(" · ");
+        ]
+            .filter(Boolean)
+            .join(" · ");
 
         const meta = createElement(
             "div",
@@ -491,14 +504,18 @@
         return link;
     }
 
-    /* =====================================================
-       LOAD DEBATES FROM SELECTED CATEGORY
-       ===================================================== */
-
     async function loadCategoryDebates(reset = false) {
         if (!selectedCategory) {
             return;
         }
+
+        if (listController) {
+            listController.abort();
+        }
+
+        const controller = new AbortController();
+
+        listController = controller;
 
         if (reset) {
             nextOffset = 0;
@@ -513,15 +530,6 @@
 
             categoryCount.textContent = "";
         }
-
-        // Cancel any previous list request.
-        if (listController) {
-            listController.abort();
-        }
-
-        const controller = new AbortController();
-
-        listController = controller;
 
         loadMoreButton.disabled = true;
         loadMoreButton.hidden = true;
@@ -538,12 +546,19 @@
             const data = await fetchJSON(
                 `/api/debates?${params.toString()}`,
                 {
-                    signal: controller.signal
+                    signal: controller.signal,
+                    cache: "no-store"
                 }
             );
 
             if (listController !== controller) {
                 return;
+            }
+
+            if (!Array.isArray(data.debates)) {
+                throw new Error(
+                    "Invalid debates response."
+                );
             }
 
             if (reset) {
@@ -558,10 +573,12 @@
 
             nextOffset += data.debates.length;
 
-            categoryCount.textContent =
-                debateCountText(data.total);
+            const total = Number(data.total) || 0;
 
-            if (data.total === 0) {
+            categoryCount.textContent =
+                debateCountText(total);
+
+            if (total === 0) {
                 debatesList.append(
                     createElement(
                         "p",
@@ -572,7 +589,8 @@
             }
 
             loadMoreButton.hidden =
-                nextOffset >= data.total;
+                nextOffset >= total ||
+                data.debates.length === 0;
 
         } catch (error) {
             if (error.name === "AbortError") {
@@ -608,10 +626,6 @@
         }
     }
 
-    /* =====================================================
-       SEARCH AND SORT
-       ===================================================== */
-
     debateSearch.addEventListener("input", () => {
         clearTimeout(searchTimer);
 
@@ -622,16 +636,13 @@
 
     debateSort.addEventListener("change", () => {
         clearTimeout(searchTimer);
+
         loadCategoryDebates(true);
     });
 
     loadMoreButton.addEventListener("click", () => {
         loadCategoryDebates(false);
     });
-
-    /* =====================================================
-       START A DEBATE
-       ===================================================== */
 
     startDebateButton.addEventListener(
         "click",
@@ -643,6 +654,7 @@
                     "Unable to check your session. Please refresh the page.",
                     true
                 );
+
                 return;
             }
 
@@ -656,12 +668,12 @@
                     "Only student accounts can start debates.",
                     true
                 );
+
                 return;
             }
 
             createDebateMessage.textContent = "";
 
-            // Preselect the current category.
             if (
                 selectedCategory &&
                 categoryMap.has(selectedCategory)
@@ -687,10 +699,6 @@
         "click",
         closeDialog
     );
-
-    /* =====================================================
-       SUBMIT A NEW DEBATE
-       ===================================================== */
 
     createDebateForm.addEventListener(
         "submit",
@@ -751,16 +759,12 @@
         }
     );
 
-    /* =====================================================
-       INITIALIZE PAGE
-       ===================================================== */
-
     function initializePage() {
         if (
             selectedCategory &&
             categoryMap.has(selectedCategory)
         ) {
-            // Show debates from one category.
+
             const category = categoryMap.get(
                 selectedCategory
             );
@@ -783,7 +787,7 @@
             loadCategoryDebates(true);
 
         } else {
-            // Show all eight categories.
+
             overviewView.hidden = false;
             categoryView.hidden = true;
 
@@ -799,5 +803,17 @@
     }
 
     initializePage();
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+            if (
+                !document.hidden &&
+                !selectedCategory
+            ) {
+                loadCategories();
+            }
+        }
+    );
 
 })();

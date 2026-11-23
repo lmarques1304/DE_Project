@@ -1,14 +1,8 @@
-
 const express = require("express");
 const db = require("../database/database");
 
 const router = express.Router();
 
-/* =========================================================
-   DATABASE COMPATIBILITY
-   ========================================================= */
-
-// Add rejection_reason to existing debates if necessary.
 const debateColumns = db.prepare(
     "PRAGMA table_info(debates)"
 ).all();
@@ -32,10 +26,6 @@ if (
 const hasDebateAnonymousColumn = debateColumns.some(
     column => column.name === "anonymous"
 );
-
-/* =========================================================
-   HELPERS
-   ========================================================= */
 
 function getPortugalDate() {
     const parts = new Intl.DateTimeFormat(
@@ -68,10 +58,6 @@ function getRejectionReason(body) {
         : "";
 }
 
-/* =========================================================
-   ADMIN AUTHENTICATION
-   ========================================================= */
-
 router.use((req, res, next) => {
 
     if (!req.session || !req.session.userId) {
@@ -100,11 +86,6 @@ router.use((req, res, next) => {
 
     next();
 });
-
-/* =========================================================
-   GET ALL PROPOSALS
-   GET /api/admin/proposals
-   ========================================================= */
 
 router.get("/proposals", (req, res) => {
 
@@ -176,11 +157,6 @@ router.get("/proposals", (req, res) => {
         });
     }
 });
-
-/* =========================================================
-   MODERATE PROPOSAL
-   PATCH /api/admin/proposals/:id/status
-   ========================================================= */
 
 router.patch(
     "/proposals/:id/status",

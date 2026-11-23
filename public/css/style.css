@@ -1,62 +1,30 @@
-
-/* =========================================================
-   INSTANT DEMOCRACY
-   GLOBAL STYLES — SHARED BY ALL PAGES
-   ========================================================= */
-
-/* =========================================================
-   DESIGN SYSTEM
-   ========================================================= */
-
 :root {
-
-    /* Main colors */
     --green: #397d46;
     --green-dark: #286035;
     --green-light: #eef5ef;
     --green-soft: #e4f0e6;
-
-    /* Neutral colors */
     --white: #ffffff;
     --dark: #263128;
     --grey: #737e75;
     --grey-light: #8b948c;
-
-    /* Backgrounds and borders */
     --border: #e4eae5;
     --border-light: #edf0ed;
     --bg-soft: #f6f8f6;
-
-    /* Feedback colors */
     --error: #b42318;
     --error-bg: #fff5f4;
     --success-bg: #f2f8f3;
-
-    /* Border radius */
     --radius: 10px;
     --radius-sm: 7px;
     --radius-lg: 14px;
-
-    /* Transitions */
     --transition: 0.2s ease;
-
-    /* Layout */
     --header-h: 82px;
     --space-x: 10%;
     --space-y: 90px;
-
-    /* Content width */
     --content-width: 1120px;
-
-    /* Compatibility with existing pages */
     --main-color: var(--green);
     --light-pink: var(--green-light);
     --soft-pink: var(--green-soft);
 }
-
-/* =========================================================
-   RESPONSIVE VARIABLES
-   ========================================================= */
 
 @media (max-width: 900px) {
 
@@ -76,10 +44,6 @@
     }
 
 }
-
-/* =========================================================
-   GLOBAL RESET
-   ========================================================= */
 
 *,
 *::before,
@@ -141,10 +105,6 @@ img {
     display: none !important;
 }
 
-/* =========================================================
-   ACCESSIBILITY
-   ========================================================= */
-
 :focus-visible {
     outline: 2px solid var(--green);
     outline-offset: 3px;
@@ -154,10 +114,6 @@ img {
     background: var(--green-soft);
     color: var(--dark);
 }
-
-/* =========================================================
-   HEADER
-   ========================================================= */
 
 .header {
     position: relative;
@@ -175,10 +131,6 @@ img {
     background: var(--white);
     border-bottom: 1px solid var(--border);
 }
-
-/* =========================================================
-   LOGO
-   ========================================================= */
 
 .logo {
     display: inline-block;
@@ -202,10 +154,6 @@ img {
 .logo:hover {
     opacity: 0.8;
 }
-
-/* =========================================================
-   HAMBURGER MENU BUTTON
-   ========================================================= */
 
 .icon-button {
     display: flex;
@@ -236,10 +184,6 @@ img {
 .icon-button:hover span {
     background: var(--green);
 }
-
-/* =========================================================
-   ACCOUNT BUTTON
-   ========================================================= */
 
 .account-container {
     position: relative;
@@ -273,10 +217,6 @@ img {
     width: 23px;
     height: 23px;
 }
-
-/* =========================================================
-   ACCOUNT DROPDOWN
-   ========================================================= */
 
 .account-dropdown {
     display: none;
@@ -323,10 +263,6 @@ img {
     color: var(--green);
 }
 
-/* =========================================================
-   LOGGED-IN USER NAME
-   ========================================================= */
-
 .account-user-name {
     display: block;
 
@@ -340,10 +276,6 @@ img {
     background: var(--bg-soft);
     border-bottom: 1px solid var(--border);
 }
-
-/* =========================================================
-   SIGN OUT BUTTON
-   ========================================================= */
 
 .account-signout {
     display: block;
@@ -372,10 +304,6 @@ img {
     background: var(--green-light);
     color: var(--green);
 }
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
 
 .sidebar {
     position: fixed;
@@ -408,10 +336,6 @@ img {
     visibility: visible;
 }
 
-/* =========================================================
-   SIDEBAR HEADER
-   ========================================================= */
-
 .sidebar-header {
     display: flex;
     align-items: center;
@@ -429,10 +353,6 @@ img {
     font-weight: 700;
     letter-spacing: -0.5px;
 }
-
-/* =========================================================
-   CLOSE SIDEBAR BUTTON
-   ========================================================= */
 
 .close-button {
     display: grid;
@@ -457,10 +377,6 @@ img {
     color: var(--green);
     background: var(--green-light);
 }
-
-/* =========================================================
-   SIDEBAR NAVIGATION
-   ========================================================= */
 
 .nav-link {
     display: block;
@@ -491,10 +407,6 @@ img {
     font-weight: 700;
 }
 
-/* =========================================================
-   SIDEBAR OVERLAY
-   ========================================================= */
-
 .overlay {
     display: none;
 
@@ -510,10 +422,6 @@ img {
     display: block;
 }
 
-/* =========================================================
-   SHARED LABELS
-   ========================================================= */
-
 .welcome-label {
     display: inline-block;
 
@@ -524,10 +432,6 @@ img {
     line-height: 1.6;
     letter-spacing: 1.8px;
 }
-
-/* =========================================================
-   MAIN BUTTON
-   ========================================================= */
 
 .main-button {
     display: inline-flex;
@@ -573,10 +477,6 @@ img {
     line-height: 1;
 }
 
-/* =========================================================
-   SHARED CARDS
-   ========================================================= */
-
 .feature-card,
 .proposal-card {
     background: var(--white);
@@ -594,10 +494,6 @@ img {
     border-color: #b8d0bd;
     box-shadow: 0 5px 18px rgba(0, 0, 0, 0.035);
 }
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
 
 footer {
     display: flex;
@@ -625,10 +521,6 @@ footer p,
     line-height: 1.7;
 }
 
-/* =========================================================
-   RESPONSIVE — TABLET
-   ========================================================= */
-
 @media (max-width: 900px) {
 
     .header {
@@ -640,10 +532,6 @@ footer p,
     }
 
 }
-
-/* =========================================================
-   RESPONSIVE — MOBILE
-   ========================================================= */
 
 @media (max-width: 600px) {
 
@@ -706,10 +594,6 @@ footer p,
     }
 
 }
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
 

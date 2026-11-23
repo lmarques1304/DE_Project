@@ -1,13 +1,4 @@
-
-/* =========================================================
-   ADMIN DASHBOARD — INSTANT DEMOCRACY
-   ========================================================= */
-
 (() => {
-
-    /* =====================================================
-       ELEMENTS
-       ===================================================== */
 
     const accessMessage =
         document.getElementById("adminAccessMessage");
@@ -60,19 +51,10 @@
     const navDebateCount =
         document.getElementById("navDebateCount");
 
-    /* =====================================================
-       STATE
-       ===================================================== */
-
     let proposals = [];
     let debates = [];
-
     let currentView = "proposals";
     let busy = false;
-
-    /* =====================================================
-       CATEGORY NAMES
-       ===================================================== */
 
     const CATEGORIES = {
         "academic-life": "Academic Life",
@@ -84,10 +66,6 @@
         "study-spaces": "Study Spaces",
         "workshops-and-skills": "Workshops and Skills"
     };
-
-    /* =====================================================
-       HELPERS
-       ===================================================== */
 
     function escapeHTML(value) {
         return String(value ?? "").replace(
@@ -220,10 +198,6 @@
         return data;
     }
 
-    /* =====================================================
-       STATISTICS
-       ===================================================== */
-
     function updateStats() {
         const items =
             currentView === "proposals"
@@ -277,10 +251,6 @@
                 item => item.status === "pending"
             ).length;
     }
-
-    /* =====================================================
-       SWITCH DASHBOARD VIEW
-       ===================================================== */
 
     function switchView(view) {
         if (!["proposals", "debates"].includes(view)) {
@@ -339,10 +309,6 @@
         );
     });
 
-    /* =====================================================
-       REJECTION REASON DISPLAY
-       ===================================================== */
-
     function renderRejectionReason(reason) {
         if (!reason) {
             return "";
@@ -360,10 +326,6 @@
             </div>
         `;
     }
-
-    /* =====================================================
-       SHARED MODERATION CONTROLS
-       ===================================================== */
 
     function renderModerationControls(
         kind,
@@ -461,10 +423,6 @@
             </div>
         `;
     }
-
-    /* =====================================================
-       RENDER PROPOSALS
-       ===================================================== */
 
     function renderProposals() {
         const selectedStatus =
@@ -620,10 +578,6 @@
         ).join("");
     }
 
-    /* =====================================================
-       RENDER DEBATES
-       ===================================================== */
-
     function renderDebates() {
         const selectedStatus =
             debateFilter.value;
@@ -745,10 +699,6 @@
         ).join("");
     }
 
-    /* =====================================================
-       LOAD PROPOSALS
-       ===================================================== */
-
     async function loadProposals() {
         const data = await fetchJSON(
             "/api/admin/proposals"
@@ -760,10 +710,6 @@
         updateStats();
     }
 
-    /* =====================================================
-       LOAD DEBATES
-       ===================================================== */
-
     async function loadDebates() {
         const data = await fetchJSON(
             "/api/admin/debates"
@@ -774,10 +720,6 @@
         renderDebates();
         updateStats();
     }
-
-    /* =====================================================
-       BUSY STATE
-       ===================================================== */
 
     function setBusy(value) {
         busy = value;
@@ -800,10 +742,6 @@
 
         });
     }
-
-    /* =====================================================
-       MODERATE SUBMISSION
-       ===================================================== */
 
     async function moderateItem(
         kind,
@@ -882,10 +820,6 @@
         }
     }
 
-    /* =====================================================
-       HANDLE MODERATION BUTTONS
-       ===================================================== */
-
     function handleModerationClick(event) {
         const button = event.target.closest(
             "button[data-action]"
@@ -914,10 +848,6 @@
             `rejection-${kind}-${id}`
         );
 
-        /* ---------------------------------
-           SHOW REJECTION FORM
-           --------------------------------- */
-
         if (action === "reject") {
             if (form) {
                 form.hidden = false;
@@ -929,11 +859,6 @@
 
             return;
         }
-
-        /* ---------------------------------
-           CANCEL REJECTION
-           --------------------------------- */
-
         if (action === "cancel-reject") {
             if (form) {
                 form.hidden = true;
@@ -941,11 +866,6 @@
 
             return;
         }
-
-        /* ---------------------------------
-           CONFIRM REJECTION
-           --------------------------------- */
-
         if (action === "confirm-reject") {
             const textarea = document.getElementById(
                 `reason-${kind}-${id}`
@@ -977,11 +897,6 @@
 
             return;
         }
-
-        /* ---------------------------------
-           APPROVE
-           --------------------------------- */
-
         if (action === "approve") {
             moderateItem(
                 kind,
@@ -1001,10 +916,6 @@
         handleModerationClick
     );
 
-    /* =====================================================
-       STATUS FILTERS
-       ===================================================== */
-
     proposalFilter.addEventListener(
         "change",
         renderProposals
@@ -1014,10 +925,6 @@
         "change",
         renderDebates
     );
-
-    /* =====================================================
-       LOGOUT
-       ===================================================== */
 
     logoutButton.addEventListener(
         "click",
@@ -1053,10 +960,6 @@
             }
         }
     );
-
-    /* =====================================================
-       INITIALIZE DASHBOARD
-       ===================================================== */
 
     async function initializeDashboard() {
         try {

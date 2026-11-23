@@ -1,9 +1,4 @@
-
 (() => {
-
-    /* =====================================================
-       PAGE ELEMENTS
-       ===================================================== */
 
     const pageNotice =
         document.getElementById("pageNotice");
@@ -107,10 +102,6 @@
     const cancelReportButton =
         document.getElementById("cancelReportButton");
 
-    /* =====================================================
-       CATEGORIES
-       ===================================================== */
-
     const CATEGORIES = {
         "academic-life": "Academic Life",
         "campus-mobility": "Campus Mobility",
@@ -122,10 +113,6 @@
         "workshops-and-skills": "Workshops and Skills"
     };
 
-    /* =====================================================
-       PAGE STATE
-       ===================================================== */
-
     const params = new URLSearchParams(
         window.location.search
     );
@@ -136,15 +123,9 @@
 
     let currentUser = null;
     let authFailed = false;
-
     let currentDebate = null;
     let commentsController = null;
-
     let reportingCommentId = null;
-
-    /* =====================================================
-       HELPERS
-       ===================================================== */
 
     function createElement(tag, className, text) {
         const element = document.createElement(tag);
@@ -167,7 +148,6 @@
 
         let normalized = value;
 
-        // SQLite CURRENT_TIMESTAMP uses UTC.
         if (
             /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
         ) {
@@ -244,10 +224,6 @@
         debateError.hidden = false;
     }
 
-    /* =====================================================
-       AUTHENTICATION
-       ===================================================== */
-
     async function loadCurrentUser() {
         try {
             const data = await fetchJSON(
@@ -302,10 +278,6 @@
         }
     }
 
-    /* =====================================================
-       RENDER DEBATE
-       ===================================================== */
-
     function renderDebate(debate) {
         currentDebate = debate;
 
@@ -342,10 +314,6 @@
         debateContent.hidden = false;
         pageNotice.textContent = "";
 
-        /* -------------------------------------
-           PENDING OR REJECTED DEBATES
-           ------------------------------------- */
-
         if (debate.status !== "approved") {
             discussionSection.hidden = true;
             debateTopicActions.hidden = true;
@@ -377,20 +345,12 @@
             return;
         }
 
-        /* -------------------------------------
-           APPROVED DEBATES
-           ------------------------------------- */
-
         moderationNotice.hidden = true;
         debateTopicActions.hidden = false;
         discussionSection.hidden = false;
 
         updateParticipation();
     }
-
-    /* =====================================================
-       CREATE COMMENT CARD
-       ===================================================== */
 
     function createCommentCard(comment) {
         const card = createElement(
@@ -401,10 +361,6 @@
         if (comment.hidden) {
             card.classList.add("is-hidden");
         }
-
-        /* -------------------------------------
-           COMMENT HEADER
-           ------------------------------------- */
 
         const header = createElement(
             "div",
@@ -452,10 +408,6 @@
 
         header.append(identity, date);
 
-        /* -------------------------------------
-           COMMENT CONTENT
-           ------------------------------------- */
-
         const content = createElement(
             "p",
             "debate-comment-text",
@@ -463,10 +415,6 @@
         );
 
         card.append(header, content);
-
-        /* -------------------------------------
-           ADMIN-ONLY AUTHOR INFORMATION
-           ------------------------------------- */
 
         if (
             isAdmin() &&
@@ -482,10 +430,6 @@
             card.append(identityInfo);
         }
 
-        /* -------------------------------------
-           COMMENT ACTIONS
-           ------------------------------------- */
-
         const actions = createElement(
             "div",
             "debate-comment-actions"
@@ -493,7 +437,6 @@
 
         if (canComment() && !comment.hidden) {
 
-            // Like / Unlike
             const likeButton = createElement(
                 "button",
                 "debate-like-button",
@@ -513,7 +456,6 @@
 
             actions.append(likeButton);
 
-            // Report
             const reportButton = createElement(
                 "button",
                 "debate-report-button",
@@ -538,10 +480,6 @@
             );
 
         }
-
-        /* -------------------------------------
-           ADMIN MODERATION
-           ------------------------------------- */
 
         if (isAdmin()) {
             const visibilityButton = createElement(
@@ -576,10 +514,6 @@
 
         return card;
     }
-
-    /* =====================================================
-       LOAD COMMENTS
-       ===================================================== */
 
     async function loadComments() {
         if (!currentDebate) {
@@ -674,10 +608,6 @@
         }
     }
 
-    /* =====================================================
-       SORT COMMENTS
-       ===================================================== */
-
     commentsSort.addEventListener(
         "change",
         () => {
@@ -686,10 +616,6 @@
         }
     );
 
-    /* =====================================================
-       COMMENT CHARACTER COUNTER
-       ===================================================== */
-
     commentContent.addEventListener(
         "input",
         () => {
@@ -697,10 +623,6 @@
                 `${commentContent.value.length} / 1500`;
         }
     );
-
-    /* =====================================================
-       SUBMIT COMMENT
-       ===================================================== */
 
     commentForm.addEventListener(
         "submit",
@@ -757,7 +679,6 @@
                 commentCharacterCount.textContent =
                     "0 / 1500";
 
-                // Show the newly published comment first.
                 commentsSort.value = "recent";
 
                 await loadComments();
@@ -779,10 +700,6 @@
             }
         }
     );
-
-    /* =====================================================
-       COMMENT ACTIONS
-       ===================================================== */
 
     commentsList.addEventListener(
         "click",
@@ -812,10 +729,6 @@
                 return;
             }
 
-            /* ---------------------------------
-               LIKE / UNLIKE
-               --------------------------------- */
-
             if (action === "like") {
                 if (!canComment()) {
                     return;
@@ -844,10 +757,6 @@
                 }
             }
 
-            /* ---------------------------------
-               REPORT COMMENT
-               --------------------------------- */
-
             if (action === "report") {
                 if (!canComment()) {
                     return;
@@ -860,10 +769,6 @@
 
                 reportDialog.showModal();
             }
-
-            /* ---------------------------------
-               ADMIN: HIDE / RESTORE
-               --------------------------------- */
 
             if (action === "visibility") {
                 if (!isAdmin()) {
@@ -911,10 +816,6 @@
         }
     );
 
-    /* =====================================================
-       REPORT DIALOG
-       ===================================================== */
-
     function closeReport() {
         reportDialog.close();
         reportingCommentId = null;
@@ -936,10 +837,6 @@
             reportingCommentId = null;
         }
     );
-
-    /* =====================================================
-       SUBMIT COMMENT REPORT
-       ===================================================== */
 
     reportForm.addEventListener(
         "submit",
@@ -1007,10 +904,6 @@
         }
     );
 
-    /* =====================================================
-       LOAD DEBATE
-       ===================================================== */
-
     async function loadDebate() {
         if (
             !Number.isSafeInteger(debateId) ||
@@ -1043,10 +936,6 @@
             );
         }
     }
-
-    /* =====================================================
-       INITIALIZE PAGE
-       ===================================================== */
 
     async function initializePage() {
         await loadCurrentUser();

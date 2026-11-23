@@ -1,21 +1,23 @@
 
 /* =========================================================
-   CREATE PROPOSAL
+   CREATE PROPOSAL — Instant Democracy
 
    Students:
-   - Optional anonymity
+   - Public or anonymous proposals
    - Administrator approval required
 
-   UC / Núcleos:
-   - Always publicly identified
-   - Automatically published
+   UC:
+   - Publicly identified
+   - Immediate publication
 
    Administrators:
-   - Cannot submit proposals
+   - Cannot create proposals
    ========================================================= */
 
 (() => {
+
     const form = document.getElementById("proposalForm");
+
     if (!form) return;
 
     const titleInput =
@@ -27,17 +29,29 @@
     const descriptionInput =
         document.getElementById("proposalDescription");
 
+    const deadlineInput =
+        document.getElementById("proposalDeadline");
+
     const anonymousInput =
         document.getElementById("proposalAnonymous");
+
+    const publicInput =
+        document.getElementById("proposalPublic");
 
     const anonymousOption =
         document.getElementById("anonymousOption");
 
-    const deadlineInput =
-        document.getElementById("proposalDeadline");
+    const privacyNote =
+        document.getElementById("privacyNote");
+
+    const organizationIdentityNotice =
+        document.getElementById("organizationIdentityNotice");
 
     const descriptionCount =
         document.getElementById("descriptionCount");
+
+    const authNotice =
+        document.getElementById("createAuthNotice");
 
     const message =
         document.getElementById("proposalMessage");
@@ -45,45 +59,21 @@
     const submitButton =
         document.getElementById("proposalSubmit");
 
-    const authNotice =
-        document.getElementById("createAuthNotice");
-
-    const organizationIdentityNotice =
-        document.getElementById("organizationIdentityNotice");
-
     const submitDisclaimer =
         document.getElementById("submitDisclaimer");
 
-    const reviewStepTitle =
-        document.getElementById("reviewStepTitle");
-
-    const reviewStepDescription =
-        document.getElementById("reviewStepDescription");
-
-    const thirdStepDescription =
-        document.getElementById("thirdStepDescription");
-
-    const privacyCardTitle =
-        document.getElementById("privacyCardTitle");
-
-    const privacyCardDescription =
-        document.getElementById("privacyCardDescription");
-
-    const createIntroDescription =
+    const introDescription =
         document.getElementById("createIntroDescription");
-
-    const createFormDescription =
-        document.getElementById("createFormDescription");
-
-    let currentUser = null;
-    let sessionChecked = false;
-    let submitting = false;
 
     const allowedRoles = [
         "student",
         "uc",
         "nuclei"
     ];
+
+    let currentUser = null;
+    let sessionChecked = false;
+    let submitting = false;
 
     function isOrganization() {
         return currentUser &&
@@ -98,25 +88,13 @@
         );
     }
 
-    function showMessage(text, success = false) {
+    function showMessage(text, type = "error") {
         message.textContent = text;
-
-        message.style.color = success
-            ? "#16803c"
-            : "#b42318";
-    }
-
-    function getOrganizationName() {
-        if (!currentUser) return "";
-
-        return (
-            currentUser.organization ||
-            currentUser.name ||
-            "Your organization"
-        );
+        message.dataset.state = text ? type : "";
     }
 
     function getPortugalToday() {
+
         const parts = new Intl.DateTimeFormat("en-GB", {
             timeZone: "Europe/Lisbon",
             year: "numeric",
@@ -131,10 +109,9 @@
     }
 
     function getMinimumDeadline() {
-        const today = getPortugalToday();
 
         const tomorrow = new Date(
-            `${today}T12:00:00Z`
+            `${getPortugalToday()}T12:00:00Z`
         );
 
         tomorrow.setUTCDate(
@@ -144,124 +121,91 @@
         return tomorrow.toISOString().slice(0, 10);
     }
 
-    function updateDeadline() {
-        if (!deadlineInput) return;
+    function setDeadlineMinimum() {
 
-        const minimumDate = getMinimumDeadline();
+        const minimum = getMinimumDeadline();
 
-        deadlineInput.min = minimumDate;
+        deadlineInput.min = minimum;
 
-        if (
-            !deadlineInput.value ||
-            deadlineInput.value < minimumDate
-        ) {
-            deadlineInput.value = minimumDate;
+        if (!deadlineInput.value) {
+            deadlineInput.value = minimum;
         }
     }
 
-    descriptionInput.addEventListener("input", () => {
+    function updateDescriptionCount() {
         descriptionCount.textContent =
             `${descriptionInput.value.length} / 3000`;
-    });
+    }
+
+    descriptionInput.addEventListener(
+        "input",
+        updateDescriptionCount
+    );
 
     function configureStudentInterface() {
+
         anonymousOption.hidden = false;
+        privacyNote.hidden = false;
 
         organizationIdentityNotice.hidden = true;
 
         anonymousInput.disabled = false;
+        publicInput.disabled = false;
 
-        submitButton.textContent =
-            "Submit proposal";
+        submitButton.textContent = "SEND";
 
         submitDisclaimer.textContent =
             "Your proposal will be reviewed by an " +
             "administrator before it becomes public.";
 
-        reviewStepTitle.textContent =
-            "Review process";
-
-        reviewStepDescription.textContent =
-            "Our administrators review student " +
-            "proposals before publication.";
-
-        thirdStepDescription.textContent =
-            "Once approved, your proposal becomes " +
-            "available for students to vote on.";
-
-        privacyCardTitle.textContent =
-            "Your privacy matters.";
-
-        privacyCardDescription.textContent =
-            "Anonymous proposals do not display your " +
-            "identity publicly. Administrators can " +
-            "still identify the author for moderation purposes.";
-
-        createIntroDescription.textContent =
-            "Have an idea to improve university life? " +
-            "Share your proposal and help shape a better community.";
-
-        createFormDescription.textContent =
-            "Tell us what you would like to change. " +
-            "Be clear, constructive and respectful.";
+        introDescription.textContent =
+            "Share an idea to improve university life " +
+            "and help shape your community.";
     }
 
     function configureOrganizationInterface() {
-        const organizationName =
-            getOrganizationName();
 
-        anonymousInput.checked = false;
+        const organizationName =
+            currentUser.organization ||
+            currentUser.name ||
+            "Your organization";
+
+        publicInput.checked = true;
+
         anonymousInput.disabled = true;
+        publicInput.disabled = true;
+
         anonymousOption.hidden = true;
+        privacyNote.hidden = true;
 
         organizationIdentityNotice.hidden = false;
 
         organizationIdentityNotice.textContent =
-            `Publishing as: ${organizationName}. ` +
-            "Your organization's identity will be " +
-            "displayed publicly alongside this proposal.";
+            `Publishing as ${organizationName}. ` +
+            "Your organization's name will appear publicly.";
 
-        submitButton.textContent =
-            "Publish proposal";
+        submitButton.textContent = "PUBLISH";
 
         submitDisclaimer.textContent =
-            "Your proposal will be published immediately. " +
-            "No administrator approval is required.";
+            "Your proposal will be published immediately, " +
+            "without administrator approval.";
 
-        reviewStepTitle.textContent =
-            "Immediate publication";
-
-        reviewStepDescription.textContent =
-            "Verified organizations can publish proposals " +
-            "directly, without administrator approval.";
-
-        thirdStepDescription.textContent =
-            "Students can vote on your proposal as soon " +
-            "as it is published.";
-
-        privacyCardTitle.textContent =
-            "Official organization proposal";
-
-        privacyCardDescription.textContent =
-            "This proposal will be publicly attributed " +
-            "to your organization. Anonymous publication " +
-            "is not available for institutional accounts.";
-
-        createIntroDescription.textContent =
-            "Share initiatives with the university " +
-            "community and encourage student participation.";
-
-        createFormDescription.textContent =
-            `Create an official proposal on behalf of ` +
-            `${organizationName}. It will be published immediately.`;
+        introDescription.textContent =
+            "Publish an official initiative and " +
+            "invite students to participate.";
     }
 
+    /* AUTHENTICATION */
+
     async function checkAuthentication() {
+
         submitButton.disabled = true;
+
         sessionChecked = false;
         currentUser = null;
 
         try {
+
             const response = await fetch(
                 "/api/auth/me",
                 {
@@ -281,47 +225,39 @@
             sessionChecked = true;
 
             if (!currentUser) {
+
                 authNotice.hidden = false;
 
-                authNotice.replaceChildren(
-                    document.createTextNode(
-                        "You need to "
-                    )
-                );
-
-                const link =
-                    document.createElement("a");
+                const link = document.createElement("a");
 
                 link.href = "login.html";
                 link.textContent = "sign in";
 
-                authNotice.append(
+                authNotice.replaceChildren(
+                    document.createTextNode("Please "),
                     link,
                     document.createTextNode(
-                        " before submitting a proposal."
+                        " to submit a proposal."
                     )
                 );
 
-                submitButton.disabled = true;
                 return;
             }
 
             if (!allowedRoles.includes(currentUser.role)) {
+
                 authNotice.hidden = false;
 
                 authNotice.textContent =
                     "Your account does not have permission " +
                     "to create proposals.";
 
-                submitButton.disabled = true;
                 return;
             }
 
             if (currentUser.role === "student") {
                 configureStudentInterface();
-            }
-
-            if (isOrganization()) {
+            } else {
                 configureOrganizationInterface();
             }
 
@@ -329,6 +265,7 @@
             submitButton.disabled = false;
 
         } catch (error) {
+
             console.error(
                 "Authentication check error:",
                 error
@@ -339,12 +276,11 @@
             authNotice.textContent =
                 "Unable to verify your session. " +
                 "Please refresh the page.";
-
-            submitButton.disabled = true;
         }
     }
 
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", async event => {
+
         event.preventDefault();
 
         if (submitting) return;
@@ -352,9 +288,11 @@
         showMessage("");
 
         if (!canSubmit()) {
+
             showMessage(
                 "Please sign in with an authorized account."
             );
+
             return;
         }
 
@@ -366,32 +304,19 @@
             descriptionInput.value.trim();
 
         const anonymous =
-            currentUser.role === "student"
-                ? anonymousInput.checked
-                : false;
+            currentUser.role === "student" &&
+            anonymousInput.checked;
 
-        updateDeadline();
+        const votingDeadline = deadlineInput.value;
 
-        const votingDeadline =
-            deadlineInput.value;
+        setDeadlineMinimum();
 
-        if (
-            !votingDeadline ||
-            votingDeadline < deadlineInput.min
-        ) {
-            showMessage(
-                "Please select a deadline of tomorrow or later."
-            );
-            return;
-        }
+        if (title.length < 5 || title.length > 120) {
 
-        if (
-            title.length < 5 ||
-            title.length > 120
-        ) {
             showMessage(
                 "Title must contain between 5 and 120 characters."
             );
+
             return;
         }
 
@@ -399,16 +324,34 @@
             description.length < 30 ||
             description.length > 3000
         ) {
+
             showMessage(
-                "Description must contain between 30 and 3000 characters."
+                "Description must contain between " +
+                "30 and 3000 characters."
             );
+
             return;
         }
 
         if (!category) {
+
             showMessage(
                 "Please select a category."
             );
+
+            return;
+        }
+
+        if (
+            !votingDeadline ||
+            votingDeadline < deadlineInput.min
+        ) {
+
+            showMessage(
+                "Please select a voting deadline " +
+                "of tomorrow or later."
+            );
+
             return;
         }
 
@@ -417,10 +360,11 @@
 
         submitButton.textContent =
             isOrganization()
-                ? "Publishing proposal..."
-                : "Submitting proposal...";
+                ? "PUBLISHING..."
+                : "SENDING...";
 
         try {
+
             const response = await fetch(
                 "/api/proposals",
                 {
@@ -445,36 +389,31 @@
             const data = await response.json();
 
             if (!response.ok) {
+
                 throw new Error(
                     data.error ||
                     "Unable to submit proposal."
                 );
             }
 
-            const successMessage =
-                currentUser.role === "student"
-                    ? "Proposal submitted successfully! " +
-                      "It is now waiting for administrator approval."
-                    : "Proposal published successfully! " +
-                      "Students can now vote on it.";
-
             showMessage(
-                data.message || successMessage,
-                true
+                data.message || (
+                    isOrganization()
+                        ? "Proposal published successfully!"
+                        : "Proposal submitted for review!"
+                ),
+                "success"
             );
 
             form.reset();
 
-            descriptionCount.textContent =
-                "0 / 3000";
+            publicInput.checked = true;
 
-            updateDeadline();
-
-            if (isOrganization()) {
-                anonymousInput.checked = false;
-            }
+            updateDescriptionCount();
+            setDeadlineMinimum();
 
         } catch (error) {
+
             console.error(
                 "Proposal submission error:",
                 error
@@ -486,18 +425,20 @@
             );
 
         } finally {
+
             submitting = false;
 
             submitButton.disabled = !canSubmit();
 
             submitButton.textContent =
                 isOrganization()
-                    ? "Publish proposal"
-                    : "Submit proposal";
+                    ? "PUBLISH"
+                    : "SEND";
         }
     });
 
-    updateDeadline();
+    updateDescriptionCount();
+    setDeadlineMinimum();
     checkAuthentication();
 
 })();

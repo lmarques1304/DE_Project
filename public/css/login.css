@@ -1,11 +1,4 @@
 
-/* =========================================================
-   AUTHENTICATION PAGES
-   Login and Create Account
-   ========================================================= */
-
-/* ---------- GENERAL ---------- */
-
 .auth-body {
     margin: 0;
     background: #ffffff;
@@ -20,8 +13,6 @@
 .auth-body .logo span {
     color: #397d46;
 }
-
-/* ---------- PAGE LAYOUT ---------- */
 
 .auth-page {
     display: flex;
@@ -43,8 +34,6 @@
     width: 100%;
     max-width: 400px;
 }
-
-/* ---------- LOGIN / REGISTER TABS ---------- */
 
 .auth-tabs {
     display: flex;
@@ -94,8 +83,6 @@
     font-size: 14px;
 }
 
-/* ---------- INTRODUCTION ---------- */
-
 .auth-intro {
     margin-bottom: 29px;
 }
@@ -127,8 +114,6 @@
     font-size: 13px;
     line-height: 1.7;
 }
-
-/* ---------- FORM ---------- */
 
 .auth-form {
     width: 100%;
@@ -183,8 +168,6 @@
     box-shadow: 0 0 0 3px rgba(57, 125, 70, 0.11);
 }
 
-/* ---------- FEEDBACK MESSAGES ---------- */
-
 .auth-message {
     margin: 0;
     color: #b42318;
@@ -199,8 +182,6 @@
 .auth-message:not(:empty) {
     margin: 4px 0 16px;
 }
-
-/* ---------- SUBMIT BUTTON ---------- */
 
 .auth-submit {
     display: block;
@@ -240,8 +221,6 @@
     cursor: not-allowed;
 }
 
-/* ---------- BOTTOM LINK ---------- */
-
 .auth-bottom-link {
     margin: 23px 0 0;
 
@@ -261,15 +240,11 @@
     text-decoration: underline;
 }
 
-/* ---------- ACCESSIBILITY ---------- */
-
 .auth-tab:focus-visible,
 .auth-bottom-link a:focus-visible {
     outline: 3px solid #a5d5ab;
     outline-offset: 4px;
 }
-
-/* ---------- MOBILE ---------- */
 
 @media (max-width: 600px) {
 
@@ -303,8 +278,6 @@
     }
 
 }
-
-/* ---------- REDUCED MOTION ---------- */
 
 @media (prefers-reduced-motion: reduce) {
 

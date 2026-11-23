@@ -139,8 +139,6 @@
         );
     }
 
-    /* VOTING RESULTS */
-
     function createResults(item) {
         const yes = Number(item.yes_votes) || 0;
         const no = Number(item.no_votes) || 0;
@@ -210,8 +208,6 @@
 
         return wrapper;
     }
-
-    /* MY PROPOSALS */
 
     function createProposalCard(proposal) {
         const card = el("article", {
@@ -336,8 +332,6 @@
             ...proposals.map(createProposalCard)
         );
     }
-
-    /* MY DEBATES */
 
     function createDebateCard(debate) {
         const card = el("article", {
@@ -487,8 +481,6 @@
         }
     }
 
-    /* MY VOTES */
-
     function createVoteCard(vote) {
         const card = el("article", {
             className: "dashboard-item"
@@ -583,8 +575,6 @@
         );
     }
 
-    /* LOAD DASHBOARD */
-
     async function loadDashboard() {
         try {
             const response = await fetch(
@@ -660,8 +650,6 @@
             message.hidden = true;
             content.hidden = false;
 
-            // Debates load independently so an error here
-            // never prevents proposals and votes from appearing.
             await loadDebates();
 
         } catch (error) {

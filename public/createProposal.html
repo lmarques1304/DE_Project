@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -45,6 +46,7 @@
                     stroke-width="1.8"
                     stroke-linecap="round"
                     stroke-linejoin="round"
+                    aria-hidden="true"
                 >
                     <circle cx="12" cy="8" r="4"></circle>
                     <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
@@ -62,7 +64,7 @@
 
     <div class="overlay" id="overlay"></div>
 
-    <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar" aria-label="Main navigation">
 
         <div class="sidebar-header">
             <h2>Explore</h2>
@@ -77,349 +79,266 @@
         </div>
 
         <a href="index.html" class="nav-link">Home</a>
+        <a href="debates.html" class="nav-link">Debates</a>
         <a href="vote.html" class="nav-link">Vote</a>
         <a href="createProposal.html" class="nav-link">Create Proposal</a>
         <a href="approvedProposals.html" class="nav-link">Approved Proposals</a>
+        <a href="unsuccessfulProposals.html" class="nav-link">Unsuccessful Proposals</a>
 
     </nav>
 
     <main class="create-page">
 
-        <section class="create-intro">
+        <section
+            class="proposal-shell"
+            aria-labelledby="createProposalHeading"
+        >
 
-            <span class="welcome-label">
-                YOUR IDEAS MATTER.
-            </span>
+            <div class="proposal-topline">
 
-            <h1>
-                Turn your ideas into
-                <span>change.</span>
-            </h1>
+                <a
+                    href="index.html"
+                    class="proposal-back"
+                    aria-label="Back to home"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M15 18l-6-6 6-6"></path>
+                    </svg>
+                </a>
 
-            <p id="createIntroDescription">
-                Have an idea to improve university life?
-                Share your proposal and help shape
-                a better community.
-            </p>
+                <a href="index.html" class="proposal-cancel">
+                    CANCEL
+                </a>
 
-        </section>
+            </div>
 
-        <section class="create-content">
+            <div class="proposal-heading">
 
-            <div class="create-layout">
+                <h1 id="createProposalHeading">
+                    CREATE PROPOSAL
+                </h1>
 
-                <div class="create-form-area">
+                <p id="createIntroDescription">
+                    Share an idea to improve university life
+                    and help shape your community.
+                </p>
 
-                    <div class="create-heading">
+            </div>
 
-                        <span class="welcome-label">
-                            MAKE A DIFFERENCE
+            <div
+                class="create-auth-notice"
+                id="createAuthNotice"
+                role="status"
+                hidden
+            ></div>
+
+            <form id="proposalForm" class="proposal-form">
+
+                <!-- TITLE -->
+
+                <div class="proposal-field">
+
+                    <label for="proposalTitle">
+                        Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="proposalTitle"
+                        name="title"
+                        minlength="5"
+                        maxlength="120"
+                        placeholder="Give your proposal a clear title"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <span class="field-hint">
+                        5–120 characters
+                    </span>
+
+                </div>
+
+                <!-- DESCRIPTION -->
+
+                <div class="proposal-field">
+
+                    <label for="proposalDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="proposalDescription"
+                        name="description"
+                        rows="10"
+                        minlength="30"
+                        maxlength="3000"
+                        placeholder="What would you like to change? Why is it important?"
+                        required
+                    ></textarea>
+
+                    <div class="description-footer">
+
+                        <span>
+                            Minimum 30 characters
                         </span>
 
-                        <h2 id="createFormHeading">
-                            Create a proposal
-                        </h2>
+                        <span id="descriptionCount">
+                            0 / 3000
+                        </span>
 
-                        <p id="createFormDescription">
-                            Tell us what you would like to change.
-                            Be clear, constructive and respectful.
-                        </p>
+                    </div>
+
+                </div>
+
+                <!-- ADDITIONAL DETAILS -->
+
+                <div class="proposal-details">
+
+                    <div class="proposal-field">
+
+                        <label for="proposalCategory">
+                            Category
+                        </label>
+
+                        <select
+                            id="proposalCategory"
+                            name="category"
+                            required
+                        >
+                            <option value="" disabled selected>
+                                Select a category
+                            </option>
+
+                            <option value="Academic">Academic</option>
+                            <option value="Campus Life">Campus Life</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Sustainability">Sustainability</option>
+                            <option value="Accessibility">Accessibility</option>
+                            <option value="Culture">Culture</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                    </div>
+
+                    <div class="proposal-field">
+
+                        <label for="proposalDeadline">
+                            Voting deadline
+                        </label>
+
+                        <input
+                            type="date"
+                            id="proposalDeadline"
+                            name="votingDeadline"
+                            required
+                        >
+
+                        <span class="field-hint">
+                            Voting closes at 23:59 on this date.
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- VISIBILITY AND SUBMIT -->
+
+                <div class="proposal-bottom">
+
+                    <div
+                        class="proposal-visibility"
+                        id="anonymousOption"
+                    >
+
+                        <span class="visibility-label">
+                            Visibility
+                        </span>
+
+                        <div
+                            class="privacy-switch"
+                            role="radiogroup"
+                            aria-label="Proposal visibility"
+                        >
+
+                            <label class="privacy-choice">
+
+                                <input
+                                    type="radio"
+                                    id="proposalAnonymous"
+                                    name="proposalVisibility"
+                                    value="anonymous"
+                                >
+
+                                <span>ANONYMOUS</span>
+
+                            </label>
+
+                            <label class="privacy-choice">
+
+                                <input
+                                    type="radio"
+                                    id="proposalPublic"
+                                    name="proposalVisibility"
+                                    value="public"
+                                    checked
+                                >
+
+                                <span>PUBLIC</span>
+
+                            </label>
+
+                        </div>
 
                     </div>
 
                     <div
-                        class="create-auth-notice"
-                        id="createAuthNotice"
+                        class="organization-identity-notice"
+                        id="organizationIdentityNotice"
                         hidden
                     ></div>
 
-                    <form
-                        id="proposalForm"
-                        class="proposal-form"
+                    <button
+                        type="submit"
+                        class="proposal-submit"
+                        id="proposalSubmit"
+                        disabled
                     >
-
-                        <div class="proposal-field">
-
-                            <label for="proposalTitle">
-                                Proposal title
-                            </label>
-
-                            <input
-                                type="text"
-                                id="proposalTitle"
-                                name="title"
-                                minlength="5"
-                                maxlength="120"
-                                placeholder="Give your proposal a clear title"
-                                required
-                            >
-
-                            <span class="field-hint">
-                                Between 5 and 120 characters.
-                            </span>
-
-                        </div>
-
-                        <div class="proposal-field">
-
-                            <label for="proposalCategory">
-                                Category
-                            </label>
-
-                            <select
-                                id="proposalCategory"
-                                name="category"
-                                required
-                            >
-
-                                <option
-                                    value=""
-                                    disabled
-                                    selected
-                                >
-                                    Select a category
-                                </option>
-
-                                <option value="Academic">
-                                    Academic
-                                </option>
-
-                                <option value="Campus Life">
-                                    Campus Life
-                                </option>
-
-                                <option value="Sports">
-                                    Sports
-                                </option>
-
-                                <option value="Sustainability">
-                                    Sustainability
-                                </option>
-
-                                <option value="Accessibility">
-                                    Accessibility
-                                </option>
-
-                                <option value="Culture">
-                                    Culture
-                                </option>
-
-                                <option value="Other">
-                                    Other
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="proposal-field">
-
-                            <label for="proposalDescription">
-                                Describe your proposal
-                            </label>
-
-                            <textarea
-                                id="proposalDescription"
-                                name="description"
-                                rows="8"
-                                minlength="30"
-                                maxlength="3000"
-                                placeholder="What would you like to improve? Why is it important? How could it work?"
-                                required
-                            ></textarea>
-
-                            <div class="description-footer">
-
-                                <span class="field-hint">
-                                    Minimum 30 characters.
-                                </span>
-
-                                <span id="descriptionCount">
-                                    0 / 3000
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <div class="proposal-field">
-
-                            <label for="proposalDeadline">
-                                Voting deadline
-                            </label>
-
-                            <input
-                                type="date"
-                                id="proposalDeadline"
-                                name="votingDeadline"
-                                required
-                            >
-
-                            <span class="field-hint">
-                                Voting closes at 23:59 on the selected date.
-                                The earliest deadline is tomorrow.
-                            </span>
-
-                        </div>
-
-                        <div
-                            class="anonymous-option"
-                            id="anonymousOption"
-                        >
-
-                            <label class="anonymous-label">
-
-                                <input
-                                    type="checkbox"
-                                    id="proposalAnonymous"
-                                    name="anonymous"
-                                >
-
-                                <span>
-
-                                    <strong>
-                                        Submit anonymously
-                                    </strong>
-
-                                    <small>
-                                        Your name will not be shown
-                                        publicly alongside this proposal.
-                                        Administrators can still identify
-                                        its author.
-                                    </small>
-
-                                </span>
-
-                            </label>
-
-                        </div>
-
-                        <div
-                            class="create-auth-notice"
-                            id="organizationIdentityNotice"
-                            hidden
-                        ></div>
-
-                        <div
-                            class="form-message"
-                            id="proposalMessage"
-                            role="status"
-                            aria-live="polite"
-                        ></div>
-
-                        <button
-                            type="submit"
-                            class="proposal-submit"
-                            id="proposalSubmit"
-                        >
-                            Submit proposal
-                        </button>
-
-                        <p
-                            class="submit-disclaimer"
-                            id="submitDisclaimer"
-                        >
-                            Your proposal will be reviewed by
-                            an administrator before it becomes public.
-                        </p>
-
-                    </form>
+                        SEND
+                    </button>
 
                 </div>
 
-                <aside class="create-info">
+                <p class="privacy-note" id="privacyNote">
+                    Anonymous proposals hide your name from
+                    other students. Administrators can still
+                    identify the author.
+                </p>
 
-                    <div class="info-card">
+                <p
+                    class="submit-disclaimer"
+                    id="submitDisclaimer"
+                >
+                    Your proposal will be reviewed by an
+                    administrator before it becomes public.
+                </p>
 
-                        <span class="welcome-label">
-                            BEFORE YOU SUBMIT
-                        </span>
+                <div
+                    class="form-message"
+                    id="proposalMessage"
+                    role="status"
+                    aria-live="polite"
+                ></div>
 
-                        <h3>How does it work?</h3>
-
-                        <div class="info-step">
-
-                            <span class="step-number">
-                                01
-                            </span>
-
-                            <div>
-
-                                <h4 id="firstStepTitle">
-                                    Share your idea
-                                </h4>
-
-                                <p id="firstStepDescription">
-                                    Describe an improvement you
-                                    would like to see.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="info-step">
-
-                            <span class="step-number">
-                                02
-                            </span>
-
-                            <div>
-
-                                <h4 id="reviewStepTitle">
-                                    Review process
-                                </h4>
-
-                                <p id="reviewStepDescription">
-                                    Our administrators review
-                                    proposals before publication.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="info-step">
-
-                            <span class="step-number">
-                                03
-                            </span>
-
-                            <div>
-
-                                <h4 id="thirdStepTitle">
-                                    Community participation
-                                </h4>
-
-                                <p id="thirdStepDescription">
-                                    Once approved, your proposal
-                                    can be shared with the community.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="privacy-card">
-
-                        <h3 id="privacyCardTitle">
-                            Your privacy matters.
-                        </h3>
-
-                        <p id="privacyCardDescription">
-                            Anonymous proposals do not display
-                            your identity publicly. Administrators
-                            can still identify the author
-                            for moderation purposes.
-                        </p>
-
-                    </div>
-
-                </aside>
-
-            </div>
+            </form>
 
         </section>
 

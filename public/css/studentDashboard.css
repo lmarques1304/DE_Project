@@ -1,9 +1,3 @@
-
-/* =========================================================
-   SHARED DASHBOARD DESIGN
-   Student, UC and Student Associations
-   ========================================================= */
-
 body.student-dashboard-page {
     --dashboard-green: #397d46;
     --dashboard-green-dark: #2d6338;
@@ -26,8 +20,6 @@ body.student-dashboard-page {
 .student-dashboard-page [hidden] {
     display: none !important;
 }
-
-/* HEADER */
 
 .dashboard-header {
     width: 100%;
@@ -116,8 +108,6 @@ body.student-dashboard-page {
     border-color: #bfd4c3;
 }
 
-/* ACCOUNT DROPDOWN */
-
 .dashboard-header .account-dropdown {
     display: none;
 
@@ -176,15 +166,11 @@ body.student-dashboard-page {
     overflow-wrap: anywhere;
 }
 
-/* MAIN CONTENT */
-
 .dashboard-main {
     width: min(1100px, calc(100% - 56px));
     margin: 0 auto;
     padding: 58px 0 100px;
 }
-
-/* INTRODUCTION */
 
 .dashboard-intro {
     display: flex;
@@ -248,8 +234,6 @@ body.student-dashboard-page {
     transform: translateY(-1px);
 }
 
-/* LOADING AND ACCESS MESSAGES */
-
 .dashboard-message {
     padding: 18px 20px;
     margin-bottom: 24px;
@@ -262,8 +246,6 @@ body.student-dashboard-page {
     font-size: 13px;
     line-height: 1.6;
 }
-
-/* ACCOUNT INFORMATION */
 
 .dashboard-identity {
     display: flex;
@@ -344,8 +326,6 @@ body.student-dashboard-page {
     line-height: 1.5;
 }
 
-/* SECTIONS */
-
 .dashboard-section {
     margin-bottom: 58px;
 }
@@ -411,8 +391,6 @@ body.student-dashboard-page {
     font-weight: 700;
     white-space: nowrap;
 }
-
-/* LISTS AND CARDS */
 
 .dashboard-card-list {
     display: grid;
@@ -486,8 +464,6 @@ body.student-dashboard-page {
     gap: 5px;
 }
 
-/* STATUS LABELS */
-
 .dashboard-status {
     display: inline-flex;
     align-items: center;
@@ -521,8 +497,6 @@ body.student-dashboard-page {
     background: #f0f2f0;
     color: #6d796d;
 }
-
-/* VOTING RESULTS */
 
 .dashboard-results {
     margin-top: 20px;
@@ -591,8 +565,6 @@ body.student-dashboard-page {
     font-weight: 700;
 }
 
-/* REJECTION FEEDBACK */
-
 .dashboard-rejection-reason {
     margin-top: 18px;
     padding: 15px 17px;
@@ -619,8 +591,6 @@ body.student-dashboard-page {
     overflow-wrap: anywhere;
 }
 
-/* COMMUNITY OUTCOME */
-
 .dashboard-outcome {
     margin: 15px 0 0;
     color: #667366;
@@ -635,8 +605,6 @@ body.student-dashboard-page {
 .dashboard-outcome.negative {
     color: #b54c4c;
 }
-
-/* EMPTY STATES */
 
 .dashboard-empty {
     padding: 45px 25px;
@@ -660,8 +628,6 @@ body.student-dashboard-page {
     font-size: 13px;
     line-height: 1.7;
 }
-
-/* RESPONSIVE */
 
 @media (max-width: 1000px) {
     .dashboard-header {
