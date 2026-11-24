@@ -5,50 +5,42 @@
         {
             slug: "academic-life",
             name: "Academic Life",
-            description:
-                "Discuss classes, academic schedules and student experiences."
+            description: "Discuss classes, academic schedules and student experiences."
         },
         {
             slug: "campus-mobility",
             name: "Campus Mobility",
-            description:
-                "Share ideas about transport, accessibility and moving around campus."
+            description: "Share ideas about transport, accessibility and moving around campus."
         },
         {
             slug: "canteens-and-food",
             name: "Canteens and Food",
-            description:
-                "Discuss university meals, canteens and food services."
+            description: "Discuss university meals, canteens and food services."
         },
         {
             slug: "events-and-traditions",
             name: "Events and Traditions",
-            description:
-                "Talk about student events, celebrations and university traditions."
+            description: "Talk about student events, celebrations and university traditions."
         },
         {
             slug: "sports-and-culture",
             name: "Sports and Culture",
-            description:
-                "Explore sports activities, cultural events and student initiatives."
+            description: "Explore sports activities, cultural events and student initiatives."
         },
         {
             slug: "student-well-being",
             name: "Student Well-Being",
-            description:
-                "Discuss student support, well-being and campus life."
+            description: "Discuss student support, well-being and campus life."
         },
         {
             slug: "study-spaces",
             name: "Study Spaces",
-            description:
-                "Share ideas about libraries, study rooms and learning environments."
+            description: "Share ideas about libraries, study rooms and learning environments."
         },
         {
             slug: "workshops-and-skills",
             name: "Workshops and Skills",
-            description:
-                "Explore learning opportunities, workshops and practical skills."
+            description: "Explore learning opportunities, workshops and practical skills."
         }
     ];
 
@@ -117,7 +109,8 @@
         document.getElementById("submitDebateButton");
 
     const newDebateCategory =
-        document.getElementById
+        document.getElementById("newDebateCategory");
+
     const urlParams = new URLSearchParams(
         window.location.search
     );
@@ -329,7 +322,6 @@
             "article",
             "debates-category-card"
         );
-
 
         const top = createElement(
             "div",
@@ -764,7 +756,6 @@
             selectedCategory &&
             categoryMap.has(selectedCategory)
         ) {
-
             const category = categoryMap.get(
                 selectedCategory
             );
@@ -787,7 +778,6 @@
             loadCategoryDebates(true);
 
         } else {
-
             overviewView.hidden = false;
             categoryView.hidden = true;
 
