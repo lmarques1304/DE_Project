@@ -1,8 +1,6 @@
 .debate-page {
     min-height: 75vh;
-
     padding: 55px 24px 100px;
-
     background: var(--white);
     color: var(--dark);
 }
@@ -13,24 +11,34 @@
     margin: 0 auto;
 }
 
-.debate-breadcrumb {
+.debate-breadcrumb,
+.debate-topic-meta,
+.debate-topic-actions,
+.debate-form-bottom,
+.debate-comment-header,
+.debate-comment-identity,
+.debate-comment-actions,
+.debate-participation-prompt {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+}
+
+.debate-breadcrumb {
     gap: 12px;
-
     margin-bottom: 40px;
-
     color: var(--grey-light);
     font-size: 13px;
 }
 
-.debate-breadcrumb a {
+.debate-breadcrumb a,
+.debate-participation-prompt a {
     color: var(--green);
     text-decoration: none;
 }
 
-.debate-breadcrumb a:hover {
+.debate-breadcrumb a:hover,
+.debate-participation-prompt a:hover {
     text-decoration: underline;
 }
 
@@ -39,72 +47,54 @@
     font-size: 14px;
 }
 
-.debate-page-notice:empty {
-    display: none;
-}
-
-.debate-page-notice.is-error {
-    color: var(--error);
-}
-
 .debate-comment-message {
     margin: 18px 0;
-
     color: var(--green);
     font-size: 13px;
     line-height: 1.6;
 }
 
-.debate-comment-message:empty {
+.debate-page-notice:empty,
+.debate-comment-message:empty,
+.debate-report-message:empty {
     display: none;
 }
 
-.debate-comment-message.is-error {
+.debate-page-notice.is-error,
+.debate-comment-message.is-error,
+.debate-report-message {
     color: var(--error);
 }
 
 .debate-topic {
     padding-bottom: 45px;
-
     border-bottom: 1px solid var(--border);
 }
 
 .debate-category-label {
     display: inline-block;
-
     margin-bottom: 18px;
     padding: 7px 12px;
-
     background: var(--green-light);
     border-radius: 6px;
-
     color: var(--green);
-
     font-size: 11px;
     font-weight: 700;
 }
 
 .debate-topic h1 {
     margin-bottom: 17px;
-
     color: var(--dark);
-
     font-size: clamp(29px, 4vw, 42px);
     font-weight: 700;
     line-height: 1.25;
     letter-spacing: -1.2px;
-
     overflow-wrap: anywhere;
 }
 
 .debate-topic-meta {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
     gap: 9px;
-
     margin-bottom: 30px;
-
     color: var(--grey-light);
     font-size: 12px;
 }
@@ -113,22 +103,20 @@
     color: #b5bdb6;
 }
 
-.debate-description {
+.debate-description,
+.debate-comment-text {
     color: #49564c;
-
-    font-size: 15px;
-    line-height: 1.9;
-
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 
-.debate-topic-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 18px;
+.debate-description {
+    font-size: 15px;
+    line-height: 1.9;
+}
 
+.debate-topic-actions {
+    gap: 18px;
     margin-top: 34px;
 }
 
@@ -138,27 +126,18 @@
     align-items: center;
     justify-content: center;
     gap: 9px;
-
     padding: 12px 20px;
-
     background: var(--green);
     border: 1px solid var(--green);
     border-radius: var(--radius-sm);
-
     color: var(--white);
-
     font-size: 13px;
     font-weight: 700;
     line-height: 1.5;
-
     text-align: center;
     text-decoration: none;
-
     cursor: pointer;
-
-    transition:
-        background var(--transition),
-        border-color var(--transition);
+    transition: background var(--transition), border-color var(--transition);
 }
 
 .debate-proposal-button:hover,
@@ -172,12 +151,16 @@
     line-height: 1;
 }
 
-.debate-primary-button:disabled {
+.debate-primary-button:disabled,
+.debate-secondary-button:disabled,
+.debate-report-header button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-.debate-proposal-hint {
+.debate-proposal-hint,
+.debate-discussion-header p,
+.debate-likes-text {
     color: var(--grey);
     font-size: 12px;
 }
@@ -185,7 +168,6 @@
 .debate-moderation-notice {
     margin-top: 28px;
     padding: 18px 20px;
-
     background: var(--green-light);
     border: 1px solid #d8e7db;
     border-radius: var(--radius);
@@ -193,19 +175,15 @@
 
 .debate-moderation-notice strong {
     display: block;
-
     margin-bottom: 6px;
-
     color: var(--green);
     font-size: 14px;
 }
 
 .debate-moderation-notice p {
     color: #536456;
-
     font-size: 13px;
     line-height: 1.7;
-
     white-space: pre-wrap;
 }
 
@@ -228,17 +206,13 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 20px;
-
     margin-bottom: 30px;
 }
 
 .debate-eyebrow {
     display: block;
-
     margin-bottom: 9px;
-
     color: var(--green);
-
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 1.7px;
@@ -246,123 +220,108 @@
 
 .debate-discussion-header h2 {
     margin-bottom: 6px;
-
     color: var(--dark);
-
     font-size: 26px;
     font-weight: 700;
     letter-spacing: -0.7px;
-}
-
-.debate-discussion-header p {
-    color: var(--grey);
-    font-size: 12px;
 }
 
 .debate-sort-container {
     display: flex;
     flex-direction: column;
     gap: 7px;
-
     min-width: 170px;
 }
 
-.debate-sort-container label {
+.debate-sort-container label,
+.debate-comment-form > label,
+.debate-report-dialog label {
     color: var(--green);
-
     font-size: 12px;
     font-weight: 700;
 }
 
-.debate-sort-container select {
+.debate-comment-form > label,
+.debate-report-dialog label {
+    display: block;
+    margin-bottom: 9px;
+}
+
+.debate-sort-container select,
+.debate-comment-form textarea,
+.debate-report-dialog textarea {
     width: 100%;
-    min-height: 42px;
-
-    padding: 10px 12px;
-
-    background: var(--bg-soft);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-
     color: var(--dark);
     font-size: 13px;
 }
 
-.debate-sort-container select:focus {
+.debate-sort-container select {
+    min-height: 42px;
+    padding: 10px 12px;
+    background: var(--bg-soft);
+}
+
+.debate-sort-container select:focus,
+.debate-comment-form textarea:focus,
+.debate-report-dialog textarea:focus {
     outline: none;
     border-color: var(--green);
+}
+
+.debate-comment-form,
+.debate-comment-card,
+.debate-report-dialog {
+    background: var(--white);
+    border: 1px solid var(--border);
 }
 
 .debate-comment-form {
     margin-bottom: 42px;
     padding: 27px;
-
-    background: var(--white);
-    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
 }
 
 .debate-comment-form h3 {
     margin-bottom: 7px;
-
     color: var(--dark);
-
     font-size: 18px;
     font-weight: 700;
 }
 
-.debate-form-intro {
-    margin-bottom: 23px;
-
+.debate-form-intro,
+.debate-report-intro,
+.debate-participation-prompt p {
     color: var(--grey);
     font-size: 13px;
     line-height: 1.7;
 }
 
-.debate-comment-form > label {
-    display: block;
-
-    margin-bottom: 9px;
-
-    color: var(--green);
-    font-size: 12px;
-    font-weight: 700;
+.debate-form-intro {
+    margin-bottom: 23px;
 }
 
-.debate-comment-form textarea {
+.debate-comment-form textarea,
+.debate-report-dialog textarea {
     display: block;
-
-    width: 100%;
-    min-height: 135px;
-
-    padding: 14px 15px;
-
     background: #f7f9f7;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-
-    color: var(--dark);
-
-    font-size: 13px;
     line-height: 1.7;
-
     resize: vertical;
 }
 
-.debate-comment-form textarea:focus {
-    outline: none;
+.debate-comment-form textarea {
+    min-height: 135px;
+    padding: 14px 15px;
+}
 
-    border-color: var(--green);
+.debate-comment-form textarea:focus {
     box-shadow: 0 0 0 3px rgba(57, 125, 70, 0.09);
 }
 
 .debate-form-bottom {
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 12px;
-
     margin-top: 15px;
 }
 
@@ -370,79 +329,55 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-
     color: var(--dark);
-
     font-size: 13px;
     font-weight: 600;
-
     cursor: pointer;
 }
 
 .debate-anonymous-option input {
     width: 16px;
     height: 16px;
-
     accent-color: var(--green);
     cursor: pointer;
 }
 
-.debate-character-count {
+.debate-character-count,
+.debate-anonymous-hint,
+.debate-comment-date {
     color: var(--grey-light);
     font-size: 11px;
 }
 
 .debate-anonymous-hint {
     margin-top: 11px;
-
-    color: var(--grey-light);
-
-    font-size: 11px;
     line-height: 1.7;
 }
 
-.debate-form-actions {
+.debate-form-actions,
+.debate-report-actions {
     display: flex;
     justify-content: flex-end;
+}
 
+.debate-form-actions {
     margin-top: 22px;
 }
 
 .debate-participation-prompt {
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 15px;
-
     margin-bottom: 35px;
     padding: 21px 23px;
-
     background: var(--bg-soft);
     border: 1px solid var(--border);
     border-radius: var(--radius);
 }
 
-.debate-participation-prompt p {
-    color: var(--grey);
-
-    font-size: 13px;
-    line-height: 1.7;
-}
-
 .debate-participation-prompt a {
     display: inline-block;
-
-    color: var(--green);
-
     font-size: 13px;
     font-weight: 700;
-
-    text-decoration: none;
-}
-
-.debate-participation-prompt a:hover {
-    text-decoration: underline;
 }
 
 .debate-comments-list {
@@ -453,9 +388,6 @@
 
 .debate-comment-card {
     padding: 24px 25px;
-
-    background: var(--white);
-    border: 1px solid var(--border);
     border-radius: var(--radius);
 }
 
@@ -465,87 +397,56 @@
 }
 
 .debate-comment-header {
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 12px;
-
     margin-bottom: 17px;
 }
 
 .debate-comment-identity {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
     gap: 9px;
 }
 
 .debate-comment-author {
     color: var(--dark);
-
     font-size: 13px;
+    font-weight: 700;
+}
+
+.debate-anonymous-badge,
+.debate-hidden-badge {
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 10px;
     font-weight: 700;
 }
 
 .debate-anonymous-badge {
-    padding: 4px 8px;
-
     background: var(--green-light);
-    border-radius: 5px;
-
     color: var(--green);
-
-    font-size: 10px;
-    font-weight: 700;
 }
 
 .debate-hidden-badge {
-    padding: 4px 8px;
-
     background: var(--error-bg);
-    border-radius: 5px;
-
     color: var(--error);
-
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.debate-comment-date {
-    color: var(--grey-light);
-    font-size: 11px;
 }
 
 .debate-comment-text {
     margin-bottom: 18px;
-
-    color: #49564c;
-
     font-size: 13px;
     line-height: 1.85;
-
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
 }
 
 .debate-admin-identity {
     margin-bottom: 15px;
     padding: 9px 12px;
-
     background: #f5f7f5;
     border-radius: 6px;
-
     color: #69766c;
-
     font-size: 11px;
     line-height: 1.6;
 }
 
 .debate-comment-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
     gap: 18px;
 }
 
@@ -553,24 +454,16 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-
     padding: 3px 0;
-
     background: transparent;
     border: none;
-
     color: var(--grey);
-
     font-size: 12px;
     font-weight: 600;
-
     cursor: pointer;
 }
 
-.debate-comment-actions button:hover {
-    color: var(--green);
-}
-
+.debate-comment-actions button:hover,
 .debate-comment-actions button.is-liked {
     color: var(--green);
 }
@@ -584,19 +477,11 @@
     cursor: not-allowed;
 }
 
-.debate-likes-text {
-    color: var(--grey);
-    font-size: 12px;
-}
-
 .debate-empty-comments {
     padding: 40px 20px;
-
     border: 1px dashed var(--border);
     border-radius: var(--radius);
-
     color: var(--grey);
-
     font-size: 13px;
     line-height: 1.7;
     text-align: center;
@@ -604,20 +489,17 @@
 
 .debate-error-state {
     padding: 55px 15px;
-
     text-align: center;
 }
 
 .debate-error-state h1 {
     margin-bottom: 13px;
-
     font-size: 29px;
     letter-spacing: -0.8px;
 }
 
 .debate-error-state p {
     margin-bottom: 25px;
-
     color: var(--grey);
     font-size: 14px;
     line-height: 1.7;
@@ -626,15 +508,9 @@
 .debate-report-dialog {
     width: min(100% - 32px, 480px);
     max-height: calc(100vh - 40px);
-
     padding: 0;
-
-    background: var(--white);
-    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-
     color: var(--dark);
-
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
@@ -651,7 +527,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-
     margin-bottom: 15px;
 }
 
@@ -672,74 +547,29 @@
 
 .debate-report-intro {
     margin-bottom: 24px;
-
-    color: var(--grey);
-    font-size: 13px;
-    line-height: 1.7;
-}
-
-.debate-report-dialog label {
-    display: block;
-
-    margin-bottom: 9px;
-
-    color: var(--green);
-    font-size: 12px;
-    font-weight: 700;
 }
 
 .debate-report-dialog textarea {
-    display: block;
-
-    width: 100%;
     min-height: 115px;
-
     padding: 13px 14px;
-
-    background: #f7f9f7;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-
-    color: var(--dark);
-    font-size: 13px;
-    line-height: 1.7;
-
-    resize: vertical;
-}
-
-.debate-report-dialog textarea:focus {
-    outline: none;
-    border-color: var(--green);
 }
 
 .debate-report-message {
     margin-top: 12px;
-
-    color: var(--error);
     font-size: 12px;
 }
 
-.debate-report-message:empty {
-    display: none;
-}
-
 .debate-report-actions {
-    display: flex;
-    justify-content: flex-end;
     gap: 12px;
-
     margin-top: 24px;
 }
 
 .debate-secondary-button {
     padding: 12px 19px;
-
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-
     color: var(--dark);
-
     font-size: 13px;
     font-weight: 600;
 }
@@ -749,7 +579,6 @@
 }
 
 @media (max-width: 800px) {
-
     .debate-page {
         padding: 45px 24px 75px;
     }
@@ -757,11 +586,9 @@
     .debate-topic h1 {
         font-size: 34px;
     }
-
 }
 
 @media (max-width: 600px) {
-
     .debate-page {
         padding: 32px 18px 65px;
     }
@@ -782,9 +609,14 @@
         font-size: 14px;
     }
 
-    .debate-topic-actions {
+    .debate-topic-actions,
+    .debate-comment-header,
+    .debate-participation-prompt {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .debate-topic-actions {
         gap: 12px;
     }
 
@@ -801,7 +633,9 @@
         font-size: 23px;
     }
 
-    .debate-sort-container {
+    .debate-sort-container,
+    .debate-form-actions .debate-primary-button,
+    .debate-report-actions button {
         width: 100%;
     }
 
@@ -809,22 +643,8 @@
         padding: 20px;
     }
 
-    .debate-form-actions .debate-primary-button {
-        width: 100%;
-    }
-
     .debate-comment-card {
         padding: 19px;
-    }
-
-    .debate-comment-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .debate-participation-prompt {
-        align-items: flex-start;
-        flex-direction: column;
     }
 
     .debate-report-content {
@@ -833,9 +653,5 @@
 
     .debate-report-actions {
         flex-direction: column-reverse;
-    }
-
-    .debate-report-actions button {
-        width: 100%;
     }
 }

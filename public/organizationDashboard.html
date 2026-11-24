@@ -1,11 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Organization Dashboard | Instant Democracy</title>
 
     <link rel="stylesheet" href="css/style.css">
@@ -13,15 +10,13 @@
     <link rel="stylesheet" href="css/organizationDashboard.css">
 
     <script src="js/script.js" defer></script>
+    <script src="js/dashboardCommon.js" defer></script>
     <script src="js/organizationDashboard.js" defer></script>
 </head>
 
 <body class="student-dashboard-page organization-dashboard-page">
 
-    <!-- HEADER -->
-
     <header class="dashboard-header">
-
         <a href="index.html" class="dashboard-brand">
             <span class="dashboard-brand-icon">D</span>
             <span>Instant Democracy</span>
@@ -35,261 +30,144 @@
         </nav>
 
         <div class="account-container">
-
-            <button
-                type="button"
-                id="accountButton"
+            <button type="button" id="accountButton"
                 class="dashboard-account-button"
-                aria-label="Account menu"
-                aria-expanded="false"
-            >
+                aria-label="Account menu" aria-expanded="false"
+                aria-controls="accountDropdown">
                 <span>👤</span>
             </button>
 
-            <div
-                id="accountDropdown"
-                class="account-dropdown"
-            ></div>
-
+            <div id="accountDropdown" class="account-dropdown"></div>
         </div>
-
     </header>
-
-    <!-- MAIN -->
 
     <main class="dashboard-main">
 
-        <!-- INTRODUCTION -->
-
         <section class="dashboard-intro">
-
             <div>
-
-                <p
-                    id="organizationType"
-                    class="dashboard-eyebrow"
-                >
+                <p id="organizationType" class="dashboard-eyebrow">
                     ORGANIZATION DASHBOARD
                 </p>
 
-                <h1 id="organizationName">
-                    Welcome back!
-                </h1>
+                <h1 id="organizationName">Welcome back!</h1>
 
                 <p class="dashboard-subtitle">
                     Manage your organization's proposals,
                     monitor student participation and
                     follow community voting results.
                 </p>
-
             </div>
 
-            <a
-                href="createProposal.html"
-                id="organizationCreateButton"
-                class="dashboard-create-button"
-            >
+            <a href="createProposal.html" id="organizationCreateButton"
+                class="dashboard-create-button">
                 + Create Proposal
             </a>
-
         </section>
 
-        <!-- LOADING / ACCESS -->
-
-        <div
-            id="dashboardMessage"
-            class="dashboard-message"
-            role="status"
-            aria-live="polite"
-        >
+        <div id="dashboardMessage" class="dashboard-message"
+            role="status" aria-live="polite">
             Loading organization dashboard...
         </div>
 
         <div id="dashboardContent" hidden>
 
-            <!-- STATISTICS -->
-
-            <section
-                class="dashboard-stats"
-                aria-label="Organization statistics"
-            >
+            <section class="dashboard-stats" aria-label="Organization statistics">
 
                 <article class="dashboard-stat-card">
-
-                    <span class="stat-label">
-                        Published Proposals
-                    </span>
-
+                    <span class="stat-label">Published Proposals</span>
                     <strong id="statTotal">0</strong>
-
                     <span class="stat-description">
                         Proposals published by your organization
                     </span>
-
                 </article>
 
                 <article class="dashboard-stat-card">
-
-                    <span class="stat-label">
-                        Active Votings
-                    </span>
-
+                    <span class="stat-label">Active Votings</span>
                     <strong id="statActive">0</strong>
-
                     <span class="stat-description">
                         Currently open to students
                     </span>
-
                 </article>
 
                 <article class="dashboard-stat-card">
-
-                    <span class="stat-label">
-                        Completed Votings
-                    </span>
-
+                    <span class="stat-label">Completed Votings</span>
                     <strong id="statCompleted">0</strong>
-
                     <span class="stat-description">
                         Voting periods that have ended
                     </span>
-
                 </article>
 
                 <article class="dashboard-stat-card">
-
-                    <span class="stat-label">
-                        Votes Received
-                    </span>
-
+                    <span class="stat-label">Votes Received</span>
                     <strong id="statVotes">0</strong>
-
                     <span class="stat-description">
                         Total community participation
                     </span>
-
                 </article>
 
             </section>
 
-            <!-- PARTICIPATION OVERVIEW -->
-
             <section class="organization-overview">
 
                 <div class="organization-overview-header">
-
                     <h2>Participation Overview</h2>
-
                     <p>
                         See how students have voted across
                         your organization's published proposals.
                     </p>
-
                 </div>
 
                 <div class="organization-overview-grid">
 
                     <div class="organization-overview-item">
-
-                        <span class="organization-overview-label">
-                            Yes Votes
-                        </span>
-
-                        <strong
-                            id="totalYesVotes"
-                            class="organization-yes-number"
-                        >
-                            0
-                        </strong>
-
+                        <span class="organization-overview-label">Yes Votes</span>
+                        <strong id="totalYesVotes"
+                            class="organization-yes-number">0</strong>
                     </div>
 
                     <div class="organization-overview-item">
-
-                        <span class="organization-overview-label">
-                            No Votes
-                        </span>
-
-                        <strong
-                            id="totalNoVotes"
-                            class="organization-no-number"
-                        >
-                            0
-                        </strong>
-
+                        <span class="organization-overview-label">No Votes</span>
+                        <strong id="totalNoVotes"
+                            class="organization-no-number">0</strong>
                     </div>
 
                     <div class="organization-overview-item">
-
                         <span class="organization-overview-label">
                             Yes Percentage
                         </span>
-
-                        <strong id="overallYesPercentage">
-                            0%
-                        </strong>
-
+                        <strong id="overallYesPercentage">0%</strong>
                     </div>
 
                 </div>
 
-                <div
-                    class="organization-overall-bar"
-                    aria-label="Overall voting distribution"
-                >
-
-                    <div
-                        id="overallYesBar"
-                        class="organization-overall-yes"
-                    ></div>
-
-                    <div
-                        id="overallNoBar"
-                        class="organization-overall-no"
-                    ></div>
-
+                <div class="organization-overall-bar"
+                    aria-label="Overall voting distribution">
+                    <div id="overallYesBar" class="organization-overall-yes"></div>
+                    <div id="overallNoBar" class="organization-overall-no"></div>
                 </div>
 
-                <p
-                    id="participationDescription"
-                    class="organization-overview-note"
-                >
+                <p id="participationDescription" class="organization-overview-note">
                     No votes have been received yet.
                 </p>
 
             </section>
 
-            <!-- OUR PROPOSALS -->
-
             <section class="dashboard-section">
-
                 <div class="dashboard-section-header">
-
                     <div>
-
                         <h2>Our Proposals</h2>
-
                         <p>
                             Follow your published proposals,
                             voting deadlines and community decisions.
                         </p>
-
                     </div>
 
-                    <span
-                        id="proposalCount"
-                        class="dashboard-count"
-                    >
+                    <span id="proposalCount" class="dashboard-count">
                         0 proposals
                     </span>
-
                 </div>
 
-                <div
-                    id="organizationProposals"
-                    class="dashboard-card-list"
-                ></div>
-
+                <div id="organizationProposals" class="dashboard-card-list"></div>
             </section>
 
         </div>

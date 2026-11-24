@@ -1,522 +1,217 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Debates | Instant Democracy</title>
-
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/debates.css">
 </head>
 
 <body class="debates-body">
 
-    <!-- HEADER -->
     <header class="header">
-
-        <button
-            class="icon-button"
-            id="menuButton"
-            type="button"
-            aria-label="Open navigation menu"
-            aria-expanded="false"
-        >
+        <button class="icon-button" id="menuButton" type="button"
+            aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
             <span></span>
             <span></span>
             <span></span>
         </button>
 
-        <a href="index.html" class="logo">
-            INSTANT<span>DEMOCRACY</span>
-        </a>
+        <a href="index.html" class="logo">INSTANT<span>DEMOCRACY</span></a>
 
         <div class="account-container">
-
-            <button
-                class="account-button"
-                id="accountButton"
-                type="button"
-                aria-label="Open account menu"
-                aria-expanded="false"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                >
+            <button class="account-button" id="accountButton" type="button"
+                aria-label="Open account menu" aria-expanded="false" aria-controls="accountDropdown">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
                 </svg>
             </button>
 
-            <div
-                class="account-dropdown"
-                id="accountDropdown"
-            >
+            <div class="account-dropdown" id="accountDropdown">
                 <a href="login.html">Sign in</a>
                 <a href="register.html">Create account</a>
             </div>
-
         </div>
-
     </header>
 
-    <!-- SIDE MENU -->
     <div class="overlay" id="overlay"></div>
 
-    <nav
-        class="sidebar"
-        id="sidebar"
-        aria-label="Main navigation"
-    >
-
+    <nav class="sidebar" id="sidebar" aria-label="Main navigation">
         <div class="sidebar-header">
-
             <h2>Explore</h2>
-
-            <button
-                class="close-button"
-                id="closeMenu"
-                type="button"
-                aria-label="Close navigation menu"
-            >
-                &times;
-            </button>
-
+            <button class="close-button" id="closeMenu" type="button"
+                aria-label="Close navigation menu">&times;</button>
         </div>
 
-        <a href="index.html" class="nav-link">
-            Home
-        </a>
-
-        <a href="debates.html" class="nav-link">
-            Debates
-        </a>
-
-        <a href="createProposal.html" class="nav-link">
-            Create a Proposal
-        </a>
-
-        <a href="vote.html" class="nav-link">
-            Vote
-        </a>
-
-        <a href="approvedProposals.html" class="nav-link">
-            Approved Proposals
-        </a>
-
-        <a href="notPassedProposals.html" class="nav-link">
-            Unsuccessful Proposals
-        </a>
-
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="debates.html" class="nav-link" aria-current="page">Debates</a>
+        <a href="createProposal.html" class="nav-link">Create a Proposal</a>
+        <a href="vote.html" class="nav-link">Vote</a>
+        <a href="approvedProposals.html" class="nav-link">Approved Proposals</a>
+        <a href="notPassedProposals.html" class="nav-link">Unsuccessful Proposals</a>
     </nav>
 
-    <!-- MAIN CONTENT -->
     <main class="debates-page">
-
         <div class="debates-container">
 
-            <!-- PAGE INTRODUCTION -->
             <section class="debates-hero">
-
                 <div class="debates-hero-content">
-
-                    <span class="debates-eyebrow">
-                        COMMUNITY DISCUSSIONS
-                    </span>
-
+                    <span class="debates-eyebrow">COMMUNITY DISCUSSIONS</span>
                     <h1>Debates</h1>
-
-                    <p>
-                        Explore ideas, share your perspective
-                        and discuss the issues that matter
-                        to our university community.
-                    </p>
-
+                    <p>Explore ideas, share your perspective and discuss the issues that matter to our university community.</p>
                 </div>
 
-                <button
-                    type="button"
-                    class="debates-primary-button"
-                    id="startDebateButton"
-                >
+                <button type="button" class="debates-primary-button" id="startDebateButton">
                     <span aria-hidden="true">+</span>
                     Start a Debate
                 </button>
-
             </section>
 
-            <!-- PAGE FEEDBACK -->
-            <p
-                id="pageMessage"
-                class="debates-message"
-                role="status"
-                aria-live="polite"
-            ></p>
+            <p id="pageMessage" class="debates-message" role="status" aria-live="polite"></p>
 
-            <!-- =====================================
-                 VIEW 1: ALL CATEGORIES
-                 ===================================== -->
-
-            <section
-                id="overviewView"
-                class="debates-overview"
-                aria-labelledby="overviewTitle"
-            >
-
+            <section id="overviewView" class="debates-overview" aria-labelledby="overviewTitle">
                 <div class="debates-section-heading">
-
                     <div>
-
-                        <h2 id="overviewTitle">
-                            Explore by Category
-                        </h2>
-
-                        <p>
-                            Discover ongoing conversations
-                            across different areas of campus life.
-                        </p>
-
+                        <h2 id="overviewTitle">Explore by Category</h2>
+                        <p>Discover ongoing conversations across different areas of campus life.</p>
                     </div>
-
                 </div>
 
-                <!-- FILLED BY JAVASCRIPT -->
-                <div
-                    id="categoriesGrid"
-                    class="debates-categories-grid"
-                    aria-live="polite"
-                >
-                    <p class="debates-loading">
-                        Loading categories...
-                    </p>
+                <div id="categoriesGrid" class="debates-categories-grid" aria-live="polite">
+                    <p class="debates-loading">Loading categories...</p>
                 </div>
-
             </section>
 
-            <!-- =====================================
-                 VIEW 2: SELECTED CATEGORY
-                 ===================================== -->
+            <section id="categoryView" class="debates-category-view" aria-labelledby="categoryTitle" hidden>
 
-            <section
-                id="categoryView"
-                class="debates-category-view"
-                aria-labelledby="categoryTitle"
-                hidden
-            >
-
-                <!-- BREADCRUMB -->
-                <nav
-                    class="debates-breadcrumb"
-                    aria-label="Breadcrumb"
-                >
-                    <a href="debates.html">
-                        Debates
-                    </a>
-
+                <nav class="debates-breadcrumb" aria-label="Breadcrumb">
+                    <a href="debates.html">Debates</a>
                     <span aria-hidden="true">/</span>
-
                     <span id="categoryBreadcrumb"></span>
                 </nav>
 
-                <!-- CATEGORY INTRO -->
                 <div class="debates-category-intro">
-
                     <h2 id="categoryTitle"></h2>
-
                     <p id="categoryDescription"></p>
-
                 </div>
 
-                <!-- SEARCH AND SORT -->
                 <div class="debates-toolbar">
-
                     <div class="debates-search-wrapper">
-
-                        <label
-                            for="debateSearch"
-                            class="debates-input-label"
-                        >
-                            Search debates
-                        </label>
-
-                        <input
-                            type="search"
-                            id="debateSearch"
-                            placeholder="Search by title or description..."
-                            autocomplete="off"
-                        >
-
+                        <label for="debateSearch" class="debates-input-label">Search debates</label>
+                        <input type="search" id="debateSearch"
+                            placeholder="Search by title or description..." autocomplete="off">
                     </div>
 
                     <div class="debates-sort-wrapper">
-
-                        <label
-                            for="debateSort"
-                            class="debates-input-label"
-                        >
-                            Sort by
-                        </label>
-
+                        <label for="debateSort" class="debates-input-label">Sort by</label>
                         <select id="debateSort">
-                            <option value="recent">
-                                Most recent
-                            </option>
-
-                            <option value="popular">
-                                Most discussed
-                            </option>
+                            <option value="recent">Most recent</option>
+                            <option value="popular">Most discussed</option>
                         </select>
-
                     </div>
-
                 </div>
 
-                <!-- RESULTS COUNT -->
-                <p
-                    id="categoryCount"
-                    class="debates-results-count"
-                ></p>
+                <p id="categoryCount" class="debates-results-count"></p>
 
-                <!-- FILLED BY JAVASCRIPT -->
-                <div
-                    id="debatesList"
-                    class="debates-list"
-                    aria-live="polite"
-                ></div>
+                <div id="debatesList" class="debates-list" aria-live="polite"></div>
 
-                <button
-                    type="button"
-                    id="loadMoreButton"
-                    class="debates-load-more"
-                    hidden
-                >
+                <button type="button" id="loadMoreButton" class="debates-load-more" hidden>
                     Load more debates
                 </button>
 
             </section>
 
         </div>
-
     </main>
 
-    <!-- =====================================
-         CREATE DEBATE DIALOG
-         ===================================== -->
-
-    <dialog
-        id="createDebateDialog"
-        class="debate-dialog"
-        aria-labelledby="createDebateTitle"
-    >
-
+    <dialog id="createDebateDialog" class="debate-dialog" aria-labelledby="createDebateTitle">
         <div class="debate-dialog-content">
 
             <div class="debate-dialog-header">
-
                 <div>
-
-                    <span class="debates-eyebrow">
-                        SHARE YOUR IDEAS
-                    </span>
-
-                    <h2 id="createDebateTitle">
-                        Start a Debate
-                    </h2>
-
+                    <span class="debates-eyebrow">SHARE YOUR IDEAS</span>
+                    <h2 id="createDebateTitle">Start a Debate</h2>
                 </div>
 
-                <button
-                    type="button"
-                    id="closeDebateDialog"
-                    class="debate-dialog-close"
-                    aria-label="Close form"
-                >
-                    &times;
-                </button>
-
+                <button type="button" id="closeDebateDialog" class="debate-dialog-close"
+                    aria-label="Close form">&times;</button>
             </div>
 
             <p class="debate-dialog-description">
-                Start a conversation about something
-                you would like to discuss with
-                the university community.
+                Start a conversation about something you would like to discuss with the university community.
             </p>
 
             <form id="createDebateForm">
 
-                <!-- CATEGORY -->
                 <div class="debate-form-group">
+                    <label for="newDebateCategory">Category</label>
 
-                    <label for="newDebateCategory">
-                        Category
-                    </label>
-
-                    <select
-                        id="newDebateCategory"
-                        name="category"
-                        required
-                    >
-                        <option value="">
-                            Select a category
-                        </option>
-
-                        <option value="academic-life">
-                            Academic Life
-                        </option>
-
-                        <option value="campus-mobility">
-                            Campus Mobility
-                        </option>
-
-                        <option value="canteens-and-food">
-                            Canteens and Food
-                        </option>
-
-                        <option value="events-and-traditions">
-                            Events and Traditions
-                        </option>
-
-                        <option value="sports-and-culture">
-                            Sports and Culture
-                        </option>
-
-                        <option value="student-well-being">
-                            Student Well-Being
-                        </option>
-
-                        <option value="study-spaces">
-                            Study Spaces
-                        </option>
-
-                        <option value="workshops-and-skills">
-                            Workshops and Skills
-                        </option>
+                    <select id="newDebateCategory" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="academic-life">Academic Life</option>
+                        <option value="campus-mobility">Campus Mobility</option>
+                        <option value="canteens-and-food">Canteens and Food</option>
+                        <option value="events-and-traditions">Events and Traditions</option>
+                        <option value="sports-and-culture">Sports and Culture</option>
+                        <option value="student-well-being">Student Well-Being</option>
+                        <option value="study-spaces">Study Spaces</option>
+                        <option value="workshops-and-skills">Workshops and Skills</option>
                     </select>
-
                 </div>
 
-                <!-- TITLE -->
                 <div class="debate-form-group">
+                    <label for="newDebateTitle">Debate title</label>
 
-                    <label for="newDebateTitle">
-                        Debate title
-                    </label>
-
-                    <input
-                        type="text"
-                        id="newDebateTitle"
-                        name="title"
+                    <input type="text" id="newDebateTitle" name="title"
                         placeholder="What would you like to discuss?"
-                        minlength="5"
-                        maxlength="140"
-                        required
-                    >
+                        minlength="5" maxlength="140" required>
 
-                    <small>
-                        Give your discussion a clear,
-                        descriptive title.
-                    </small>
-
+                    <small>Give your discussion a clear, descriptive title.</small>
                 </div>
 
-                <!-- DESCRIPTION -->
                 <div class="debate-form-group">
+                    <label for="newDebateDescription">Description</label>
 
-                    <label for="newDebateDescription">
-                        Description
-                    </label>
-
-                    <textarea
-                        id="newDebateDescription"
-                        name="description"
+                    <textarea id="newDebateDescription" name="description"
                         placeholder="Explain the topic and why it matters..."
-                        rows="5"
-                        minlength="15"
-                        maxlength="3000"
-                        required
-                    ></textarea>
+                        rows="5" minlength="15" maxlength="3000" required></textarea>
 
-                    <small>
-                        Describe the issue and what
-                        you would like others to discuss.
-                    </small>
-
+                    <small>Describe the issue and what you would like others to discuss.</small>
                 </div>
 
-                <!-- MODERATION NOTICE -->
                 <div class="debate-review-notice">
-
                     <strong>Review required</strong>
-
-                    <p>
-                        Your debate will be reviewed
-                        by an administrator before
-                        appearing publicly.
-                    </p>
-
+                    <p>Your debate will be reviewed by an administrator before appearing publicly.</p>
                 </div>
 
-                <!-- FORM FEEDBACK -->
-                <p
-                    id="createDebateMessage"
-                    class="debates-form-message"
-                    role="status"
-                    aria-live="polite"
-                ></p>
+                <p id="createDebateMessage" class="debates-form-message"
+                    role="status" aria-live="polite"></p>
 
-                <!-- ACTIONS -->
                 <div class="debate-dialog-actions">
-
-                    <button
-                        type="button"
-                        id="cancelDebateButton"
-                        class="debates-secondary-button"
-                    >
+                    <button type="button" id="cancelDebateButton" class="debates-secondary-button">
                         Cancel
                     </button>
 
-                    <button
-                        type="submit"
-                        id="submitDebateButton"
-                        class="debates-primary-button"
-                    >
+                    <button type="submit" id="submitDebateButton" class="debates-primary-button">
                         Submit for Review
                     </button>
-
                 </div>
 
             </form>
 
         </div>
-
     </dialog>
 
-    <!-- FOOTER -->
     <footer>
-
-        <a href="index.html" class="logo">
-            INSTANT<span>DEMOCRACY</span>
-        </a>
-
-        <p>
-            Building stronger communities together.
-        </p>
-
-        <span class="copyright">
-            © 2026 Instant Democracy. All rights reserved.
-        </span>
-
+        <a href="index.html" class="logo">INSTANT<span>DEMOCRACY</span></a>
+        <p>Building stronger communities together.</p>
+        <span class="copyright">© 2026 Instant Democracy. All rights reserved.</span>
     </footer>
 
-    <!-- SCRIPTS -->
     <script src="js/script.js"></script>
     <script src="js/debates.js"></script>
 

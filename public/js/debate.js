@@ -1,108 +1,9 @@
 (() => {
+    "use strict";
 
-    const pageNotice =
-        document.getElementById("pageNotice");
+    const $ = id => document.getElementById(id);
 
-    const debateContent =
-        document.getElementById("debateContent");
-
-    const debateError =
-        document.getElementById("debateError");
-
-    const categoryBackLink =
-        document.getElementById("categoryBackLink");
-
-    const debateCategory =
-        document.getElementById("debateCategory");
-
-    const debateTitle =
-        document.getElementById("debateTitle");
-
-    const debateAuthor =
-        document.getElementById("debateAuthor");
-
-    const debateDate =
-        document.getElementById("debateDate");
-
-    const debateDescription =
-        document.getElementById("debateDescription");
-
-    const debateTopicActions =
-        document.getElementById("debateTopicActions");
-
-    const createProposalLink =
-        document.getElementById("createProposalLink");
-
-    const moderationNotice =
-        document.getElementById("moderationNotice");
-
-    const moderationTitle =
-        document.getElementById("moderationTitle");
-
-    const moderationText =
-        document.getElementById("moderationText");
-
-    const discussionSection =
-        document.getElementById("discussionSection");
-
-    const commentsCount =
-        document.getElementById("commentsCount");
-
-    const commentsSort =
-        document.getElementById("commentsSort");
-
-    const commentsList =
-        document.getElementById("commentsList");
-
-    const commentForm =
-        document.getElementById("commentForm");
-
-    const commentContent =
-        document.getElementById("commentContent");
-
-    const commentAnonymous =
-        document.getElementById("commentAnonymous");
-
-    const commentCharacterCount =
-        document.getElementById("commentCharacterCount");
-
-    const submitCommentButton =
-        document.getElementById("submitCommentButton");
-
-    const commentMessage =
-        document.getElementById("commentMessage");
-
-    const participationPrompt =
-        document.getElementById("participationPrompt");
-
-    const participationText =
-        document.getElementById("participationText");
-
-    const participationLogin =
-        document.getElementById("participationLogin");
-
-    const reportDialog =
-        document.getElementById("reportDialog");
-
-    const reportForm =
-        document.getElementById("reportForm");
-
-    const reportReason =
-        document.getElementById("reportReason");
-
-    const reportMessage =
-        document.getElementById("reportMessage");
-
-    const submitReportButton =
-        document.getElementById("submitReportButton");
-
-    const closeReportDialog =
-        document.getElementById("closeReportDialog");
-
-    const cancelReportButton =
-        document.getElementById("cancelReportButton");
-
-    const CATEGORIES = {
+    const categories = {
         "academic-life": "Academic Life",
         "campus-mobility": "Campus Mobility",
         "canteens-and-food": "Canteens and Food",
@@ -113,112 +14,132 @@
         "workshops-and-skills": "Workshops and Skills"
     };
 
-    const params = new URLSearchParams(
-        window.location.search
-    );
+    const debateId = Number(new URLSearchParams(window.location.search).get("id"));
+    const debateEndpoint = `/api/debates/${debateId}`;
+    const commentsEndpoint = `${debateEndpoint}/comments`;
 
-    const debateId = Number(
-        params.get("id")
-    );
+    const pageNotice = $("pageNotice");
+    const debateContent = $("debateContent");
+    const debateError = $("debateError");
+    const commentsCount = $("commentsCount");
+    const commentsSort = $("commentsSort");
+    const commentsList = $("commentsList");
+    const commentForm = $("commentForm");
+    const commentContent = $("commentContent");
+    const commentAnonymous = $("commentAnonymous");
+    const commentCharacterCount = $("commentCharacterCount");
+    const submitCommentButton = $("submitCommentButton");
+    const commentMessage = $("commentMessage");
+    const participationPrompt = $("participationPrompt");
+    const participationText = $("participationText");
+    const participationLogin = $("participationLogin");
+    const reportDialog = $("reportDialog");
+    const reportForm = $("reportForm");
+    const reportReason = $("reportReason");
+    const reportMessage = $("reportMessage");
+    const submitReportButton = $("submitReportButton");
+    const closeReportDialog = $("closeReportDialog");
+    const cancelReportButton = $("cancelReportButton");
+
+    const MAX_COMMENT_LENGTH = 1500;
+
+    const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Europe/Lisbon"
+    });
 
     let currentUser = null;
-    let authFailed = false;
     let currentDebate = null;
+    let authFailed = false;
     let commentsController = null;
     let reportingCommentId = null;
 
-    function createElement(tag, className, text) {
+    const canComment = () => currentUser?.role === "student";
+    const isAdmin = () => currentUser?.role === "admin";
+    const isApproved = () => currentDebate?.status === "approved";
+
+    function createElement(tag, className = "", text) {
         const element = document.createElement(tag);
 
-        if (className) {
-            element.className = className;
-        }
-
-        if (text !== undefined) {
-            element.textContent = text;
-        }
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = String(text);
 
         return element;
     }
 
     function formatDate(value) {
-        if (!value) {
-            return "";
-        }
+        if (!value) return "";
 
-        let normalized = value;
+        let normalized = String(value).trim();
 
-        if (
-            /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
-        ) {
-            normalized = value.replace(" ", "T") + "Z";
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)) {
+            normalized = normalized.replace(" ", "T") + "Z";
         }
 
         const date = new Date(normalized);
 
-        if (Number.isNaN(date.getTime())) {
-            return "";
-        }
-
-        return new Intl.DateTimeFormat("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }).format(date);
+        return Number.isNaN(date.getTime())
+            ? ""
+            : dateFormatter.format(date);
     }
 
-    function commentCountText(count) {
-        return count === 1
-            ? "1 comment"
-            : `${count} comments`;
+    function countText(value, singular) {
+        const count = Number(value) || 0;
+
+        return `${count} ${singular}${count === 1 ? "" : "s"}`;
     }
 
-    function likeCountText(count) {
-        return count === 1
-            ? "1 like"
-            : `${count} likes`;
+    function setMessage(element, message = "", isError = false) {
+        element.textContent = message;
+        element.classList.toggle("is-error", isError);
     }
 
-    function canComment() {
-        return currentUser?.role === "student";
+    function setCommentMessage(message = "", isError = false) {
+        setMessage(commentMessage, message, isError);
     }
 
-    function isAdmin() {
-        return currentUser?.role === "admin";
-    }
+    function setBusy(button, busy, text) {
+        button.disabled = busy;
 
-    function setCommentMessage(message, isError = false) {
-        commentMessage.textContent = message;
-
-        commentMessage.classList.toggle(
-            "is-error",
-            isError
-        );
+        if (text !== undefined) button.textContent = text;
     }
 
     async function fetchJSON(url, options = {}) {
         const response = await fetch(url, {
             credentials: "same-origin",
+            cache: "no-store",
             ...options
         });
 
-        const data = await response.json().catch(
-            () => ({})
-        );
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
             throw new Error(
-                data.error ||
-                "Something went wrong. Please try again."
+                data.error || "Something went wrong. Please try again."
             );
         }
 
         return data;
     }
 
+    function sendRequest(url, method = "POST", body) {
+        const options = { method };
+
+        if (body !== undefined) {
+            options.headers = {
+                "Content-Type": "application/json"
+            };
+
+            options.body = JSON.stringify(body);
+        }
+
+        return fetchJSON(url, options);
+    }
+
     function showError(message) {
-        pageNotice.textContent = message;
-        pageNotice.classList.add("is-error");
+        setMessage(pageNotice, message, true);
 
         debateContent.hidden = true;
         debateError.hidden = false;
@@ -226,286 +147,183 @@
 
     async function loadCurrentUser() {
         try {
-            const data = await fetchJSON(
-                "/api/auth/me"
-            );
-
+            const data = await fetchJSON("/api/auth/me");
             currentUser = data.user || null;
-
-        } catch (error) {
+        } catch {
             currentUser = null;
             authFailed = true;
         }
     }
 
     function updateParticipation() {
-        if (!currentDebate) {
-            return;
-        }
+        const approved = isApproved();
+        const student = canComment();
 
-        if (currentDebate.status !== "approved") {
-            commentForm.hidden = true;
-            participationPrompt.hidden = true;
-            return;
-        }
+        commentForm.hidden = !approved || !student;
+        participationPrompt.hidden = !approved || student;
 
-        if (canComment()) {
-            commentForm.hidden = false;
-            participationPrompt.hidden = true;
-            return;
-        }
+        if (!approved || student) return;
 
-        commentForm.hidden = true;
-        participationPrompt.hidden = false;
+        participationLogin.hidden = authFailed || Boolean(currentUser);
 
         if (authFailed) {
             participationText.textContent =
                 "Unable to verify your session. Please refresh the page.";
-
-            participationLogin.hidden = true;
-
         } else if (!currentUser) {
             participationText.textContent =
                 "Sign in with a student account to join the discussion.";
-
-            participationLogin.hidden = false;
-
         } else {
             participationText.textContent =
                 "Only student accounts can publish comments and react to discussions.";
-
-            participationLogin.hidden = true;
         }
     }
 
     function renderDebate(debate) {
         currentDebate = debate;
 
-        const categoryName =
-            CATEGORIES[debate.category] || "Debates";
+        const categoryName = Object.hasOwn(categories, debate.category)
+            ? categories[debate.category]
+            : "Debates";
 
-        categoryBackLink.textContent =
-            categoryName;
+        const category = encodeURIComponent(debate.category);
+        const approved = isApproved();
+        const rejected = debate.status === "rejected";
 
-        categoryBackLink.href =
-            `debates.html?category=${encodeURIComponent(debate.category)}`;
+        $("categoryBackLink").textContent = categoryName;
+        $("categoryBackLink").href = `debates.html?category=${category}`;
 
-        debateCategory.textContent =
-            categoryName;
+        $("debateCategory").textContent = categoryName;
+        $("debateTitle").textContent = debate.title;
+        $("debateAuthor").textContent = `Started by ${debate.authorName}`;
+        $("debateDate").textContent = formatDate(debate.createdAt);
+        $("debateDescription").textContent = debate.description;
 
-        debateTitle.textContent =
-            debate.title;
+        $("createProposalLink").href = `createProposal.html?category=${category}`;
 
-        debateAuthor.textContent =
-            `Started by ${debate.authorName}`;
-
-        debateDate.textContent =
-            formatDate(debate.createdAt);
-
-        debateDescription.textContent =
-            debate.description;
-
-        document.title =
-            `${debate.title} | Instant Democracy`;
-
-        createProposalLink.href =
-            `createProposal.html?category=${encodeURIComponent(debate.category)}`;
+        document.title = `${debate.title} | Instant Democracy`;
 
         debateContent.hidden = false;
-        pageNotice.textContent = "";
+        debateError.hidden = true;
 
-        if (debate.status !== "approved") {
-            discussionSection.hidden = true;
-            debateTopicActions.hidden = true;
+        setMessage(pageNotice);
 
-            moderationNotice.hidden = false;
+        $("discussionSection").hidden = !approved;
+        $("debateTopicActions").hidden = !approved;
 
-            moderationNotice.classList.toggle(
-                "is-rejected",
-                debate.status === "rejected"
-            );
+        const moderationNotice = $("moderationNotice");
 
-            if (debate.status === "pending") {
-                moderationTitle.textContent =
-                    "Pending Review";
+        moderationNotice.hidden = approved;
+        moderationNotice.classList.toggle("is-rejected", rejected);
 
-                moderationText.textContent =
-                    "This debate is waiting for administrator approval. It is not publicly visible yet.";
+        if (!approved) {
+            const pending = debate.status === "pending";
 
-            } else {
-                moderationTitle.textContent =
-                    "Debate Rejected";
+            $("moderationTitle").textContent = pending
+                ? "Pending Review"
+                : "Debate Rejected";
 
-                moderationText.textContent =
-                    debate.rejectionReason
-                        ? `Reason: ${debate.rejectionReason}`
-                        : "This debate was not approved for publication.";
-            }
-
-            return;
+            $("moderationText").textContent = pending
+                ? "This debate is waiting for administrator approval. It is not publicly visible yet."
+                : debate.rejectionReason
+                    ? `Reason: ${debate.rejectionReason}`
+                    : "This debate was not approved for publication.";
         }
-
-        moderationNotice.hidden = true;
-        debateTopicActions.hidden = false;
-        discussionSection.hidden = false;
 
         updateParticipation();
     }
 
+    function createActionButton(action, commentId, text, className) {
+        const button = createElement("button", className, text);
+
+        button.type = "button";
+        button.dataset.action = action;
+        button.dataset.commentId = commentId;
+
+        return button;
+    }
+
     function createCommentCard(comment) {
-        const card = createElement(
-            "article",
-            "debate-comment-card"
+        const card = createElement("article", "debate-comment-card");
+        const header = createElement("div", "debate-comment-header");
+        const identity = createElement("div", "debate-comment-identity");
+        const actions = createElement("div", "debate-comment-actions");
+
+        card.classList.toggle("is-hidden", Boolean(comment.hidden));
+
+        identity.append(
+            createElement("strong", "debate-comment-author", comment.author)
         );
-
-        if (comment.hidden) {
-            card.classList.add("is-hidden");
-        }
-
-        const header = createElement(
-            "div",
-            "debate-comment-header"
-        );
-
-        const identity = createElement(
-            "div",
-            "debate-comment-identity"
-        );
-
-        const author = createElement(
-            "strong",
-            "debate-comment-author",
-            comment.author
-        );
-
-        identity.append(author);
 
         if (comment.anonymous) {
             identity.append(
-                createElement(
-                    "span",
-                    "debate-anonymous-badge",
-                    "Anonymous"
-                )
+                createElement("span", "debate-anonymous-badge", "Anonymous")
             );
         }
 
         if (comment.hidden) {
             identity.append(
+                createElement("span", "debate-hidden-badge", "Hidden")
+            );
+        }
+
+        header.append(
+            identity,
+            createElement("time", "debate-comment-date", formatDate(comment.createdAt))
+        );
+
+        card.append(
+            header,
+            createElement("p", "debate-comment-text", comment.content)
+        );
+
+        if (isAdmin() && comment.anonymous && comment.realAuthorName) {
+            card.append(
                 createElement(
-                    "span",
-                    "debate-hidden-badge",
-                    "Hidden"
+                    "p",
+                    "debate-admin-identity",
+                    `Administrator only — Real author: ${comment.realAuthorName}`
                 )
             );
         }
-
-        const date = createElement(
-            "time",
-            "debate-comment-date",
-            formatDate(comment.createdAt)
-        );
-
-        header.append(identity, date);
-
-        const content = createElement(
-            "p",
-            "debate-comment-text",
-            comment.content
-        );
-
-        card.append(header, content);
-
-        if (
-            isAdmin() &&
-            comment.anonymous &&
-            comment.realAuthorName
-        ) {
-            const identityInfo = createElement(
-                "p",
-                "debate-admin-identity",
-                `Administrator only — Real author: ${comment.realAuthorName}`
-            );
-
-            card.append(identityInfo);
-        }
-
-        const actions = createElement(
-            "div",
-            "debate-comment-actions"
-        );
 
         if (canComment() && !comment.hidden) {
+            const liked = Boolean(comment.likedByMe);
 
-            const likeButton = createElement(
-                "button",
-                "debate-like-button",
-                comment.likedByMe
-                    ? `♥ Liked · ${comment.likes}`
-                    : `♡ Like · ${comment.likes}`
+            const likeButton = createActionButton(
+                "like",
+                comment.id,
+                `${liked ? "♥ Liked" : "♡ Like"} · ${comment.likes}`,
+                "debate-like-button"
             );
 
-            likeButton.type = "button";
-
-            likeButton.dataset.action = "like";
-            likeButton.dataset.commentId = comment.id;
-
-            if (comment.likedByMe) {
-                likeButton.classList.add("is-liked");
-            }
-
-            actions.append(likeButton);
-
-            const reportButton = createElement(
-                "button",
-                "debate-report-button",
-                "Report"
-            );
-
-            reportButton.type = "button";
-
-            reportButton.dataset.action = "report";
-            reportButton.dataset.commentId = comment.id;
-
-            actions.append(reportButton);
-
-        } else {
+            likeButton.classList.toggle("is-liked", liked);
+            likeButton.setAttribute("aria-pressed", String(liked));
 
             actions.append(
-                createElement(
-                    "span",
-                    "debate-likes-text",
-                    likeCountText(comment.likes)
+                likeButton,
+                createActionButton(
+                    "report",
+                    comment.id,
+                    "Report",
+                    "debate-report-button"
                 )
             );
-
+        } else {
+            actions.append(
+                createElement("span", "debate-likes-text", countText(comment.likes, "like"))
+            );
         }
 
         if (isAdmin()) {
-            const visibilityButton = createElement(
-                "button",
-                "debate-visibility-button",
-                comment.hidden
-                    ? "Restore Comment"
-                    : "Hide Comment"
+            const visibilityButton = createActionButton(
+                "visibility",
+                comment.id,
+                comment.hidden ? "Restore Comment" : "Hide Comment",
+                "debate-visibility-button"
             );
 
-            visibilityButton.type = "button";
-
-            visibilityButton.dataset.action =
-                "visibility";
-
-            visibilityButton.dataset.commentId =
-                comment.id;
-
-            visibilityButton.dataset.hidden =
-                String(Boolean(comment.hidden));
-
-            if (!comment.hidden) {
-                visibilityButton.classList.add(
-                    "is-danger"
-                );
-            }
+            visibilityButton.dataset.hidden = String(Boolean(comment.hidden));
+            visibilityButton.classList.toggle("is-danger", !comment.hidden);
 
             actions.append(visibilityButton);
         }
@@ -515,91 +333,61 @@
         return card;
     }
 
-    async function loadComments() {
-        if (!currentDebate) {
-            return;
-        }
+    function showCommentsState(message) {
+        commentsList.replaceChildren(
+            createElement("p", "debate-empty-comments", message)
+        );
+    }
 
-        if (commentsController) {
-            commentsController.abort();
-        }
+    async function loadComments() {
+        if (!isApproved()) return false;
+
+        commentsController?.abort();
 
         const controller = new AbortController();
-
         commentsController = controller;
 
-        commentsList.replaceChildren(
-            createElement(
-                "p",
-                "debate-empty-comments",
-                "Loading comments..."
-            )
-        );
+        showCommentsState("Loading comments...");
 
         try {
-            const sort = commentsSort.value;
+            const sort = encodeURIComponent(commentsSort.value);
 
-            const data = await fetchJSON(
-                `/api/debates/${debateId}/comments?sort=${encodeURIComponent(sort)}`,
-                {
-                    signal: controller.signal
-                }
-            );
-
-            if (commentsController !== controller) {
-                return;
-            }
-
-            commentsList.replaceChildren();
-
-            const comments = data.comments || [];
-
-            const visibleCount = comments.filter(
-                comment => !comment.hidden
-            ).length;
-
-            commentsCount.textContent =
-                commentCountText(visibleCount);
-
-            if (comments.length === 0) {
-                commentsList.append(
-                    createElement(
-                        "p",
-                        "debate-empty-comments",
-                        "No comments yet. Be the first to share your thoughts!"
-                    )
-                );
-
-                return;
-            }
-
-            comments.forEach(comment => {
-                commentsList.append(
-                    createCommentCard(comment)
-                );
+            const data = await fetchJSON(`${commentsEndpoint}?sort=${sort}`, {
+                signal: controller.signal
             });
 
+            if (commentsController !== controller) return false;
+
+            if (!Array.isArray(data.comments)) {
+                throw new Error("Invalid comments response.");
+            }
+
+            const comments = data.comments;
+            const visibleCount = comments.filter(comment => !comment.hidden).length;
+
+            commentsCount.textContent = countText(visibleCount, "comment");
+
+            if (comments.length) {
+                commentsList.replaceChildren(...comments.map(createCommentCard));
+            } else {
+                showCommentsState(
+                    "No comments yet. Be the first to share your thoughts!"
+                );
+            }
+
+            return true;
+
         } catch (error) {
-            if (error.name === "AbortError") {
-                return;
+            if (error.name === "AbortError" || commentsController !== controller) {
+                return false;
             }
 
-            if (commentsController !== controller) {
-                return;
-            }
+            commentsCount.textContent = "Unable to load comments.";
 
-            commentsList.replaceChildren(
-                createElement(
-                    "p",
-                    "debate-empty-comments",
-                    "Unable to load comments. Please try again."
-                )
-            );
+            showCommentsState("Unable to load comments. Please try again.");
+            setCommentMessage(error.message, true);
 
-            setCommentMessage(
-                error.message,
-                true
-            );
+            return false;
 
         } finally {
             if (commentsController === controller) {
@@ -608,332 +396,230 @@
         }
     }
 
-    commentsSort.addEventListener(
-        "change",
-        () => {
-            setCommentMessage("");
-            loadComments();
+    function updateCharacterCount() {
+        commentCharacterCount.textContent =
+            `${commentContent.value.length} / ${MAX_COMMENT_LENGTH}`;
+    }
+
+    commentsSort.addEventListener("change", () => {
+        setCommentMessage();
+        loadComments();
+    });
+
+    commentContent.addEventListener("input", updateCharacterCount);
+
+    commentForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        if (submitCommentButton.disabled) return;
+
+        if (!canComment() || !isApproved()) {
+            setCommentMessage("Only students can post comments on approved debates.", true);
+            return;
         }
-    );
 
-    commentContent.addEventListener(
-        "input",
-        () => {
-            commentCharacterCount.textContent =
-                `${commentContent.value.length} / 1500`;
-        }
-    );
+        const content = commentContent.value.trim();
+        const anonymous = commentAnonymous.checked;
 
-    commentForm.addEventListener(
-        "submit",
-        async event => {
-            event.preventDefault();
-
-            if (!canComment()) {
-                setCommentMessage(
-                    "Only students can post comments.",
-                    true
-                );
-                return;
-            }
-
-            const content =
-                commentContent.value.trim();
-
-            const anonymous =
-                commentAnonymous.checked;
-
-            if (!content || content.length > 1500) {
-                setCommentMessage(
-                    "Please enter a comment of up to 1500 characters.",
-                    true
-                );
-                return;
-            }
-
-            submitCommentButton.disabled = true;
-            submitCommentButton.textContent =
-                "Publishing...";
-
-            setCommentMessage("");
-
-            try {
-                await fetchJSON(
-                    `/api/debates/${debateId}/comments`,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            content,
-                            anonymous
-                        })
-                    }
-                );
-
-                commentForm.reset();
-
-                commentCharacterCount.textContent =
-                    "0 / 1500";
-
-                commentsSort.value = "recent";
-
-                await loadComments();
-
-                setCommentMessage(
-                    "Your comment has been published successfully."
-                );
-
-            } catch (error) {
-                setCommentMessage(
-                    error.message,
-                    true
-                );
-
-            } finally {
-                submitCommentButton.disabled = false;
-                submitCommentButton.textContent =
-                    "Post Comment";
-            }
-        }
-    );
-
-    commentsList.addEventListener(
-        "click",
-        async event => {
-            const button = event.target.closest(
-                "button[data-action]"
+        if (!content || content.length > MAX_COMMENT_LENGTH) {
+            setCommentMessage(
+                `Please enter a comment of up to ${MAX_COMMENT_LENGTH} characters.`,
+                true
             );
-
-            if (
-                !button ||
-                !commentsList.contains(button)
-            ) {
-                return;
-            }
-
-            const commentId = Number(
-                button.dataset.commentId
-            );
-
-            const action =
-                button.dataset.action;
-
-            if (
-                !Number.isSafeInteger(commentId) ||
-                commentId <= 0
-            ) {
-                return;
-            }
-
-            if (action === "like") {
-                if (!canComment()) {
-                    return;
-                }
-
-                button.disabled = true;
-                setCommentMessage("");
-
-                try {
-                    await fetchJSON(
-                        `/api/debates/${debateId}/comments/${commentId}/like`,
-                        {
-                            method: "POST"
-                        }
-                    );
-
-                    await loadComments();
-
-                } catch (error) {
-                    setCommentMessage(
-                        error.message,
-                        true
-                    );
-
-                    button.disabled = false;
-                }
-            }
-
-            if (action === "report") {
-                if (!canComment()) {
-                    return;
-                }
-
-                reportingCommentId = commentId;
-
-                reportForm.reset();
-                reportMessage.textContent = "";
-
-                reportDialog.showModal();
-            }
-
-            if (action === "visibility") {
-                if (!isAdmin()) {
-                    return;
-                }
-
-                const currentlyHidden =
-                    button.dataset.hidden === "true";
-
-                button.disabled = true;
-
-                try {
-                    await fetchJSON(
-                        `/api/debates/admin/comments/${commentId}/visibility`,
-                        {
-                            method: "PATCH",
-
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                hidden: !currentlyHidden
-                            })
-                        }
-                    );
-
-                    await loadComments();
-
-                    setCommentMessage(
-                        currentlyHidden
-                            ? "Comment restored successfully."
-                            : "Comment hidden successfully."
-                    );
-
-                } catch (error) {
-                    setCommentMessage(
-                        error.message,
-                        true
-                    );
-
-                    button.disabled = false;
-                }
-            }
+            return;
         }
-    );
+
+        setBusy(submitCommentButton, true, "Publishing...");
+        setCommentMessage();
+
+        try {
+            await sendRequest(commentsEndpoint, "POST", {
+                content,
+                anonymous
+            });
+
+            commentForm.reset();
+            updateCharacterCount();
+
+            commentsSort.value = "recent";
+
+            if (await loadComments()) {
+                setCommentMessage("Your comment has been published successfully.");
+            }
+
+        } catch (error) {
+            setCommentMessage(error.message, true);
+
+        } finally {
+            setBusy(submitCommentButton, false, "Post Comment");
+        }
+    });
+
+    function openReport(commentId) {
+        if (reportDialog.open || submitReportButton.disabled) return;
+
+        reportingCommentId = commentId;
+
+        reportForm.reset();
+        reportMessage.textContent = "";
+
+        reportDialog.showModal();
+    }
 
     function closeReport() {
         reportDialog.close();
         reportingCommentId = null;
     }
 
-    closeReportDialog.addEventListener(
-        "click",
-        closeReport
-    );
+    async function handleCommentAction(button, commentId, action) {
+        if (!isApproved()) return;
 
-    cancelReportButton.addEventListener(
-        "click",
-        closeReport
-    );
-
-    reportDialog.addEventListener(
-        "close",
-        () => {
-            reportingCommentId = null;
-        }
-    );
-
-    reportForm.addEventListener(
-        "submit",
-        async event => {
-            event.preventDefault();
-
-            if (!canComment()) {
-                return;
-            }
-
-            if (!reportingCommentId) {
-                return;
-            }
-
-            const reason =
-                reportReason.value.trim();
-
-            if (
-                reason.length < 5 ||
-                reason.length > 500
-            ) {
-                reportMessage.textContent =
-                    "Please provide a reason between 5 and 500 characters.";
-
-                return;
-            }
-
-            submitReportButton.disabled = true;
-            submitReportButton.textContent =
-                "Submitting...";
-
-            reportMessage.textContent = "";
-
-            try {
-                await fetchJSON(
-                    `/api/debates/${debateId}/comments/${reportingCommentId}/report`,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            reason
-                        })
-                    }
-                );
-
-                closeReport();
-
-                setCommentMessage(
-                    "Your report has been submitted. An administrator will review it."
-                );
-
-            } catch (error) {
-                reportMessage.textContent =
-                    error.message;
-
-            } finally {
-                submitReportButton.disabled = false;
-                submitReportButton.textContent =
-                    "Submit Report";
-            }
-        }
-    );
-
-    async function loadDebate() {
-        if (
-            !Number.isSafeInteger(debateId) ||
-            debateId <= 0
-        ) {
-            showError(
-                "Invalid debate link."
-            );
-
+        if (action === "report") {
+            if (canComment()) openReport(commentId);
             return;
         }
 
-        pageNotice.textContent =
-            "Loading debate...";
+        const like = action === "like";
+        const visibility = action === "visibility";
+
+        if (!like && !visibility) return;
+        if (like && !canComment()) return;
+        if (visibility && !isAdmin()) return;
+
+        const currentlyHidden = button.dataset.hidden === "true";
+
+        setBusy(button, true);
+        setCommentMessage();
 
         try {
-            const data = await fetchJSON(
-                `/api/debates/${debateId}`
-            );
+            if (like) {
+                await sendRequest(`${commentsEndpoint}/${commentId}/like`);
+            } else {
+                await sendRequest(
+                    `/api/debates/admin/comments/${commentId}/visibility`,
+                    "PATCH",
+                    { hidden: !currentlyHidden }
+                );
+            }
 
-            renderDebate(data.debate);
+            const loaded = await loadComments();
 
-            if (data.debate.status === "approved") {
-                await loadComments();
+            if (visibility && loaded) {
+                setCommentMessage(
+                    currentlyHidden
+                        ? "Comment restored successfully."
+                        : "Comment hidden successfully."
+                );
             }
 
         } catch (error) {
-            showError(
-                error.message
+            setCommentMessage(error.message, true);
+
+        } finally {
+            setBusy(button, false);
+        }
+    }
+
+    commentsList.addEventListener("click", event => {
+        const button = event.target.closest("button[data-action]");
+
+        if (!button || button.disabled || !commentsList.contains(button)) return;
+
+        const commentId = Number(button.dataset.commentId);
+
+        if (!Number.isSafeInteger(commentId) || commentId <= 0) return;
+
+        handleCommentAction(button, commentId, button.dataset.action);
+    });
+
+    [closeReportDialog, cancelReportButton].forEach(button => {
+        button.addEventListener("click", () => {
+            if (!submitReportButton.disabled) closeReport();
+        });
+    });
+
+    reportDialog.addEventListener("cancel", event => {
+        if (submitReportButton.disabled) event.preventDefault();
+    });
+
+    reportDialog.addEventListener("close", () => {
+        if (!reportDialog.open) reportingCommentId = null;
+    });
+
+    function setReportBusy(busy) {
+        setBusy(
+            submitReportButton,
+            busy,
+            busy ? "Submitting..." : "Submit Report"
+        );
+
+        closeReportDialog.disabled = busy;
+        cancelReportButton.disabled = busy;
+    }
+
+    reportForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        if (
+            submitReportButton.disabled ||
+            !canComment() ||
+            !isApproved() ||
+            !reportingCommentId
+        ) return;
+
+        const reason = reportReason.value.trim();
+
+        if (reason.length < 5 || reason.length > 500) {
+            reportMessage.textContent =
+                "Please provide a reason between 5 and 500 characters.";
+            return;
+        }
+
+        setReportBusy(true);
+        reportMessage.textContent = "";
+
+        try {
+            await sendRequest(
+                `${commentsEndpoint}/${reportingCommentId}/report`,
+                "POST",
+                { reason }
             );
+
+            closeReport();
+
+            setCommentMessage(
+                "Your report has been submitted. An administrator will review it."
+            );
+
+        } catch (error) {
+            reportMessage.textContent = error.message;
+
+        } finally {
+            setReportBusy(false);
+        }
+    });
+
+    async function loadDebate() {
+        if (!Number.isSafeInteger(debateId) || debateId <= 0) {
+            showError("Invalid debate link.");
+            return;
+        }
+
+        setMessage(pageNotice, "Loading debate...");
+
+        try {
+            const data = await fetchJSON(debateEndpoint);
+
+            if (!data.debate) {
+                throw new Error("Debate not found.");
+            }
+
+            renderDebate(data.debate);
+
+            if (isApproved()) await loadComments();
+
+        } catch (error) {
+            showError(error.message);
         }
     }
 
@@ -943,5 +629,4 @@
     }
 
     initializePage();
-
 })();

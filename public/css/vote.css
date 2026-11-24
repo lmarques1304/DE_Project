@@ -64,8 +64,7 @@
 }
 
 .vote-content {
-    padding-top: 66px;
-    padding-bottom: 100px;
+    padding: 66px 0 100px;
 }
 
 .vote-section-heading {
@@ -87,8 +86,13 @@
     line-height: 1.75;
 }
 
-.main-filters {
+.main-filters,
+.proposal-grid,
+.vote-actions {
     display: grid;
+}
+
+.main-filters {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 31px;
@@ -96,24 +100,33 @@
     border-bottom: 1px solid var(--vote-border);
 }
 
+.filter-button,
+.category-button,
+.vote-button,
+.clear-filters,
+.proposal-read-more {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.filter-button,
+.category-button {
+    border: 1px solid var(--vote-border);
+    background: #fff;
+}
+
 .filter-button {
     min-height: 49px;
     padding: 12px 16px;
-    border: 1px solid var(--vote-border);
     border-radius: 10px;
-    background: #fff;
     color: var(--vote-text);
-    font-family: inherit;
     font-size: 13px;
     font-weight: 700;
-    cursor: pointer;
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.filter-button:hover {
+.filter-button:hover,
+.category-button:hover {
     border-color: var(--vote-green);
     color: var(--vote-green);
 }
@@ -142,10 +155,15 @@
     margin-bottom: 47px;
 }
 
-.filter-heading {
+.filter-heading,
+.results-heading,
+.proposal-card-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.filter-heading {
     gap: 16px;
     margin-bottom: 18px;
 }
@@ -156,18 +174,21 @@
     font-weight: 750;
 }
 
-.clear-filters {
-    padding: 6px 0;
+.clear-filters,
+.proposal-read-more {
     border: 0;
     background: transparent;
     color: var(--vote-green);
-    font-family: inherit;
     font-size: 12px;
     font-weight: 750;
-    cursor: pointer;
 }
 
-.clear-filters:hover:not(:disabled) {
+.clear-filters {
+    padding: 6px 0;
+}
+
+.clear-filters:hover:not(:disabled),
+.proposal-read-more:hover {
     text-decoration: underline;
 }
 
@@ -176,7 +197,8 @@
     cursor: default;
 }
 
-.secondary-filters {
+.secondary-filters,
+.proposal-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 9px;
@@ -185,20 +207,11 @@
 .category-button {
     min-height: 37px;
     padding: 9px 15px;
-    border: 1px solid var(--vote-border);
     border-radius: 999px;
-    background: #fff;
     color: var(--vote-muted);
-    font-family: inherit;
     font-size: 12px;
     font-weight: 600;
-    cursor: pointer;
     transition: 0.2s ease;
-}
-
-.category-button:hover {
-    border-color: var(--vote-green);
-    color: var(--vote-green);
 }
 
 .category-button.active {
@@ -216,9 +229,6 @@
 }
 
 .results-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     gap: 20px;
     margin-bottom: 23px;
 }
@@ -230,38 +240,46 @@
     letter-spacing: -0.4px;
 }
 
-.results-heading p {
-    margin: 0;
+.results-heading p,
+.results-heading > span {
     color: var(--vote-muted);
     font-size: 12px;
 }
 
+.results-heading p {
+    margin: 0;
+}
+
 .results-heading > span {
-    color: var(--vote-muted);
-    font-size: 12px;
     font-weight: 650;
     white-space: nowrap;
 }
 
-.proposal-grid {
-    display: grid;
+.proposal-grid,
+.vote-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.proposal-grid {
     gap: 22px;
     align-items: stretch;
 }
 
-.proposal-card {
+.proposal-card,
+.vote-results,
+.vote-result-row {
     display: flex;
     flex-direction: column;
+}
+
+.proposal-card {
     min-width: 0;
     padding: 28px;
     border: 1px solid var(--vote-border);
     border-radius: 15px;
     background: #fff;
     box-shadow: 0 3px 14px rgba(30, 55, 35, 0.035);
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .proposal-card:hover {
@@ -270,16 +288,17 @@
 }
 
 .proposal-meta {
-    display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 9px;
     margin-bottom: 18px;
 }
 
-.proposal-tag {
+.proposal-tag,
+.proposal-status {
     display: inline-flex;
     align-items: center;
+}
+
+.proposal-tag {
     min-height: 26px;
     padding: 5px 10px;
     border-radius: 6px;
@@ -290,9 +309,13 @@
     letter-spacing: 0.2px;
 }
 
-.proposal-source {
+.proposal-source,
+.proposal-outcome {
     color: var(--vote-muted);
     font-size: 11px;
+}
+
+.proposal-source {
     font-weight: 600;
 }
 
@@ -330,17 +353,6 @@
     align-self: flex-start;
     margin-top: 9px;
     padding: 3px 0;
-    border: 0;
-    background: transparent;
-    color: var(--vote-green);
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 750;
-    cursor: pointer;
-}
-
-.proposal-read-more:hover {
-    text-decoration: underline;
 }
 
 .proposal-author {
@@ -371,18 +383,13 @@
 }
 
 .proposal-card-footer {
-    display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
     gap: 10px;
     margin-top: auto;
     padding-top: 20px;
 }
 
 .proposal-status {
-    display: inline-flex;
-    align-items: center;
     gap: 7px;
     font-size: 12px;
     font-weight: 750;
@@ -405,8 +412,6 @@
 }
 
 .proposal-outcome {
-    color: var(--vote-muted);
-    font-size: 11px;
     font-weight: 650;
 }
 
@@ -417,8 +422,6 @@
 }
 
 .vote-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 11px;
     margin-bottom: 20px;
 }
@@ -427,14 +430,9 @@
     min-height: 44px;
     padding: 12px 18px;
     border-radius: 9px;
-    font-family: inherit;
     font-size: 13px;
     font-weight: 800;
-    cursor: pointer;
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .vote-button:hover:not(:disabled) {
@@ -503,8 +501,6 @@
 }
 
 .vote-results {
-    display: flex;
-    flex-direction: column;
     gap: 13px;
 }
 
@@ -515,8 +511,6 @@
 }
 
 .vote-result-row {
-    display: flex;
-    flex-direction: column;
     gap: 7px;
 }
 
@@ -597,7 +591,6 @@
 }
 
 @media (max-width: 900px) {
-
     .vote-content {
         padding-top: 55px;
     }
@@ -609,11 +602,9 @@
     .proposal-grid {
         gap: 16px;
     }
-
 }
 
 @media (max-width: 700px) {
-
     .vote-container {
         width: min(100% - 32px, 1160px);
     }
@@ -643,16 +634,15 @@
     .proposal-card {
         padding: 24px;
     }
-
 }
 
 @media (max-width: 480px) {
-
     .vote-intro p {
         font-size: 14px;
     }
 
-    .filter-heading {
+    .filter-heading,
+    .results-heading {
         align-items: flex-start;
     }
 
@@ -660,11 +650,8 @@
         line-height: 1.5;
     }
 
-    .results-heading {
-        align-items: flex-start;
-    }
-
-    .results-heading h3 {
+    .results-heading h3,
+    .proposal-card h3 {
         font-size: 18px;
     }
 
@@ -680,10 +667,6 @@
 
     .proposal-card {
         padding: 20px;
-    }
-
-    .proposal-card h3 {
-        font-size: 18px;
     }
 
     .vote-actions {

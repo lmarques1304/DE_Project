@@ -1,230 +1,138 @@
 (() => {
     "use strict";
 
-    const CATEGORIES = [
-        {
-            slug: "academic-life",
+    const $ = id => document.getElementById(id);
+
+    const categories = {
+        "academic-life": {
             name: "Academic Life",
             description: "Discuss classes, academic schedules and student experiences."
         },
-        {
-            slug: "campus-mobility",
+        "campus-mobility": {
             name: "Campus Mobility",
             description: "Share ideas about transport, accessibility and moving around campus."
         },
-        {
-            slug: "canteens-and-food",
+        "canteens-and-food": {
             name: "Canteens and Food",
             description: "Discuss university meals, canteens and food services."
         },
-        {
-            slug: "events-and-traditions",
+        "events-and-traditions": {
             name: "Events and Traditions",
             description: "Talk about student events, celebrations and university traditions."
         },
-        {
-            slug: "sports-and-culture",
+        "sports-and-culture": {
             name: "Sports and Culture",
             description: "Explore sports activities, cultural events and student initiatives."
         },
-        {
-            slug: "student-well-being",
+        "student-well-being": {
             name: "Student Well-Being",
             description: "Discuss student support, well-being and campus life."
         },
-        {
-            slug: "study-spaces",
+        "study-spaces": {
             name: "Study Spaces",
             description: "Share ideas about libraries, study rooms and learning environments."
         },
-        {
-            slug: "workshops-and-skills",
+        "workshops-and-skills": {
             name: "Workshops and Skills",
             description: "Explore learning opportunities, workshops and practical skills."
         }
-    ];
+    };
 
-    const categoryMap = new Map(
-        CATEGORIES.map(category => [
-            category.slug,
-            category
-        ])
-    );
+    const overviewView = $("overviewView");
+    const categoryView = $("categoryView");
+    const categoriesGrid = $("categoriesGrid");
+    const categoryCount = $("categoryCount");
+    const debatesList = $("debatesList");
+    const debateSearch = $("debateSearch");
+    const debateSort = $("debateSort");
+    const loadMoreButton = $("loadMoreButton");
+    const pageMessage = $("pageMessage");
+    const startDebateButton = $("startDebateButton");
+    const createDebateDialog = $("createDebateDialog");
+    const createDebateForm = $("createDebateForm");
+    const createDebateMessage = $("createDebateMessage");
+    const submitDebateButton = $("submitDebateButton");
+    const newDebateCategory = $("newDebateCategory");
 
-    const overviewView =
-        document.getElementById("overviewView");
+    const selectedCategory = new URLSearchParams(window.location.search).get("category");
 
-    const categoryView =
-        document.getElementById("categoryView");
-
-    const categoriesGrid =
-        document.getElementById("categoriesGrid");
-
-    const categoryBreadcrumb =
-        document.getElementById("categoryBreadcrumb");
-
-    const categoryTitle =
-        document.getElementById("categoryTitle");
-
-    const categoryDescription =
-        document.getElementById("categoryDescription");
-
-    const categoryCount =
-        document.getElementById("categoryCount");
-
-    const debatesList =
-        document.getElementById("debatesList");
-
-    const debateSearch =
-        document.getElementById("debateSearch");
-
-    const debateSort =
-        document.getElementById("debateSort");
-
-    const loadMoreButton =
-        document.getElementById("loadMoreButton");
-
-    const pageMessage =
-        document.getElementById("pageMessage");
-
-    const startDebateButton =
-        document.getElementById("startDebateButton");
-
-    const createDebateDialog =
-        document.getElementById("createDebateDialog");
-
-    const closeDebateDialog =
-        document.getElementById("closeDebateDialog");
-
-    const cancelDebateButton =
-        document.getElementById("cancelDebateButton");
-
-    const createDebateForm =
-        document.getElementById("createDebateForm");
-
-    const createDebateMessage =
-        document.getElementById("createDebateMessage");
-
-    const submitDebateButton =
-        document.getElementById("submitDebateButton");
-
-    const newDebateCategory =
-        document.getElementById("newDebateCategory");
-
-    const urlParams = new URLSearchParams(
-        window.location.search
-    );
-
-    const selectedCategory =
-        urlParams.get("category");
+    const category = Object.hasOwn(categories, selectedCategory)
+        ? categories[selectedCategory]
+        : null;
 
     const PAGE_SIZE = 12;
+
+    const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Europe/Lisbon"
+    });
 
     let nextOffset = 0;
     let listController = null;
     let searchTimer = null;
-
     let currentUser = null;
     let authError = false;
 
     function createElement(tag, className = "", text) {
         const element = document.createElement(tag);
 
-        if (className) {
-            element.className = className;
-        }
-
-        if (text !== undefined) {
-            element.textContent = String(text);
-        }
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = String(text);
 
         return element;
     }
 
     function shorten(value, maxLength = 160) {
-        if (typeof value !== "string") {
-            return "";
-        }
+        if (typeof value !== "string") return "";
 
-        const text = value
-            .trim()
-            .replace(/\s+/g, " ");
+        const text = value.trim().replace(/\s+/g, " ");
 
-        if (text.length <= maxLength) {
-            return text;
-        }
-
-        return text.slice(0, maxLength - 1) + "…";
+        return text.length > maxLength
+            ? text.slice(0, maxLength - 1) + "…"
+            : text;
     }
 
     function formatDate(value) {
-        if (!value) {
-            return "";
+        if (!value) return "";
+
+        let normalized = String(value).trim();
+
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)) {
+            normalized = normalized.replace(" ", "T") + "Z";
         }
 
-        let dateValue = String(value).trim();
+        const date = new Date(normalized);
 
-        if (
-            /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(
-                dateValue
-            )
-        ) {
-            dateValue = dateValue.replace(" ", "T") + "Z";
-        }
-
-        const date = new Date(dateValue);
-
-        if (Number.isNaN(date.getTime())) {
-            return "";
-        }
-
-        return new Intl.DateTimeFormat("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-            timeZone: "Europe/Lisbon"
-        }).format(date);
+        return Number.isNaN(date.getTime())
+            ? ""
+            : dateFormatter.format(date);
     }
 
-    function debateCountText(count) {
-        const total = Number(count) || 0;
+    function countText(value, singular) {
+        const count = Number(value) || 0;
 
-        return total === 1
-            ? "1 debate"
-            : `${total} debates`;
-    }
-
-    function commentCountText(count) {
-        const total = Number(count) || 0;
-
-        return total === 1
-            ? "1 comment"
-            : `${total} comments`;
+        return `${count} ${singular}${count === 1 ? "" : "s"}`;
     }
 
     function showPageMessage(message, isError = false) {
         pageMessage.textContent = message;
-
-        pageMessage.classList.toggle(
-            "is-error",
-            isError
-        );
+        pageMessage.classList.toggle("is-error", isError);
     }
 
     async function fetchJSON(url, options = {}) {
         const response = await fetch(url, {
             credentials: "same-origin",
+            cache: "no-store",
             ...options
         });
 
-        const data = await response.json().catch(
-            () => ({})
-        );
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
             throw new Error(
-                data.error ||
-                "Something went wrong. Please try again."
+                data.error || "Something went wrong. Please try again."
             );
         }
 
@@ -235,131 +143,104 @@
         .then(data => {
             currentUser = data.user || null;
 
-            if (
-                currentUser &&
-                currentUser.role !== "student"
-            ) {
-                startDebateButton.hidden = true;
-            }
+            startDebateButton.hidden = Boolean(
+                currentUser && currentUser.role !== "student"
+            );
         })
         .catch(() => {
             authError = true;
         });
 
-    function createRecentDebate(debate) {
+    function createDebateCard(debate, compact = false) {
         const link = createElement(
             "a",
-            "debates-recent-item"
+            compact ? "debates-recent-item" : "debates-list-item"
         );
 
-        link.href =
-            `debate.html?id=${encodeURIComponent(debate.id)}`;
+        link.href = `debate.html?id=${encodeURIComponent(debate.id)}`;
 
         const title = createElement(
-            "span",
-            "debates-recent-title",
+            compact ? "span" : "h3",
+            compact ? "debates-recent-title" : "",
             debate.title || "Untitled debate"
         );
 
         const description = createElement(
             "p",
-            "debates-recent-preview",
-            shorten(debate.description, 180)
+            compact ? "debates-recent-preview" : "debates-list-description",
+            shorten(debate.description, compact ? 180 : 260)
         );
 
-        const meta = createElement(
-            "div",
-            "debates-recent-meta"
-        );
+        link.append(title, description);
 
         const date = formatDate(debate.createdAt);
+        const comments = countText(debate.commentCount, "comment");
 
-        if (date) {
-            meta.append(
-                createElement(
-                    "span",
-                    "",
-                    date
-                )
-            );
+        if (compact) {
+            const meta = createElement("div", "debates-recent-meta");
 
-            meta.append(
+            if (date) {
+                meta.append(
+                    createElement("span", "", date),
+                    createElement("span", "debates-recent-separator", "·")
+                );
+            }
+
+            meta.append(createElement("span", "", comments));
+            link.append(meta);
+        } else {
+            if (debate.topComment) {
+                link.append(
+                    createElement(
+                        "p",
+                        "debates-top-comment",
+                        `Most liked comment: "${shorten(debate.topComment, 190)}"`
+                    )
+                );
+            }
+
+            link.append(
                 createElement(
-                    "span",
-                    "debates-recent-separator",
-                    "·"
+                    "div",
+                    "debates-list-meta",
+                    [comments, date].filter(Boolean).join(" · ")
                 )
             );
         }
-
-        meta.append(
-            createElement(
-                "span",
-                "",
-                commentCountText(debate.commentCount)
-            )
-        );
-
-        link.append(
-            title,
-            description,
-            meta
-        );
 
         return link;
     }
 
     function createCategoryCard(categoryData) {
-        const info = categoryMap.get(
-            categoryData.slug
+        const slug = categoryData.slug;
+
+        if (!Object.hasOwn(categories, slug)) return null;
+
+        const info = categories[slug];
+
+        const card = createElement("article", "debates-category-card");
+        const top = createElement("div", "debates-card-top");
+
+        top.append(
+            createElement("h3", "", info.name),
+            createElement(
+                "span",
+                "debates-count-badge",
+                countText(categoryData.totalDebates, "debate")
+            )
         );
 
-        if (!info) {
-            return null;
-        }
+        const recentList = createElement("div", "debates-recent-list");
 
-        const card = createElement(
-            "article",
-            "debates-category-card"
-        );
-
-        const top = createElement(
-            "div",
-            "debates-card-top"
-        );
-
-        const heading = createElement(
-            "h3",
-            "",
-            info.name
-        );
-
-        const badge = createElement(
-            "span",
-            "debates-count-badge",
-            debateCountText(categoryData.totalDebates)
-        );
-
-        top.append(heading, badge);
-
-        const description = createElement(
-            "p",
-            "debates-card-description",
-            info.description
-        );
-
-        const recentList = createElement(
-            "div",
-            "debates-recent-list"
-        );
-
-        const recentDebates = Array.isArray(
-            categoryData.recentDebates
-        )
-            ? categoryData.recentDebates
+        const recentDebates = Array.isArray(categoryData.recentDebates)
+            ? categoryData.recentDebates.slice(0, 3)
             : [];
 
-        if (recentDebates.length === 0) {
+        if (recentDebates.length) {
+            recentList.append(
+                ...recentDebates.map(debate => createDebateCard(debate, true))
+            );
+        } else {
             recentList.append(
                 createElement(
                     "p",
@@ -367,33 +248,18 @@
                     "No debates in this category yet. Be the first to start a discussion!"
                 )
             );
-        } else {
-            recentDebates.forEach(debate => {
-                recentList.append(
-                    createRecentDebate(debate)
-                );
-            });
         }
 
-        const footer = createElement(
-            "div",
-            "debates-card-footer"
-        );
+        const footer = createElement("div", "debates-card-footer");
+        const viewAll = createElement("a", "debates-view-all", "View all debates →");
 
-        const viewAll = createElement(
-            "a",
-            "debates-view-all",
-            "View all debates →"
-        );
-
-        viewAll.href =
-            `debates.html?category=${encodeURIComponent(info.slug)}`;
+        viewAll.href = `debates.html?category=${encodeURIComponent(slug)}`;
 
         footer.append(viewAll);
 
         card.append(
             top,
-            description,
+            createElement("p", "debates-card-description", info.description),
             recentList,
             footer
         );
@@ -403,25 +269,15 @@
 
     async function loadCategories() {
         try {
-            const data = await fetchJSON(
-                "/api/debates/categories",
-                {
-                    cache: "no-store"
-                }
-            );
+            const data = await fetchJSON("/api/debates/categories");
 
             if (!Array.isArray(data.categories)) {
-                throw new Error(
-                    "Invalid categories response."
-                );
+                throw new Error("Invalid categories response.");
             }
 
-            const cards = data.categories
-                .map(createCategoryCard)
-                .filter(Boolean);
-
-            categoriesGrid.replaceChildren(...cards);
-
+            categoriesGrid.replaceChildren(
+                ...data.categories.map(createCategoryCard).filter(Boolean)
+            );
         } catch (error) {
             categoriesGrid.replaceChildren(
                 createElement(
@@ -431,96 +287,25 @@
                 )
             );
 
-            showPageMessage(
-                error.message,
-                true
-            );
+            showPageMessage(error.message, true);
         }
-    }
-
-    function createDebateListItem(debate) {
-        const link = createElement(
-            "a",
-            "debates-list-item"
-        );
-
-        link.href =
-            `debate.html?id=${encodeURIComponent(debate.id)}`;
-
-        const title = createElement(
-            "h3",
-            "",
-            debate.title || "Untitled debate"
-        );
-
-        const description = createElement(
-            "p",
-            "debates-list-description",
-            shorten(debate.description, 260)
-        );
-
-        link.append(title, description);
-
-        if (debate.topComment) {
-            const comment = createElement(
-                "p",
-                "debates-top-comment",
-                `Most liked comment: "${shorten(
-                    debate.topComment,
-                    190
-                )}"`
-            );
-
-            link.append(comment);
-        }
-
-        const date = formatDate(
-            debate.createdAt
-        );
-
-        const metaText = [
-            commentCountText(debate.commentCount),
-            date
-        ]
-            .filter(Boolean)
-            .join(" · ");
-
-        const meta = createElement(
-            "div",
-            "debates-list-meta",
-            metaText
-        );
-
-        link.append(meta);
-
-        return link;
     }
 
     async function loadCategoryDebates(reset = false) {
-        if (!selectedCategory) {
-            return;
-        }
+        if (!category) return;
 
-        if (listController) {
-            listController.abort();
-        }
+        listController?.abort();
 
         const controller = new AbortController();
-
         listController = controller;
 
         if (reset) {
             nextOffset = 0;
+            categoryCount.textContent = "";
 
             debatesList.replaceChildren(
-                createElement(
-                    "p",
-                    "debates-loading",
-                    "Loading debates..."
-                )
+                createElement("p", "debates-loading", "Loading debates...")
             );
-
-            categoryCount.textContent = "";
         }
 
         loadMoreButton.disabled = true;
@@ -535,40 +320,27 @@
         });
 
         try {
-            const data = await fetchJSON(
-                `/api/debates?${params.toString()}`,
-                {
-                    signal: controller.signal,
-                    cache: "no-store"
-                }
-            );
+            const data = await fetchJSON(`/api/debates?${params}`, {
+                signal: controller.signal
+            });
 
-            if (listController !== controller) {
-                return;
-            }
+            if (listController !== controller) return;
 
             if (!Array.isArray(data.debates)) {
-                throw new Error(
-                    "Invalid debates response."
-                );
+                throw new Error("Invalid debates response.");
             }
 
-            if (reset) {
-                debatesList.replaceChildren();
-            }
+            if (reset) debatesList.replaceChildren();
 
-            data.debates.forEach(debate => {
-                debatesList.append(
-                    createDebateListItem(debate)
-                );
-            });
+            debatesList.append(
+                ...data.debates.map(debate => createDebateCard(debate))
+            );
 
             nextOffset += data.debates.length;
 
             const total = Number(data.total) || 0;
 
-            categoryCount.textContent =
-                debateCountText(total);
+            categoryCount.textContent = countText(total, "debate");
 
             if (total === 0) {
                 debatesList.append(
@@ -581,21 +353,14 @@
             }
 
             loadMoreButton.hidden =
-                nextOffset >= total ||
-                data.debates.length === 0;
+                nextOffset >= total || data.debates.length === 0;
 
         } catch (error) {
-            if (error.name === "AbortError") {
+            if (error.name === "AbortError" || listController !== controller) {
                 return;
             }
 
-            if (listController !== controller) {
-                return;
-            }
-
-            if (reset) {
-                debatesList.replaceChildren();
-            }
+            if (reset) debatesList.replaceChildren();
 
             debatesList.append(
                 createElement(
@@ -605,10 +370,7 @@
                 )
             );
 
-            showPageMessage(
-                error.message,
-                true
-            );
+            showPageMessage(error.message, true);
 
         } finally {
             if (listController === controller) {
@@ -628,159 +390,101 @@
 
     debateSort.addEventListener("change", () => {
         clearTimeout(searchTimer);
-
         loadCategoryDebates(true);
     });
 
     loadMoreButton.addEventListener("click", () => {
-        loadCategoryDebates(false);
+        loadCategoryDebates();
     });
 
-    startDebateButton.addEventListener(
-        "click",
-        async () => {
-            await authPromise;
+    startDebateButton.addEventListener("click", async () => {
+        await authPromise;
 
-            if (authError) {
-                showPageMessage(
-                    "Unable to check your session. Please refresh the page.",
-                    true
-                );
-
-                return;
-            }
-
-            if (!currentUser) {
-                window.location.href = "login.html";
-                return;
-            }
-
-            if (currentUser.role !== "student") {
-                showPageMessage(
-                    "Only student accounts can start debates.",
-                    true
-                );
-
-                return;
-            }
-
-            createDebateMessage.textContent = "";
-
-            if (
-                selectedCategory &&
-                categoryMap.has(selectedCategory)
-            ) {
-                newDebateCategory.value =
-                    selectedCategory;
-            }
-
-            createDebateDialog.showModal();
+        if (authError) {
+            showPageMessage(
+                "Unable to check your session. Please refresh the page.",
+                true
+            );
+            return;
         }
-    );
 
-    function closeDialog() {
-        createDebateDialog.close();
-    }
-
-    closeDebateDialog.addEventListener(
-        "click",
-        closeDialog
-    );
-
-    cancelDebateButton.addEventListener(
-        "click",
-        closeDialog
-    );
-
-    createDebateForm.addEventListener(
-        "submit",
-        async event => {
-            event.preventDefault();
-
-            const title = document
-                .getElementById("newDebateTitle")
-                .value
-                .trim();
-
-            const description = document
-                .getElementById("newDebateDescription")
-                .value
-                .trim();
-
-            const category =
-                newDebateCategory.value;
-
-            createDebateMessage.textContent = "";
-
-            submitDebateButton.disabled = true;
-            submitDebateButton.textContent =
-                "Submitting...";
-
-            try {
-                await fetchJSON("/api/debates", {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        title,
-                        description,
-                        category
-                    })
-                });
-
-                createDebateForm.reset();
-                createDebateDialog.close();
-
-                showPageMessage(
-                    "Your debate has been submitted for review. It will appear publicly once approved."
-                );
-
-            } catch (error) {
-                createDebateMessage.textContent =
-                    error.message ||
-                    "Unable to submit your debate.";
-
-            } finally {
-                submitDebateButton.disabled = false;
-                submitDebateButton.textContent =
-                    "Submit for Review";
-            }
+        if (!currentUser) {
+            window.location.href = "login.html";
+            return;
         }
-    );
 
-    function initializePage() {
-        if (
-            selectedCategory &&
-            categoryMap.has(selectedCategory)
-        ) {
-            const category = categoryMap.get(
-                selectedCategory
+        if (currentUser.role !== "student") {
+            showPageMessage("Only student accounts can start debates.", true);
+            return;
+        }
+
+        createDebateMessage.textContent = "";
+
+        if (category) {
+            newDebateCategory.value = selectedCategory;
+        }
+
+        createDebateDialog.showModal();
+    });
+
+    ["closeDebateDialog", "cancelDebateButton"].forEach(id => {
+        $(id).addEventListener("click", () => createDebateDialog.close());
+    });
+
+    createDebateForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const formData = new FormData(createDebateForm);
+
+        const debate = {
+            title: formData.get("title").trim(),
+            description: formData.get("description").trim(),
+            category: formData.get("category")
+        };
+
+        createDebateMessage.textContent = "";
+        submitDebateButton.disabled = true;
+        submitDebateButton.textContent = "Submitting...";
+
+        try {
+            await fetchJSON("/api/debates", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(debate)
+            });
+
+            createDebateForm.reset();
+            createDebateDialog.close();
+
+            showPageMessage(
+                "Your debate has been submitted for review. It will appear publicly once approved."
             );
 
-            overviewView.hidden = true;
-            categoryView.hidden = false;
+        } catch (error) {
+            createDebateMessage.textContent =
+                error.message || "Unable to submit your debate.";
 
-            categoryBreadcrumb.textContent =
-                category.name;
+        } finally {
+            submitDebateButton.disabled = false;
+            submitDebateButton.textContent = "Submit for Review";
+        }
+    });
 
-            categoryTitle.textContent =
-                category.name;
+    function initializePage() {
+        overviewView.hidden = Boolean(category);
+        categoryView.hidden = !category;
 
-            categoryDescription.textContent =
-                category.description;
+        if (category) {
+            $("categoryBreadcrumb").textContent = category.name;
+            $("categoryTitle").textContent = category.name;
+            $("categoryDescription").textContent = category.description;
 
-            document.title =
-                `${category.name} Debates | Instant Democracy`;
+            document.title = `${category.name} Debates | Instant Democracy`;
 
             loadCategoryDebates(true);
-
         } else {
-            overviewView.hidden = false;
-            categoryView.hidden = true;
-
             if (selectedCategory) {
                 showPageMessage(
                     "Category not found. Showing all categories.",
@@ -792,18 +496,11 @@
         }
     }
 
-    initializePage();
-
-    document.addEventListener(
-        "visibilitychange",
-        () => {
-            if (
-                !document.hidden &&
-                !selectedCategory
-            ) {
-                loadCategories();
-            }
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && !category) {
+            loadCategories();
         }
-    );
+    });
 
+    initializePage();
 })();

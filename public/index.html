@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Home | Instant Democracy</title>
-
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/home.css">
 </head>
@@ -14,43 +12,20 @@
 <body class="home-page">
 
     <header class="header">
-
-        <button
-            class="icon-button"
-            id="menuButton"
-            type="button"
-            aria-label="Open navigation menu"
-            aria-expanded="false"
-            aria-controls="sidebar"
-        >
+        <button class="icon-button" id="menuButton" type="button"
+            aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
             <span></span>
             <span></span>
             <span></span>
         </button>
 
-        <a href="index.html" class="logo">
-            INSTANT<span>DEMOCRACY</span>
-        </a>
+        <a href="index.html" class="logo">INSTANT<span>DEMOCRACY</span></a>
 
         <div class="account-container">
-
-            <button
-                class="account-button"
-                id="accountButton"
-                type="button"
-                aria-label="Open account menu"
-                aria-expanded="false"
-                aria-controls="accountDropdown"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                >
+            <button class="account-button" id="accountButton" type="button"
+                aria-label="Open account menu" aria-expanded="false" aria-controls="accountDropdown">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
                 </svg>
@@ -60,365 +35,143 @@
                 <a href="login.html">Sign in</a>
                 <a href="register.html">Create account</a>
             </div>
-
         </div>
     </header>
 
     <div class="overlay" id="overlay"></div>
 
-    <nav
-        class="sidebar"
-        id="sidebar"
-        aria-label="Main navigation"
-    >
-
+    <nav class="sidebar" id="sidebar" aria-label="Main navigation">
         <div class="sidebar-header">
-
             <h2>Explore</h2>
-
-            <button
-                class="close-button"
-                id="closeMenu"
-                type="button"
-                aria-label="Close navigation menu"
-            >
-                &times;
-            </button>
-
+            <button class="close-button" id="closeMenu" type="button"
+                aria-label="Close navigation menu">&times;</button>
         </div>
 
-        <a
-            href="index.html"
-            class="nav-link"
-            aria-current="page"
-        >
-            Home
-        </a>
-
-        <a href="debates.html" class="nav-link">
-            Debates
-        </a>
-
-        <a href="createProposal.html" class="nav-link">
-            Create a Proposal
-        </a>
-
-        <a href="vote.html" class="nav-link">
-            Vote
-        </a>
-
-        <a href="approvedProposals.html" class="nav-link">
-            Approved Proposals
-        </a>
-
-        <a href="notPassedProposals.html" class="nav-link">
-            Unsuccessful Proposals
-        </a>
-
+        <a href="index.html" class="nav-link" aria-current="page">Home</a>
+        <a href="debates.html" class="nav-link">Debates</a>
+        <a href="createProposal.html" class="nav-link">Create a Proposal</a>
+        <a href="vote.html" class="nav-link">Vote</a>
+        <a href="approvedProposals.html" class="nav-link">Approved Proposals</a>
+        <a href="notPassedProposals.html" class="nav-link">Unsuccessful Proposals</a>
     </nav>
 
     <main class="home-main">
 
         <section class="home-intro">
-
-            <span class="home-eyebrow">
-                INSTANT DEMOCRACY
-            </span>
-
+            <span class="home-eyebrow">INSTANT DEMOCRACY</span>
             <h1>Your campus. Your voice.</h1>
-
-            <p>
-                Explore discussions, share ideas and take part
-                in decisions that shape the University of Coimbra.
-            </p>
-
+            <p>Explore discussions, share ideas and take part in decisions that shape the University of Coimbra.</p>
         </section>
 
-        <section
-            class="home-section topics-section"
-            id="topics"
-            aria-labelledby="topicsTitle"
-        >
-
+        <section class="home-section topics-section" id="topics" aria-labelledby="topicsTitle">
             <div class="section-heading">
-
                 <div>
                     <h2 id="topicsTitle">Topics to Debate</h2>
-
-                    <p>
-                        Discover conversations about student life.
-                    </p>
+                    <p>Discover conversations about student life.</p>
                 </div>
-
             </div>
 
             <details class="topics-disclosure">
-
                 <summary class="browse-topics-button">
-
                     <span>Browse Topics</span>
-
-                    <span
-                        class="browse-arrow"
-                        aria-hidden="true"
-                    >
-                        &#8964;
-                    </span>
-
+                    <span class="browse-arrow" aria-hidden="true">&#8964;</span>
                 </summary>
 
                 <div class="topics-grid">
-
-                    <a
-                        href="debates.html?category=academic-life"
-                        class="topic-card"
-                    >
-                        <span>Academic Life</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=academic-life" class="topic-card">
+                        <span>Academic Life</span><span aria-hidden="true">↗</span>
                     </a>
 
-                    <a
-                        href="debates.html?category=campus-mobility"
-                        class="topic-card"
-                    >
-                        <span>Campus Mobility</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=campus-mobility" class="topic-card">
+                        <span>Campus Mobility</span><span aria-hidden="true">↗</span>
                     </a>
 
-                    <a
-                        href="debates.html?category=canteens-and-food"
-                        class="topic-card"
-                    >
-                        <span>Canteens and Food</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=canteens-and-food" class="topic-card">
+                        <span>Canteens and Food</span><span aria-hidden="true">↗</span>
                     </a>
 
-                    <a
-                        href="debates.html?category=events-and-traditions"
-                        class="topic-card"
-                    >
-                        <span>Events and Traditions</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=events-and-traditions" class="topic-card">
+                        <span>Events and Traditions</span><span aria-hidden="true">↗</span>
                     </a>
 
-                    <a
-                        href="debates.html?category=sports-and-culture"
-                        class="topic-card"
-                    >
-                        <span>Sports and Culture</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=sports-and-culture" class="topic-card">
+                        <span>Sports and Culture</span><span aria-hidden="true">↗</span>
                     </a>
 
-                    <a
-                        href="debates.html?category=student-well-being"
-                        class="topic-card"
-                    >
-                        <span>Student Well-Being</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=student-well-being" class="topic-card">
+                        <span>Student Well-Being</span><span aria-hidden="true">↗</span>
                     </a>
 
-                    <a
-                        href="debates.html?category=study-spaces"
-                        class="topic-card"
-                    >
-                        <span>Study Spaces</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=study-spaces" class="topic-card">
+                        <span>Study Spaces</span><span aria-hidden="true">↗</span>
                     </a>
 
-                    <a
-                        href="debates.html?category=workshops-and-skills"
-                        class="topic-card"
-                    >
-                        <span>Workshops and Skills</span>
-                        <span aria-hidden="true">↗</span>
+                    <a href="debates.html?category=workshops-and-skills" class="topic-card">
+                        <span>Workshops and Skills</span><span aria-hidden="true">↗</span>
                     </a>
-
                 </div>
-
             </details>
-
         </section>
 
         <div class="activity-heading">
-
-            <span class="home-eyebrow">
-                WHAT'S HAPPENING
-            </span>
-
+            <span class="home-eyebrow">WHAT'S HAPPENING</span>
             <h2>Community Activity</h2>
-
-            <p>
-                Stay up to date with the latest discussions
-                and proposals.
-            </p>
-
+            <p>Stay up to date with the latest discussions and proposals.</p>
         </div>
 
-        <section
-            class="home-section activity-section"
-            id="recent-debates"
-            aria-labelledby="recentDebatesTitle"
-        >
-
+        <section class="home-section activity-section" id="recent-debates" aria-labelledby="recentDebatesTitle">
             <div class="section-heading">
-
                 <div>
-
-                    <h2 id="recentDebatesTitle">
-                        Recent Debates
-                    </h2>
-
-                    <p>
-                        Join the latest campus conversations.
-                    </p>
-
+                    <h2 id="recentDebatesTitle">Recent Debates</h2>
+                    <p>Join the latest campus conversations.</p>
                 </div>
-
-                <a href="debates.html" class="view-all">
-                    View all
-                    <span aria-hidden="true">→</span>
-                </a>
-
+                <a href="debates.html" class="view-all">View all <span aria-hidden="true">→</span></a>
             </div>
 
-            <div
-                class="recent-grid"
-                id="recentDebates"
-                aria-live="polite"
-                hidden
-            ></div>
-
+            <div class="recent-grid" id="recentDebates" aria-live="polite" hidden></div>
         </section>
 
-        <section
-            class="home-section activity-section"
-            id="open-for-voting"
-            aria-labelledby="votingTitle"
-        >
-
+        <section class="home-section activity-section" id="open-for-voting" aria-labelledby="votingTitle">
             <div class="section-heading">
-
                 <div>
-
-                    <h2 id="votingTitle">
-                        Proposals Open for Voting
-                    </h2>
-
-                    <p>
-                        Have your say on proposals currently
-                        being voted on.
-                    </p>
-
+                    <h2 id="votingTitle">Proposals Open for Voting</h2>
+                    <p>Have your say on proposals currently being voted on.</p>
                 </div>
-
-                <a href="vote.html" class="view-all">
-                    View all
-                    <span aria-hidden="true">→</span>
-                </a>
-
+                <a href="vote.html" class="view-all">View all <span aria-hidden="true">→</span></a>
             </div>
 
-            <div
-                class="recent-grid"
-                id="recentVotingProposals"
-                aria-live="polite"
-                hidden
-            ></div>
-
+            <div class="recent-grid" id="recentVotingProposals" aria-live="polite" hidden></div>
         </section>
 
-        <section
-            class="home-section activity-section"
-            id="approved-proposals"
-            aria-labelledby="approvedTitle"
-        >
-
+        <section class="home-section activity-section" id="approved-proposals" aria-labelledby="approvedTitle">
             <div class="section-heading">
-
                 <div>
-
-                    <h2 id="approvedTitle">
-                        Approved Proposals
-                    </h2>
-
-                    <p>
-                        Ideas that received a majority
-                        of favourable votes.
-                    </p>
-
+                    <h2 id="approvedTitle">Approved Proposals</h2>
+                    <p>Ideas that received a majority of favourable votes.</p>
                 </div>
-
-                <a
-                    href="approvedProposals.html"
-                    class="view-all"
-                >
-                    View all
-                    <span aria-hidden="true">→</span>
-                </a>
-
+                <a href="approvedProposals.html" class="view-all">View all <span aria-hidden="true">→</span></a>
             </div>
 
-            <div
-                class="recent-grid"
-                id="recentApprovedProposals"
-                aria-live="polite"
-                hidden
-            ></div>
-
+            <div class="recent-grid" id="recentApprovedProposals" aria-live="polite" hidden></div>
         </section>
 
-        <section
-            class="home-section activity-section"
-            id="unsuccessful-proposals"
-            aria-labelledby="unsuccessfulTitle"
-        >
-
+        <section class="home-section activity-section" id="unsuccessful-proposals" aria-labelledby="unsuccessfulTitle">
             <div class="section-heading">
-
                 <div>
-
-                    <h2 id="unsuccessfulTitle">
-                        Unsuccessful Proposals
-                    </h2>
-
-                    <p>
-                        Proposals that did not receive
-                        a majority of favourable votes.
-                    </p>
-
+                    <h2 id="unsuccessfulTitle">Unsuccessful Proposals</h2>
+                    <p>Proposals that did not receive a majority of favourable votes.</p>
                 </div>
-
-                <a
-                    href="notPassedProposals.html"
-                    class="view-all"
-                >
-                    View all
-                    <span aria-hidden="true">→</span>
-                </a>
-
+                <a href="notPassedProposals.html" class="view-all">View all <span aria-hidden="true">→</span></a>
             </div>
 
-            <div
-                class="recent-grid"
-                id="recentNotPassedProposals"
-                aria-live="polite"
-                hidden
-            ></div>
-
+            <div class="recent-grid" id="recentNotPassedProposals" aria-live="polite" hidden></div>
         </section>
 
     </main>
 
     <footer class="home-footer">
-
-        <p>
-            Instant Democracy · University of Coimbra
-        </p>
-
-        <p>
-            © 2026 Instant Democracy
-        </p>
-
+        <p>Instant Democracy · University of Coimbra</p>
+        <p>© 2026 Instant Democracy</p>
     </footer>
 
     <script src="js/script.js"></script>

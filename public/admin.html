@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Admin Dashboard | Instant Democracy</title>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
+    <script src="js/admin.js" defer></script>
 </head>
 
 <body class="admin-page">
@@ -21,28 +21,20 @@
                 INSTANT<span>DEMOCRACY</span>
             </a>
 
-            <div class="admin-sidebar-label">
-                ADMINISTRATION
-            </div>
+            <div class="admin-sidebar-label">ADMINISTRATION</div>
 
             <nav class="admin-navigation" aria-label="Admin navigation">
 
-                <button
-                    type="button"
-                    class="admin-nav-link active"
-                    data-view="proposals"
-                    aria-pressed="true"
-                >
+                <button type="button" class="admin-nav-link active"
+                    data-view="proposals" aria-pressed="true"
+                    aria-controls="adminProposalsSection">
                     <span>Proposals</span>
                     <span class="admin-nav-count" id="navProposalCount">0</span>
                 </button>
 
-                <button
-                    type="button"
-                    class="admin-nav-link"
-                    data-view="debates"
-                    aria-pressed="false"
-                >
+                <button type="button" class="admin-nav-link"
+                    data-view="debates" aria-pressed="false"
+                    aria-controls="adminDebatesSection">
                     <span>Debates</span>
                     <span class="admin-nav-count" id="navDebateCount">0</span>
                 </button>
@@ -64,11 +56,7 @@
                     </div>
                 </div>
 
-                <button
-                    id="adminLogout"
-                    class="admin-logout"
-                    type="button"
-                >
+                <button id="adminLogout" class="admin-logout" type="button">
                     Log out
                 </button>
 
@@ -83,89 +71,60 @@
                 <header class="admin-topbar">
 
                     <div>
-                        <p class="admin-eyebrow">
-                            MANAGEMENT AREA
-                        </p>
+                        <p class="admin-eyebrow">MANAGEMENT AREA</p>
+                        <h1 id="adminPageTitle">Proposal Management</h1>
 
-                        <h1 id="adminPageTitle">
-                            Proposal Management
-                        </h1>
-
-                        <p
-                            class="admin-subtitle"
-                            id="adminPageSubtitle"
-                        >
+                        <p class="admin-subtitle" id="adminPageSubtitle">
                             Review proposals submitted by the community.
                         </p>
                     </div>
 
-                    <span class="admin-header-badge">
-                        ADMIN PANEL
-                    </span>
+                    <span class="admin-header-badge">ADMIN PANEL</span>
 
                 </header>
 
-                <section
-                    id="adminAccessMessage"
-                    class="admin-access-message"
-                    role="status"
-                >
+                <section id="adminAccessMessage"
+                    class="admin-access-message" role="status">
                     Checking administrator access...
                 </section>
 
                 <div id="adminContent" hidden>
 
-                    <section
-                        class="admin-stats"
-                        aria-label="Submission statistics"
-                    >
+                    <section class="admin-stats" aria-label="Submission statistics">
 
                         <article class="admin-stat-card">
-                            <span id="statTotalLabel">
-                                Total proposals
-                            </span>
-
+                            <span id="statTotalLabel">Total proposals</span>
                             <strong id="statTotal">0</strong>
-
                             <small>All submissions</small>
                         </article>
 
                         <article class="admin-stat-card pending-stat">
                             <span>Pending review</span>
-
                             <strong id="statPending">0</strong>
-
                             <small>Awaiting your decision</small>
                         </article>
 
                         <article class="admin-stat-card">
                             <span>Approved</span>
-
                             <strong id="statApproved">0</strong>
-
                             <small>Published submissions</small>
                         </article>
 
                         <article class="admin-stat-card">
                             <span>Rejected</span>
-
                             <strong id="statRejected">0</strong>
-
                             <small>Declined submissions</small>
                         </article>
 
                     </section>
 
-                    <section
-                        id="adminProposalsSection"
-                        class="admin-management-section"
-                    >
+                    <section id="adminProposalsSection"
+                        class="admin-management-section">
 
                         <div class="admin-section-heading">
 
                             <div>
                                 <h2>Community Proposals</h2>
-
                                 <p>
                                     Review proposals before they become
                                     available for voting.
@@ -185,31 +144,21 @@
 
                         </div>
 
-                        <p
-                            id="adminFeedback"
-                            class="admin-feedback"
-                            role="status"
-                            aria-live="polite"
-                        ></p>
+                        <p id="adminFeedback" class="admin-feedback"
+                            role="status" aria-live="polite"></p>
 
-                        <div
-                            id="adminProposalList"
-                            class="admin-proposal-list"
-                        ></div>
+                        <div id="adminProposalList"
+                            class="admin-proposal-list"></div>
 
                     </section>
 
-                    <section
-                        id="adminDebatesSection"
-                        class="admin-management-section"
-                        hidden
-                    >
+                    <section id="adminDebatesSection"
+                        class="admin-management-section" hidden>
 
                         <div class="admin-section-heading">
 
                             <div>
                                 <h2>Community Debates</h2>
-
                                 <p>
                                     Approve new discussions before
                                     students can participate.
@@ -229,17 +178,11 @@
 
                         </div>
 
-                        <p
-                            id="adminDebateFeedback"
-                            class="admin-feedback"
-                            role="status"
-                            aria-live="polite"
-                        ></p>
+                        <p id="adminDebateFeedback" class="admin-feedback"
+                            role="status" aria-live="polite"></p>
 
-                        <div
-                            id="adminDebateList"
-                            class="admin-proposal-list"
-                        ></div>
+                        <div id="adminDebateList"
+                            class="admin-proposal-list"></div>
 
                     </section>
 
@@ -250,8 +193,6 @@
         </main>
 
     </div>
-
-    <script src="js/admin.js"></script>
 
 </body>
 </html>

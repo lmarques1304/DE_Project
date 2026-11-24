@@ -1,359 +1,152 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Unsuccessful Proposals | Instant Democracy</title>
-
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/notPassedProposals.css">
+    <link rel="stylesheet" href="css/proposalResults.css">
 </head>
 
 <body>
 
-    <!-- HEADER -->
     <header class="header">
-
-        <button
-            class="icon-button"
-            id="menuButton"
-            type="button"
-            aria-label="Open navigation menu"
-            aria-expanded="false"
-        >
+        <button class="icon-button" id="menuButton" type="button"
+            aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
             <span></span>
             <span></span>
             <span></span>
         </button>
 
-        <a href="index.html" class="logo">
-            INSTANT<span>DEMOCRACY</span>
-        </a>
+        <a href="index.html" class="logo">INSTANT<span>DEMOCRACY</span></a>
 
         <div class="account-container">
-
-            <button
-                class="account-button"
-                id="accountButton"
-                type="button"
-                aria-label="Open account menu"
-                aria-expanded="false"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                >
-                    <circle cx="12" cy="8" r="4"></circle>
-                    <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
+            <button class="account-button" id="accountButton" type="button"
+                aria-label="Open account menu" aria-expanded="false" aria-controls="accountDropdown">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
                 </svg>
             </button>
 
-            <div
-                class="account-dropdown"
-                id="accountDropdown"
-            >
+            <div class="account-dropdown" id="accountDropdown">
                 <a href="login.html">Sign in</a>
                 <a href="register.html">Create account</a>
             </div>
-
         </div>
-
     </header>
 
-    <!-- SIDE MENU OVERLAY -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- SIDE MENU -->
-    <nav
-        class="sidebar"
-        id="sidebar"
-        aria-label="Main navigation"
-    >
-
+    <nav class="sidebar" id="sidebar" aria-label="Main navigation">
         <div class="sidebar-header">
-
             <h2>Explore</h2>
-
-            <button
-                class="close-button"
-                id="closeMenu"
-                type="button"
-                aria-label="Close navigation menu"
-            >
-                &times;
-            </button>
-
+            <button class="close-button" id="closeMenu" type="button"
+                aria-label="Close navigation menu">&times;</button>
         </div>
 
-        <a href="index.html" class="nav-link">
-            Home
-        </a>
-
-        <a href="debates.html" class="nav-link">
-            Debates
-        </a>
-
-        <a href="createProposal.html" class="nav-link">
-            Create a Proposal
-        </a>
-
-        <a href="vote.html" class="nav-link">
-            Vote
-        </a>
-
-        <a href="approvedProposals.html" class="nav-link">
-            Approved Proposals
-        </a>
-
-        <a
-            href="notPassedProposals.html"
-            class="nav-link"
-            aria-current="page"
-        >
-            Unsuccessful Proposals
-        </a>
-
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="debates.html" class="nav-link">Debates</a>
+        <a href="createProposal.html" class="nav-link">Create a Proposal</a>
+        <a href="vote.html" class="nav-link">Vote</a>
+        <a href="approvedProposals.html" class="nav-link">Approved Proposals</a>
+        <a href="notPassedProposals.html" class="nav-link" aria-current="page">Unsuccessful Proposals</a>
     </nav>
 
-    <!-- MAIN CONTENT -->
-    <main class="unsuccessful-page">
+    <main class="results-page" data-result="not_approved">
 
-        <!-- INTRODUCTION -->
-        <section class="unsuccessful-hero">
-
-            <div class="unsuccessful-container">
-
-                <span class="unsuccessful-eyebrow">
-                    COMMUNITY VOTING RESULTS
-                </span>
-
-                <h1>
-                    Unsuccessful
-                    <span>proposals.</span>
-                </h1>
-
+        <section class="results-intro">
+            <div class="results-container">
+                <span class="results-eyebrow">COMMUNITY VOTING RESULTS</span>
+                <h1>Unsuccessful <span>proposals.</span></h1>
                 <p>
                     Explore proposals whose voting periods have ended
                     without majority support. Every vote helps us
                     understand what matters to our university community.
                 </p>
-
             </div>
-
         </section>
 
-        <!-- PROPOSALS CONTENT -->
-        <section
-            class="unsuccessful-content unsuccessful-container"
-        >
+        <section class="results-content results-container">
 
-            <!-- SECTION HEADING -->
-            <div class="unsuccessful-section-heading">
-
-                <span class="unsuccessful-eyebrow">
-                    PAST COMMUNITY DECISIONS
-                </span>
-
+            <div class="results-section-heading">
+                <span class="results-eyebrow">PAST COMMUNITY DECISIONS</span>
                 <h2>Explore voting outcomes</h2>
-
                 <p>
                     These proposals received the same number of Yes
                     and No votes, or fewer Yes votes than No votes.
                     This is different from a proposal being rejected
                     during administrator review.
                 </p>
-
             </div>
 
-            <!-- SUMMARY -->
-            <div class="unsuccessful-summary">
+            <div class="results-summary">
+                <div class="results-summary-icon" aria-hidden="true">−</div>
+                <div class="results-summary-info">
+                    <strong class="results-summary-number" id="resultsTotal">—</strong>
+                    <p>Proposals not approved by community voting</p>
+                </div>
+            </div>
 
-                <div
-                    class="unsuccessful-summary-icon"
-                    aria-hidden="true"
-                >
-                    −
+            <div class="results-main-filters" id="resultsMainFilters"
+                role="group" aria-label="Filter proposals by source">
+
+                <button type="button" class="results-main-filter active"
+                    data-source="all" aria-pressed="true">All proposals</button>
+
+                <button type="button" class="results-main-filter"
+                    data-source="uc" aria-pressed="false">UC</button>
+
+                <button type="button" class="results-main-filter"
+                    data-source="nuclei" aria-pressed="false">Núcleos</button>
+
+                <button type="button" class="results-main-filter"
+                    data-source="student" aria-pressed="false">Students</button>
+            </div>
+
+            <div class="results-filter-area">
+                <div class="results-filter-heading">
+                    <h3 id="resultsFilterTitle">Browse all proposals</h3>
+                    <button type="button" id="clearResultsFilters"
+                        class="results-clear-filters">Clear filters</button>
                 </div>
 
-                <div>
-
-                    <strong
-                        id="unsuccessfulTotal"
-                        class="unsuccessful-summary-number"
-                    >
-                        0
-                    </strong>
-
-                    <p>
-                        Proposals not approved by community voting
-                    </p>
-
-                </div>
-
+                <div class="results-filters" id="resultsFilters"></div>
             </div>
 
-            <!-- MAIN FILTERS -->
-            <div
-                class="unsuccessful-main-filters"
-                id="unsuccessfulMainFilters"
-                role="group"
-                aria-label="Filter by proposal source"
-            >
-
-                <button
-                    type="button"
-                    class="unsuccessful-main-filter active"
-                    data-source="all"
-                    aria-pressed="true"
-                >
-                    All proposals
-                </button>
-
-                <button
-                    type="button"
-                    class="unsuccessful-main-filter"
-                    data-source="uc"
-                    aria-pressed="false"
-                >
-                    UC
-                </button>
-
-                <button
-                    type="button"
-                    class="unsuccessful-main-filter"
-                    data-source="nuclei"
-                    aria-pressed="false"
-                >
-                    Núcleos
-                </button>
-
-                <button
-                    type="button"
-                    class="unsuccessful-main-filter"
-                    data-source="student"
-                    aria-pressed="false"
-                >
-                    Students
-                </button>
-
-            </div>
-
-            <!-- SECONDARY FILTERS -->
-            <div class="unsuccessful-filter-area">
-
-                <div class="unsuccessful-filter-heading">
-
-                    <h3 id="unsuccessfulFilterTitle">
-                        Browse all proposals
-                    </h3>
-
-                    <button
-                        type="button"
-                        id="clearUnsuccessfulFilters"
-                        class="unsuccessful-clear-filters"
-                    >
-                        Clear filters
-                    </button>
-
-                </div>
-
-                <div
-                    class="unsuccessful-filters"
-                    id="unsuccessfulFilters"
-                ></div>
-
-            </div>
-
-            <!-- RESULTS -->
-            <div class="unsuccessful-results-heading">
-
+            <div class="results-list-heading">
                 <h3>Proposals without majority support</h3>
-
-                <span id="unsuccessfulResultsCount">
-                    Loading...
-                </span>
-
+                <span id="resultsCount" aria-live="polite">Loading...</span>
             </div>
 
-            <!-- PROPOSAL CARDS -->
-            <div
-                class="unsuccessful-grid"
-                id="unsuccessfulGrid"
-                aria-live="polite"
-            ></div>
+            <div class="results-error" id="resultsError" role="alert" hidden></div>
 
-            <!-- EMPTY STATE -->
-            <div
-                class="unsuccessful-empty"
-                id="unsuccessfulEmpty"
-                hidden
-            >
+            <div class="results-grid" id="resultsGrid"></div>
 
-                <div
-                    class="unsuccessful-empty-icon"
-                    aria-hidden="true"
-                >
-                    —
-                </div>
-
-                <h3 id="unsuccessfulEmptyTitle">
-                    No unsuccessful proposals yet
-                </h3>
-
-                <p id="unsuccessfulEmptyMessage">
-                    No completed proposals have been unsuccessful
-                    so far.
+            <div class="results-empty" id="resultsEmpty" hidden>
+                <div class="results-empty-icon" aria-hidden="true">—</div>
+                <h3 id="resultsEmptyTitle">No unsuccessful proposals yet</h3>
+                <p id="resultsEmptyMessage">
+                    No completed proposals have been unsuccessful so far.
                 </p>
-
-                <a
-                    href="vote.html"
-                    class="unsuccessful-empty-link"
-                >
+                <a href="vote.html" class="results-empty-link">
                     Explore proposals to vote on
                 </a>
-
             </div>
 
-            <!-- ERROR MESSAGE -->
-            <div
-                class="unsuccessful-error"
-                id="unsuccessfulError"
-                role="alert"
-                hidden
-            ></div>
-
         </section>
-
     </main>
 
-    <!-- FOOTER -->
     <footer>
-
-        <a href="index.html" class="logo">
-            INSTANT<span>DEMOCRACY</span>
-        </a>
-
-        <p>
-            Building stronger communities together.
-        </p>
-
-        <span class="copyright">
-            © 2026 Instant Democracy. All rights reserved.
-        </span>
-
+        <a href="index.html" class="logo">INSTANT<span>DEMOCRACY</span></a>
+        <p>Building stronger communities together.</p>
+        <span class="copyright">© 2026 Instant Democracy. All rights reserved.</span>
     </footer>
 
-    <!-- SCRIPTS -->
     <script src="js/script.js"></script>
-    <script src="js/notPassedProposals.js"></script>
+    <script src="js/proposalResults.js"></script>
 
 </body>
 </html>

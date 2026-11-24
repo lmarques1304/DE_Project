@@ -1,62 +1,41 @@
 (() => {
+    "use strict";
 
-    const accessMessage =
-        document.getElementById("adminAccessMessage");
+    const $ = id => document.getElementById(id);
 
-    const adminContent =
-        document.getElementById("adminContent");
+    const accessMessage = $("adminAccessMessage");
+    const adminContent = $("adminContent");
+    const logoutButton = $("adminLogout");
+    const navigationButtons = document.querySelectorAll("[data-view]");
 
-    const pageTitle =
-        document.getElementById("adminPageTitle");
+    const views = {
+        proposals: {
+            kind: "proposal",
+            name: "Proposal",
+            endpoint: "/api/admin/proposals",
+            section: $("adminProposalsSection"),
+            list: $("adminProposalList"),
+            filter: $("adminStatusFilter"),
+            feedback: $("adminFeedback"),
+            count: $("navProposalCount"),
+            subtitle: "Review proposals submitted by the community.",
+            items: null
+        },
+        debates: {
+            kind: "debate",
+            name: "Debate",
+            endpoint: "/api/admin/debates",
+            section: $("adminDebatesSection"),
+            list: $("adminDebateList"),
+            filter: $("adminDebateStatusFilter"),
+            feedback: $("adminDebateFeedback"),
+            count: $("navDebateCount"),
+            subtitle: "Review and moderate student discussions.",
+            items: null
+        }
+    };
 
-    const pageSubtitle =
-        document.getElementById("adminPageSubtitle");
-
-    const adminName =
-        document.getElementById("adminName");
-
-    const logoutButton =
-        document.getElementById("adminLogout");
-
-    const navigationButtons =
-        document.querySelectorAll("[data-view]");
-
-    const proposalSection =
-        document.getElementById("adminProposalsSection");
-
-    const debateSection =
-        document.getElementById("adminDebatesSection");
-
-    const proposalList =
-        document.getElementById("adminProposalList");
-
-    const debateList =
-        document.getElementById("adminDebateList");
-
-    const proposalFilter =
-        document.getElementById("adminStatusFilter");
-
-    const debateFilter =
-        document.getElementById("adminDebateStatusFilter");
-
-    const proposalFeedback =
-        document.getElementById("adminFeedback");
-
-    const debateFeedback =
-        document.getElementById("adminDebateFeedback");
-
-    const navProposalCount =
-        document.getElementById("navProposalCount");
-
-    const navDebateCount =
-        document.getElementById("navDebateCount");
-
-    let proposals = [];
-    let debates = [];
-    let currentView = "proposals";
-    let busy = false;
-
-    const CATEGORIES = {
+    const categories = {
         "academic-life": "Academic Life",
         "campus-mobility": "Campus Mobility",
         "canteens-and-food": "Canteens and Food",
@@ -67,114 +46,81 @@
         "workshops-and-skills": "Workshops and Skills"
     };
 
-    function escapeHTML(value) {
-        return String(value ?? "").replace(
-            /[&<>"']/g,
-            character => {
+    const statusLabels = {
+        pending: "Pending Review",
+        approved: "Published",
+        rejected: "Rejected"
+    };
 
-                const entities = {
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#39;"
-                };
+    const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Europe/Lisbon"
+    });
 
-                return entities[character];
-            }
-        );
+    const portugalFormatter = new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "Europe/Lisbon"
+    });
+
+    let currentView = "proposals";
+    let busy = false;
+    let ready = false;
+
+    function el(tag, props = {}, ...children) {
+        const node = Object.assign(document.createElement(tag), props);
+        node.append(...children);
+        return node;
     }
 
-    function formatDate(value) {
-        if (!value) {
-            return "Unknown date";
-        }
+    function text(tag, value, className = "") {
+        return el(tag, {
+            className,
+            textContent: String(value ?? "")
+        });
+    }
+
+    function setText(id, value) {
+        $(id).textContent = value;
+    }
+
+    function formatDate(value, fallback = "Unknown date") {
+        if (!value) return fallback;
 
         let normalized = String(value);
 
-        if (
-            /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)
-        ) {
-            normalized =
-                normalized.replace(" ", "T") + "Z";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+            normalized += "T12:00:00Z";
+        } else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)) {
+            normalized = normalized.replace(" ", "T") + "Z";
         }
 
         const date = new Date(normalized);
 
-        if (Number.isNaN(date.getTime())) {
-            return String(value);
-        }
-
-        return date.toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        });
-    }
-
-    function formatDeadline(value) {
-        if (!value) {
-            return "Not specified";
-        }
-
-        const date = new Date(
-            `${value}T12:00:00Z`
-        );
-
-        if (Number.isNaN(date.getTime())) {
-            return String(value);
-        }
-
-        return date.toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-            timeZone: "UTC"
-        });
+        return Number.isNaN(date.getTime())
+            ? String(value)
+            : dateFormatter.format(date);
     }
 
     function getPortugalToday() {
-        const parts = new Intl.DateTimeFormat(
-            "en-GB",
-            {
-                timeZone: "Europe/Lisbon",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }
-        ).formatToParts(new Date());
-
-        const get = type =>
-            parts.find(part => part.type === type).value;
+        const parts = portugalFormatter.formatToParts(new Date());
+        const get = type => parts.find(part => part.type === type).value;
 
         return `${get("year")}-${get("month")}-${get("day")}`;
     }
 
-    function getCategoryName(category) {
-        return CATEGORIES[category] || category;
+    function categoryName(category) {
+        return Object.hasOwn(categories, category)
+            ? categories[category]
+            : category || "Other";
     }
 
-    function getStatusLabel(status) {
-        if (status === "approved") {
-            return "Published";
-        }
-
-        if (status === "rejected") {
-            return "Rejected";
-        }
-
-        return "Pending Review";
-    }
-
-    function showFeedback(kind, message, type = "") {
-        const element =
-            kind === "proposal"
-                ? proposalFeedback
-                : debateFeedback;
-
-        element.textContent = message;
-        element.className =
-            `admin-feedback ${type}`;
+    function showFeedback(view, message = "", type = "") {
+        view.feedback.textContent = message;
+        view.feedback.className = `admin-feedback ${type}`.trim();
     }
 
     async function fetchJSON(url, options = {}) {
@@ -184,854 +130,486 @@
             ...options
         });
 
-        const data = await response.json().catch(
-            () => ({})
-        );
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-            throw new Error(
-                data.error ||
-                "Something went wrong. Please try again."
+            const error = new Error(
+                data.error || "Something went wrong. Please try again."
             );
+
+            error.status = response.status;
+            throw error;
         }
 
         return data;
     }
 
-    function updateStats() {
-        const items =
-            currentView === "proposals"
-                ? proposals
-                : debates;
-
-        const total = items.length;
-
-        const pending = items.filter(
-            item => item.status === "pending"
-        ).length;
-
-        const approved = items.filter(
-            item => item.status === "approved"
-        ).length;
-
-        const rejected = items.filter(
-            item => item.status === "rejected"
-        ).length;
-
-        document.getElementById(
-            "statTotalLabel"
-        ).textContent =
-            currentView === "proposals"
-                ? "Total proposals"
-                : "Total debates";
-
-        document.getElementById(
-            "statTotal"
-        ).textContent = total;
-
-        document.getElementById(
-            "statPending"
-        ).textContent = pending;
-
-        document.getElementById(
-            "statApproved"
-        ).textContent = approved;
-
-        document.getElementById(
-            "statRejected"
-        ).textContent = rejected;
-
-        navProposalCount.textContent =
-            proposals.filter(
-                item => item.status === "pending"
-            ).length;
-
-        navDebateCount.textContent =
-            debates.filter(
-                item => item.status === "pending"
-            ).length;
+    function countStatus(items, status) {
+        return items
+            ? items.filter(item => item.status === status).length
+            : "—";
     }
 
-    function switchView(view) {
-        if (!["proposals", "debates"].includes(view)) {
-            return;
-        }
+    function updateStats() {
+        const items = views[currentView].items;
 
-        currentView = view;
+        setText("statTotalLabel", `Total ${currentView}`);
+        setText("statTotal", items ? items.length : "—");
+        setText("statPending", countStatus(items, "pending"));
+        setText("statApproved", countStatus(items, "approved"));
+        setText("statRejected", countStatus(items, "rejected"));
 
-        proposalSection.hidden =
-            view !== "proposals";
+        Object.values(views).forEach(view => {
+            view.count.textContent = countStatus(view.items, "pending");
+        });
+    }
 
-        debateSection.hidden =
-            view !== "debates";
+    function switchView(name) {
+        if (!ready || !Object.hasOwn(views, name)) return;
 
-        navigationButtons.forEach(button => {
-            const active =
-                button.dataset.view === view;
+        currentView = name;
 
-            button.classList.toggle(
-                "active",
-                active
-            );
-
-            button.setAttribute(
-                "aria-pressed",
-                String(active)
-            );
+        Object.entries(views).forEach(([key, view]) => {
+            view.section.hidden = key !== name;
         });
 
-        if (view === "proposals") {
-            pageTitle.textContent =
-                "Proposal Management";
+        navigationButtons.forEach(button => {
+            const active = button.dataset.view === name;
 
-            pageSubtitle.textContent =
-                "Review proposals submitted by the community.";
+            button.classList.toggle("active", active);
+            button.setAttribute("aria-pressed", String(active));
+        });
 
-        } else {
-            pageTitle.textContent =
-                "Debate Management";
-
-            pageSubtitle.textContent =
-                "Review and moderate student discussions.";
-        }
+        setText("adminPageTitle", `${views[name].name} Management`);
+        setText("adminPageSubtitle", views[name].subtitle);
 
         updateStats();
     }
 
-    navigationButtons.forEach(button => {
-        button.addEventListener(
-            "click",
-            () => {
-                switchView(
-                    button.dataset.view
-                );
+    function createTag(value, type = "") {
+        return text("span", value, `admin-tag ${type}`.trim());
+    }
+
+    function createRejectionReason(reason) {
+        return el("div", { className: "admin-rejection-reason" },
+            text("strong", "Reason for rejection"),
+            text("p", reason)
+        );
+    }
+
+    function createAction(view, id, action, label, type = "", locked = false) {
+        const button = el("button", {
+            type: "button",
+            className: `admin-action-button ${type}`.trim(),
+            textContent: label,
+            disabled: busy || locked
+        });
+
+        Object.assign(button.dataset, {
+            action,
+            kind: view.kind,
+            id: String(id),
+            locked: String(locked)
+        });
+
+        return button;
+    }
+
+    function createModerationControls(view, id, approvalDisabled) {
+        const formId = `rejection-${view.kind}-${id}`;
+        const reasonId = `reason-${view.kind}-${id}`;
+
+        const actions = el("div", { className: "admin-actions" },
+            createAction(
+                view, id, "approve",
+                `Publish ${view.name}`, "admin-approve", approvalDisabled
+            ),
+            createAction(
+                view, id, "reject",
+                "Reject Publication", "admin-reject"
+            )
+        );
+
+        const form = el("div", {
+            className: "admin-rejection-form",
+            id: formId,
+            hidden: true
+        },
+            el("label", {
+                htmlFor: reasonId,
+                textContent: "Reason for rejection"
+            }),
+            el("textarea", {
+                id: reasonId,
+                rows: 4,
+                minLength: 10,
+                maxLength: 500,
+                disabled: busy,
+                placeholder: "Explain why this submission cannot be published..."
+            }),
+            text("p",
+                "This explanation will be visible to the student. Minimum 10 characters, maximum 500."
+            ),
+            el("div", { className: "admin-rejection-controls" },
+                createAction(
+                    view, id, "confirm-reject",
+                    "Confirm Rejection", "admin-reject"
+                ),
+                createAction(view, id, "cancel-reject", "Cancel")
+            )
+        );
+
+        const fragment = document.createDocumentFragment();
+        fragment.append(actions, form);
+
+        return fragment;
+    }
+
+    function createCard(view, item) {
+        const isProposal = view.kind === "proposal";
+        const isPending = item.status === "pending";
+        const isStudent = item.source === "student";
+        const isAnonymous = Number(item.anonymous) === 1;
+        const id = Number(item.id);
+        const validId = Number.isSafeInteger(id) && id > 0;
+
+        const deadlineExpired = isProposal && (
+            !item.voting_deadline ||
+            item.voting_deadline < getPortugalToday()
+        );
+
+        const status = Object.hasOwn(statusLabels, item.status)
+            ? item.status
+            : "pending";
+
+        const tags = [createTag(categoryName(item.category))];
+
+        if (isProposal) {
+            tags.push(createTag(item.source));
+        }
+
+        tags.push(createTag(formatDate(item.created_at)));
+
+        if (isAnonymous) {
+            tags.push(createTag("Anonymous"));
+        }
+
+        const authorInfo = [
+            `Name: ${item.author_name ?? ""}`,
+            `Email: ${item.author_email ?? ""}`,
+            `Account ID: ${item.author_id ?? ""}`,
+            `Anonymous submission: ${isAnonymous ? "Yes" : "No"}`
+        ];
+
+        if (isProposal) {
+            authorInfo.push(
+                `Voting deadline: ${formatDate(item.voting_deadline, "Not specified")}`
+            );
+        }
+
+        const card = el("article", { className: "admin-proposal-card" },
+            el("div", { className: "admin-proposal-top" },
+                el("div", {},
+                    text("h3", item.title),
+                    el("div", { className: "admin-proposal-meta" }, ...tags)
+                ),
+                createTag(statusLabels[status], status)
+            ),
+            text("p", item.description, "admin-proposal-description"),
+            el("div", { className: "admin-author-info" },
+                text("strong", "Author information — Admin only"),
+                ...authorInfo.map(value => text("span", value))
+            )
+        );
+
+        if (item.rejection_reason) {
+            card.append(createRejectionReason(item.rejection_reason));
+        }
+
+        if (!isProposal && validId) {
+            card.append(el("a", {
+                className: "admin-debate-link",
+                href: `debate.html?id=${id}`,
+                textContent: "View Debate"
+            }));
+        }
+
+        if (isPending && validId && (!isProposal || isStudent)) {
+            card.append(createModerationControls(view, id, deadlineExpired));
+        }
+
+        if (isProposal && isPending) {
+            if (isStudent && deadlineExpired) {
+                card.append(text("p",
+                    "The voting deadline has expired or is missing. This proposal cannot be published.",
+                    "admin-deadline-warning"
+                ));
+            } else if (!isStudent) {
+                card.append(text("p",
+                    "This submission is not eligible for student proposal moderation.",
+                    "admin-inline-note"
+                ));
             }
-        );
-    });
-
-    function renderRejectionReason(reason) {
-        if (!reason) {
-            return "";
         }
 
-        return `
-            <div class="admin-rejection-reason">
-
-                <strong>
-                    Reason for rejection
-                </strong>
-
-                <p>${escapeHTML(reason)}</p>
-
-            </div>
-        `;
+        return card;
     }
 
-    function renderModerationControls(
-        kind,
-        id,
-        approvalDisabled = false
-    ) {
-        const safeId = Number(id);
+    function renderView(name) {
+        const view = views[name];
 
-        if (
-            !Number.isSafeInteger(safeId) ||
-            safeId <= 0
-        ) {
-            return "";
-        }
-
-        const itemName =
-            kind === "proposal"
-                ? "Proposal"
-                : "Debate";
-
-        return `
-            <div class="admin-actions">
-
-                <button
-                    type="button"
-                    class="admin-action-button admin-approve"
-                    data-action="approve"
-                    data-kind="${kind}"
-                    data-id="${safeId}"
-                    ${approvalDisabled ? "disabled" : ""}
-                >
-                    Publish ${itemName}
-                </button>
-
-                <button
-                    type="button"
-                    class="admin-action-button admin-reject"
-                    data-action="reject"
-                    data-kind="${kind}"
-                    data-id="${safeId}"
-                >
-                    Reject Publication
-                </button>
-
-            </div>
-
-            <div
-                class="admin-rejection-form"
-                id="rejection-${kind}-${safeId}"
-                hidden
-            >
-
-                <label for="reason-${kind}-${safeId}">
-                    Reason for rejection
-                </label>
-
-                <textarea
-                    id="reason-${kind}-${safeId}"
-                    rows="4"
-                    minlength="10"
-                    maxlength="500"
-                    placeholder="Explain why this submission cannot be published..."
-                ></textarea>
-
-                <p>
-                    This explanation will be visible to
-                    the student. Minimum 10 characters,
-                    maximum 500.
-                </p>
-
-                <div class="admin-rejection-controls">
-
-                    <button
-                        type="button"
-                        class="admin-action-button admin-reject"
-                        data-action="confirm-reject"
-                        data-kind="${kind}"
-                        data-id="${safeId}"
-                    >
-                        Confirm Rejection
-                    </button>
-
-                    <button
-                        type="button"
-                        class="admin-action-button"
-                        data-action="cancel-reject"
-                        data-kind="${kind}"
-                        data-id="${safeId}"
-                    >
-                        Cancel
-                    </button>
-
-                </div>
-
-            </div>
-        `;
-    }
-
-    function renderProposals() {
-        const selectedStatus =
-            proposalFilter.value;
-
-        const visible = proposals.filter(
-            proposal =>
-                selectedStatus === "all" ||
-                proposal.status === selectedStatus
-        );
-
-        if (visible.length === 0) {
-            proposalList.innerHTML = `
-                <div class="admin-empty">
-                    No proposals found for this status.
-                </div>
-            `;
-
+        if (!view.items) {
+            view.list.replaceChildren(text("div",
+                `Unable to load ${name}.`,
+                "admin-empty"
+            ));
             return;
         }
 
-        const today = getPortugalToday();
+        const status = view.filter.value;
 
-        proposalList.innerHTML = visible.map(
-            proposal => {
-
-                const isPending =
-                    proposal.status === "pending";
-
-                const isAnonymous =
-                    Number(proposal.anonymous) === 1;
-
-                const isStudent =
-                    proposal.source === "student";
-
-                const deadlineExpired =
-                    !proposal.voting_deadline ||
-                    proposal.voting_deadline < today;
-
-                const controls =
-                    isPending && isStudent
-                        ? renderModerationControls(
-                            "proposal",
-                            proposal.id,
-                            deadlineExpired
-                        )
-                        : "";
-
-                return `
-                    <article class="admin-proposal-card">
-
-                        <div class="admin-proposal-top">
-
-                            <div>
-
-                                <h3>
-                                    ${escapeHTML(proposal.title)}
-                                </h3>
-
-                                <div class="admin-proposal-meta">
-
-                                    <span class="admin-tag">
-                                        ${escapeHTML(
-                                            getCategoryName(proposal.category)
-                                        )}
-                                    </span>
-
-                                    <span class="admin-tag">
-                                        ${escapeHTML(proposal.source)}
-                                    </span>
-
-                                    <span class="admin-tag">
-                                        ${escapeHTML(
-                                            formatDate(proposal.created_at)
-                                        )}
-                                    </span>
-
-                                    ${isAnonymous
-                                        ? '<span class="admin-tag">Anonymous</span>'
-                                        : ""}
-
-                                </div>
-
-                            </div>
-
-                            <span class="admin-tag ${escapeHTML(proposal.status)}">
-                                ${getStatusLabel(proposal.status)}
-                            </span>
-
-                        </div>
-
-                        <p class="admin-proposal-description">${escapeHTML(proposal.description)}</p>
-
-                        <div class="admin-author-info">
-
-                            <strong>
-                                Author information — Admin only
-                            </strong>
-
-                            <span>
-                                Name: ${escapeHTML(proposal.author_name)}
-                            </span>
-
-                            <span>
-                                Email: ${escapeHTML(proposal.author_email)}
-                            </span>
-
-                            <span>
-                                Account ID: ${escapeHTML(proposal.author_id)}
-                            </span>
-
-                            <span>
-                                Anonymous submission:
-                                ${isAnonymous ? "Yes" : "No"}
-                            </span>
-
-                            <span>
-                                Voting deadline:
-                                ${escapeHTML(
-                                    formatDeadline(proposal.voting_deadline)
-                                )}
-                            </span>
-
-                        </div>
-
-                        ${renderRejectionReason(
-                            proposal.rejection_reason
-                        )}
-
-                        ${controls}
-
-                        ${isPending && isStudent && deadlineExpired
-                            ? `
-                                <p class="admin-deadline-warning">
-                                    The voting deadline has expired or is
-                                    missing. This proposal cannot be published.
-                                </p>
-                            `
-                            : ""}
-
-                        ${isPending && !isStudent
-                            ? `
-                                <p class="admin-inline-note">
-                                    This submission is not eligible for
-                                    student proposal moderation.
-                                </p>
-                            `
-                            : ""}
-
-                    </article>
-                `;
-            }
-        ).join("");
-    }
-
-    function renderDebates() {
-        const selectedStatus =
-            debateFilter.value;
-
-        const visible = debates.filter(
-            debate =>
-                selectedStatus === "all" ||
-                debate.status === selectedStatus
+        const visible = view.items.filter(item =>
+            status === "all" || item.status === status
         );
 
-        if (visible.length === 0) {
-            debateList.innerHTML = `
-                <div class="admin-empty">
-                    No debates found for this status.
-                </div>
-            `;
+        view.list.replaceChildren(
+            ...(visible.length
+                ? visible.map(item => createCard(view, item))
+                : [text("div",
+                    `No ${name} found for this status.`,
+                    "admin-empty"
+                )])
+        );
+    }
 
-            return;
+    async function loadView(name) {
+        const view = views[name];
+        const data = await fetchJSON(view.endpoint);
+
+        if (!Array.isArray(data[name])) {
+            throw new Error(`Unable to load ${name}.`);
         }
 
-        debateList.innerHTML = visible.map(
-            debate => {
+        view.items = data[name];
 
-                const isPending =
-                    debate.status === "pending";
-
-                const isAnonymous =
-                    Number(debate.anonymous) === 1;
-
-                const controls = isPending
-                    ? renderModerationControls(
-                        "debate",
-                        debate.id
-                    )
-                    : "";
-
-                return `
-                    <article class="admin-proposal-card">
-
-                        <div class="admin-proposal-top">
-
-                            <div>
-
-                                <h3>
-                                    ${escapeHTML(debate.title)}
-                                </h3>
-
-                                <div class="admin-proposal-meta">
-
-                                    <span class="admin-tag">
-                                        ${escapeHTML(
-                                            getCategoryName(debate.category)
-                                        )}
-                                    </span>
-
-                                    <span class="admin-tag">
-                                        ${escapeHTML(
-                                            formatDate(debate.created_at)
-                                        )}
-                                    </span>
-
-                                    ${isAnonymous
-                                        ? '<span class="admin-tag">Anonymous</span>'
-                                        : ""}
-
-                                </div>
-
-                            </div>
-
-                            <span class="admin-tag ${escapeHTML(debate.status)}">
-                                ${getStatusLabel(debate.status)}
-                            </span>
-
-                        </div>
-
-                        <p class="admin-proposal-description">${escapeHTML(debate.description)}</p>
-
-                        <div class="admin-author-info">
-
-                            <strong>
-                                Author information — Admin only
-                            </strong>
-
-                            <span>
-                                Name: ${escapeHTML(debate.author_name)}
-                            </span>
-
-                            <span>
-                                Email: ${escapeHTML(debate.author_email)}
-                            </span>
-
-                            <span>
-                                Account ID: ${escapeHTML(debate.author_id)}
-                            </span>
-
-                            <span>
-                                Anonymous submission:
-                                ${isAnonymous ? "Yes" : "No"}
-                            </span>
-
-                        </div>
-
-                        ${renderRejectionReason(
-                            debate.rejection_reason
-                        )}
-
-                        <a
-                            class="admin-debate-link"
-                            href="debate.html?id=${Number(debate.id)}"
-                        >
-                            View Debate
-                        </a>
-
-                        ${controls}
-
-                    </article>
-                `;
-            }
-        ).join("");
-    }
-
-    async function loadProposals() {
-        const data = await fetchJSON(
-            "/api/admin/proposals"
-        );
-
-        proposals = data.proposals || [];
-
-        renderProposals();
-        updateStats();
-    }
-
-    async function loadDebates() {
-        const data = await fetchJSON(
-            "/api/admin/debates"
-        );
-
-        debates = data.debates || [];
-
-        renderDebates();
+        renderView(name);
         updateStats();
     }
 
     function setBusy(value) {
         busy = value;
+        logoutButton.disabled = value;
 
-        document.querySelectorAll(
-            ".admin-action-button"
-        ).forEach(button => {
-
-            if (value) {
-                if (!button.disabled) {
-                    button.disabled = true;
-                    button.dataset.busyDisabled = "true";
-                }
-            } else if (
-                button.dataset.busyDisabled === "true"
-            ) {
-                button.disabled = false;
-                delete button.dataset.busyDisabled;
-            }
-
+        Object.values(views).forEach(view => {
+            view.filter.disabled = value;
         });
+
+        document.querySelectorAll(".admin-action-button").forEach(button => {
+            button.disabled = value || button.dataset.locked === "true";
+        });
+
+        document.querySelectorAll(".admin-rejection-form textarea")
+            .forEach(textarea => {
+                textarea.disabled = value;
+            });
     }
 
-    async function moderateItem(
-        kind,
-        id,
-        status,
-        rejectionReason = ""
-    ) {
-        if (busy) {
+    async function moderateItem(name, id, status, rejectionReason = "") {
+        if (busy || !ready) return;
+
+        const view = views[name];
+
+        if (status === "approved" && !window.confirm(
+            `Publish this ${view.kind} and make it visible to the community?`
+        )) {
             return;
         }
 
-        if (status === "approved") {
-            const itemName =
-                kind === "proposal"
-                    ? "proposal"
-                    : "debate";
-
-            const confirmed = window.confirm(
-                `Publish this ${itemName} and make it visible to the community?`
-            );
-
-            if (!confirmed) {
-                return;
-            }
-        }
-
-        const endpoint =
-            kind === "proposal"
-                ? `/api/admin/proposals/${id}/status`
-                : `/api/admin/debates/${id}/status`;
-
         setBusy(true);
-        showFeedback(kind, "");
+        showFeedback(view);
 
         try {
+            const data = await fetchJSON(`${view.endpoint}/${id}/status`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status, rejectionReason })
+            });
 
-            const data = await fetchJSON(
-                endpoint,
-                {
-                    method: "PATCH",
+            try {
+                await loadView(name);
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                showFeedback(
+                    view,
+                    data.message || "Submission reviewed successfully.",
+                    "success"
+                );
+            } catch (error) {
+                view.items = null;
 
-                    body: JSON.stringify({
-                        status,
-                        rejectionReason
-                    })
-                }
-            );
+                renderView(name);
+                updateStats();
 
-            if (kind === "proposal") {
-                await loadProposals();
-            } else {
-                await loadDebates();
+                showFeedback(
+                    view,
+                    "Submission reviewed, but the list could not be refreshed. Please reload the page.",
+                    "error"
+                );
             }
-
-            showFeedback(
-                kind,
-                data.message ||
-                    "Submission reviewed successfully.",
-                "success"
-            );
-
         } catch (error) {
-
-            showFeedback(
-                kind,
-                error.message,
-                "error"
-            );
-
+            showFeedback(view, error.message, "error");
         } finally {
             setBusy(false);
         }
     }
 
-    function handleModerationClick(event) {
-        const button = event.target.closest(
-            "button[data-action]"
-        );
+    function handleModerationClick(name, event) {
+        const button = event.target.closest("button[data-action]");
 
-        if (!button || busy || button.disabled) {
-            return;
-        }
+        if (!button || busy || button.disabled || !ready) return;
 
-        const kind = button.dataset.kind;
+        const view = views[name];
+        const id = Number(button.dataset.id);
         const action = button.dataset.action;
 
-        const id = Number(
-            button.dataset.id
-        );
-
         if (
-            !["proposal", "debate"].includes(kind) ||
+            button.dataset.kind !== view.kind ||
             !Number.isSafeInteger(id) ||
             id <= 0
         ) {
             return;
         }
 
-        const form = document.getElementById(
-            `rejection-${kind}-${id}`
-        );
+        const form = $(`rejection-${view.kind}-${id}`);
+        const textarea = $(`reason-${view.kind}-${id}`);
 
-        if (action === "reject") {
-            if (form) {
-                form.hidden = false;
+        switch (action) {
+            case "reject":
+                if (form) {
+                    form.hidden = false;
+                    textarea?.focus();
+                }
+                break;
 
-                document.getElementById(
-                    `reason-${kind}-${id}`
-                )?.focus();
+            case "cancel-reject":
+                if (form) form.hidden = true;
+                break;
+
+            case "confirm-reject": {
+                const reason = textarea?.value.trim() || "";
+
+                if (reason.length < 10 || reason.length > 500) {
+                    showFeedback(
+                        view,
+                        "Please provide a rejection reason between 10 and 500 characters.",
+                        "error"
+                    );
+
+                    textarea?.focus();
+                    return;
+                }
+
+                moderateItem(name, id, "rejected", reason);
+                break;
             }
 
-            return;
-        }
-        if (action === "cancel-reject") {
-            if (form) {
-                form.hidden = true;
-            }
-
-            return;
-        }
-        if (action === "confirm-reject") {
-            const textarea = document.getElementById(
-                `reason-${kind}-${id}`
-            );
-
-            const reason =
-                textarea?.value.trim() || "";
-
-            if (
-                reason.length < 10 ||
-                reason.length > 500
-            ) {
-                showFeedback(
-                    kind,
-                    "Please provide a rejection reason between 10 and 500 characters.",
-                    "error"
-                );
-
-                textarea?.focus();
-                return;
-            }
-
-            moderateItem(
-                kind,
-                id,
-                "rejected",
-                reason
-            );
-
-            return;
-        }
-        if (action === "approve") {
-            moderateItem(
-                kind,
-                id,
-                "approved"
-            );
+            case "approve":
+                moderateItem(name, id, "approved");
+                break;
         }
     }
 
-    proposalList.addEventListener(
-        "click",
-        handleModerationClick
-    );
+    async function logout() {
+        if (busy) return;
 
-    debateList.addEventListener(
-        "click",
-        handleModerationClick
-    );
+        setBusy(true);
 
-    proposalFilter.addEventListener(
-        "change",
-        renderProposals
-    );
+        try {
+            await fetchJSON("/api/auth/logout", {
+                method: "POST"
+            });
 
-    debateFilter.addEventListener(
-        "change",
-        renderDebates
-    );
+            window.location.replace("login.html");
+        } catch (error) {
+            const message = "Unable to log out. Please try again.";
 
-    logoutButton.addEventListener(
-        "click",
-        async () => {
-
-            logoutButton.disabled = true;
-
-            try {
-
-                await fetchJSON(
-                    "/api/auth/logout",
-                    {
-                        method: "POST"
-                    }
-                );
-
-                window.location.replace(
-                    "login.html"
-                );
-
-            } catch (error) {
-
-                showFeedback(
-                    currentView === "proposals"
-                        ? "proposal"
-                        : "debate",
-
-                    "Unable to log out. Please try again.",
-                    "error"
-                );
-
-                logoutButton.disabled = false;
+            if (ready) {
+                showFeedback(views[currentView], message, "error");
+            } else {
+                accessMessage.textContent = message;
             }
+
+            setBusy(false);
         }
-    );
+    }
 
     async function initializeDashboard() {
+        setBusy(true);
+
         try {
-
-            const authData = await fetchJSON(
-                "/api/auth/me"
-            );
-
-            const user = authData.user;
+            const { user } = await fetchJSON("/api/auth/me");
 
             if (!user) {
-                window.location.replace(
-                    "login.html"
-                );
-
+                window.location.replace("login.html");
                 return;
             }
 
             if (user.role !== "admin") {
                 accessMessage.textContent =
                     "Access denied. This page is only available to administrators.";
-
                 return;
             }
 
-            adminName.textContent =
-                user.name || "Administrator";
+            setText("adminName", user.name || "Administrator");
 
-            const results = await Promise.allSettled([
-                loadProposals(),
-                loadDebates()
-            ]);
+            await Promise.all(
+                Object.keys(views).map(async name => {
+                    try {
+                        await loadView(name);
+                    } catch (error) {
+                        renderView(name);
+                        showFeedback(views[name], error.message, "error");
+                    }
+                })
+            );
 
-            if (results[0].status === "rejected") {
-                showFeedback(
-                    "proposal",
-                    results[0].reason.message,
-                    "error"
-                );
-
-                proposalList.textContent =
-                    "Unable to load proposals.";
-            }
-
-            if (results[1].status === "rejected") {
-                showFeedback(
-                    "debate",
-                    results[1].reason.message,
-                    "error"
-                );
-
-                debateList.textContent =
-                    "Unable to load debates.";
-            }
+            ready = true;
 
             switchView("proposals");
 
             accessMessage.hidden = true;
             adminContent.hidden = false;
-
         } catch (error) {
+            if (error.status === 401) {
+                window.location.replace("login.html");
+                return;
+            }
 
-            console.error(
-                "Dashboard error:",
-                error
-            );
+            console.error("Dashboard error:", error);
 
             accessMessage.textContent =
                 "Unable to load the dashboard. Please try again.";
+        } finally {
+            setBusy(false);
         }
     }
 
-    initializeDashboard();
+    navigationButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            switchView(button.dataset.view);
+        });
+    });
 
+    Object.entries(views).forEach(([name, view]) => {
+        view.filter.addEventListener("change", () => renderView(name));
+
+        view.list.addEventListener("click", event => {
+            handleModerationClick(name, event);
+        });
+    });
+
+    logoutButton.addEventListener("click", logout);
+
+    initializeDashboard();
 })();

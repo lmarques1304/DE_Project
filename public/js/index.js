@@ -1,16 +1,5 @@
 (() => {
-
-    const recentDebates =
-        document.getElementById("recentDebates");
-
-    const recentVotingProposals =
-        document.getElementById("recentVotingProposals");
-
-    const recentApprovedProposals =
-        document.getElementById("recentApprovedProposals");
-
-    const recentNotPassedProposals =
-        document.getElementById("recentNotPassedProposals");
+    const $ = id => document.getElementById(id);
 
     const debateCategories = {
         "academic-life": "Academic Life",
@@ -23,6 +12,33 @@
         "workshops-and-skills": "Workshops and Skills"
     };
 
+    const proposalSections = [
+        {
+            id: "recentVotingProposals",
+            result: "ongoing",
+            label: "Open for voting",
+            type: "voting",
+            href: "vote.html",
+            error: "Unable to load voting proposals."
+        },
+        {
+            id: "recentApprovedProposals",
+            result: "approved",
+            label: "Approved",
+            type: "approved",
+            href: "approvedProposals.html",
+            error: "Unable to load approved proposals."
+        },
+        {
+            id: "recentNotPassedProposals",
+            result: "not_approved",
+            label: "Unsuccessful",
+            type: "not-passed",
+            href: "notPassedProposals.html",
+            error: "Unable to load unsuccessful proposals."
+        }
+    ];
+
     const dateFormatter = new Intl.DateTimeFormat("en-GB", {
         day: "numeric",
         month: "short",
@@ -32,498 +48,231 @@
 
     let loading = false;
 
-    function createElement(tag, className, text) {
-
+    function createElement(tag, className = "", text) {
         const element = document.createElement(tag);
-
-        if (className) {
-            element.className = className;
-        }
-
-        if (text !== undefined) {
-            element.textContent = text;
-        }
-
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
         return element;
     }
 
     function parseDate(value) {
-
-        if (!value) {
-            return null;
-        }
+        if (!value) return null;
 
         let normalized = String(value).trim();
 
         if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
-
             normalized += "T12:00:00Z";
-
-        } else if (
-            /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
-                .test(normalized)
-        ) {
-
-            normalized =
-                normalized.replace(" ", "T") + "Z";
+        } else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)) {
+            normalized = normalized.replace(" ", "T") + "Z";
         }
 
         const date = new Date(normalized);
-
-        return Number.isNaN(date.getTime())
-            ? null
-            : date;
+        return Number.isNaN(date.getTime()) ? null : date;
     }
 
     function formatDate(value) {
-
         const date = parseDate(value);
-
-        return date
-            ? dateFormatter.format(date)
-            : "";
+        return date ? dateFormatter.format(date) : "";
     }
 
     function getTimestamp(value) {
-
         return parseDate(value)?.getTime() || 0;
     }
 
     function truncateText(value, limit = 140) {
+        const text = String(value || "").replace(/\s+/g, " ").trim();
 
-        const text = String(value || "")
-            .replace(/\s+/g, " ")
-            .trim();
-
-        if (text.length <= limit) {
-            return text;
-        }
+        if (text.length <= limit) return text;
 
         const shortened = text.slice(0, limit);
-
         const lastSpace = shortened.lastIndexOf(" ");
 
-        return (
-            lastSpace > limit * 0.7
-                ? shortened.slice(0, lastSpace)
-                : shortened
-        ) + "…";
+        return (lastSpace > limit * 0.7
+            ? shortened.slice(0, lastSpace)
+            : shortened) + "…";
     }
 
-    function sortByCreation(items) {
+    const getCreationDate = item => item.createdAt || item.created_at;
+    const getDeadline = item => item.voting_deadline;
 
-        return [...items].sort((a, b) => {
-
-            const dateA = getTimestamp(
-                a.createdAt || a.created_at
-            );
-
-            const dateB = getTimestamp(
-                b.createdAt || b.created_at
-            );
-
-            return dateB - dateA ||
-                Number(b.id) - Number(a.id);
-        });
+    function sortRecent(items, getDate = getCreationDate) {
+        return [...items].sort((a, b) =>
+            getTimestamp(getDate(b)) - getTimestamp(getDate(a)) ||
+            Number(b.id) - Number(a.id)
+        );
     }
 
-    function sortByDeadline(items) {
+    function countText(value, singular) {
+        const count = Number(value) || 0;
+        return `${count} ${singular}${count === 1 ? "" : "s"}`;
+    }
 
-        return [...items].sort((a, b) => {
-
-            const dateA = getTimestamp(
-                a.voting_deadline
-            );
-
-            const dateB = getTimestamp(
-                b.voting_deadline
-            );
-
-            return dateB - dateA ||
-                Number(b.id) - Number(a.id);
-        });
+    function joinMetadata(...items) {
+        return items.filter(Boolean).join(" · ");
     }
 
     async function fetchData(url) {
-
         const response = await fetch(url, {
             credentials: "same-origin",
             cache: "no-store"
         });
 
         if (!response.ok) {
-            throw new Error(
-                `Unable to load ${url}: ${response.status}`
-            );
+            throw new Error(`Unable to load ${url}: ${response.status}`);
         }
 
         return response.json();
     }
 
-    function createRecentCard({
-        title,
-        description,
-        label,
-        type,
-        metadata,
-        href
-    }) {
-
-        const card = createElement(
-            "a",
-            "recent-card"
-        );
-
+    function createRecentCard(item, { label, type, metadata, href }) {
+        const card = createElement("a", "recent-card");
         card.href = href;
-        card.style.overflowWrap = "anywhere";
-
-        const status = createElement(
-            "span",
-            `status-label status-label--${type}`,
-            label
-        );
-
-        const heading = createElement(
-            "h3",
-            "",
-            title
-        );
-
-        const preview = createElement(
-            "p",
-            "",
-            truncateText(description)
-        );
-
-        const meta = createElement(
-            "div",
-            "recent-card-meta",
-            metadata
-        );
 
         card.append(
-            status,
-            heading,
-            preview,
-            meta
+            createElement("span", `status-label status-label--${type}`, label),
+            createElement("h3", "", item.title),
+            createElement("p", "", truncateText(item.description)),
+            createElement("div", "recent-card-meta", metadata)
         );
 
         return card;
     }
 
     function createDebateCard(debate) {
-
-        const category =
-            debateCategories[debate.category] ||
-            debate.category ||
-            "Debate";
-
-        const comments =
-            Number(debate.commentCount) || 0;
-
-        const commentText =
-            comments === 1
-                ? "1 comment"
-                : `${comments} comments`;
-
-        const metadata = [
-            formatDate(debate.createdAt),
-            commentText
-        ].filter(Boolean).join(" · ");
-
-        return createRecentCard({
-            title: debate.title,
-            description: debate.description,
-            label: category,
+        return createRecentCard(debate, {
+            label: debateCategories[debate.category] || debate.category || "Debate",
             type: "debate",
-            metadata,
+            metadata: joinMetadata(
+                formatDate(debate.createdAt),
+                countText(debate.commentCount, "comment")
+            ),
             href: `debate.html?id=${encodeURIComponent(debate.id)}`
         });
     }
 
     function getProposalSource(proposal) {
-
-        if (proposal.source === "uc") {
-            return "UC";
+        switch (proposal.source) {
+            case "uc": return "UC";
+            case "nuclei": return proposal.organization || "Núcleos";
+            case "student": return "Student";
+            default: return proposal.category || "Proposal";
         }
-
-        if (proposal.source === "nuclei") {
-            return proposal.organization || "Núcleos";
-        }
-
-        if (proposal.source === "student") {
-            return "Student";
-        }
-
-        return proposal.category || "Proposal";
     }
 
-    function createVotingCard(proposal) {
+    function createProposalCard(proposal, section) {
+        const deadline = formatDate(proposal.voting_deadline);
+        const totalVotes = (Number(proposal.yes_votes) || 0) +
+            (Number(proposal.no_votes) || 0);
 
-        const deadline = formatDate(
-            proposal.voting_deadline
-        );
+        const metadata = section.result === "ongoing"
+            ? joinMetadata(
+                getProposalSource(proposal),
+                deadline ? `Ends ${deadline}` : ""
+            )
+            : joinMetadata(
+                deadline ? `Closed ${deadline}` : "",
+                countText(totalVotes, "vote")
+            );
 
-        const metadata = [
-            getProposalSource(proposal),
-            deadline ? `Ends ${deadline}` : ""
-        ].filter(Boolean).join(" · ");
-
-        return createRecentCard({
-            title: proposal.title,
-            description: proposal.description,
-            label: "Open for voting",
-            type: "voting",
+        return createRecentCard(proposal, {
+            label: section.label,
+            type: section.type,
             metadata,
-            href: "vote.html"
+            href: section.href
         });
     }
 
-    function getVoteMetadata(proposal) {
+    function renderCards(id, items, cardBuilder) {
+        const container = $(id);
+        if (!container) return;
 
-        const yesVotes =
-            Number(proposal.yes_votes) || 0;
-
-        const noVotes =
-            Number(proposal.no_votes) || 0;
-
-        const totalVotes = yesVotes + noVotes;
-
-        const deadline = formatDate(
-            proposal.voting_deadline
-        );
-
-        const voteText =
-            totalVotes === 1
-                ? "1 vote"
-                : `${totalVotes} votes`;
-
-        return [
-            deadline ? `Closed ${deadline}` : "",
-            voteText
-        ].filter(Boolean).join(" · ");
+        container.replaceChildren(...items.slice(0, 3).map(cardBuilder));
+        container.hidden = items.length === 0;
     }
 
-    function createApprovedCard(proposal) {
+    function renderError(id, message) {
+        const container = $(id);
+        if (!container) return;
 
-        return createRecentCard({
-            title: proposal.title,
-            description: proposal.description,
-            label: "Approved",
-            type: "approved",
-            metadata: getVoteMetadata(proposal),
-            href: "approvedProposals.html"
-        });
-    }
-
-    function createNotPassedCard(proposal) {
-
-        return createRecentCard({
-            title: proposal.title,
-            description: proposal.description,
-            label: "Unsuccessful",
-            type: "not-passed",
-            metadata: getVoteMetadata(proposal),
-            href: "notPassedProposals.html"
-        });
-    }
-
-    function renderCards(container, items, cardBuilder) {
-
-        if (!container) {
-            return;
-        }
-
-        container.replaceChildren();
-
-        const recentItems = items.slice(0, 3);
-
-        if (recentItems.length === 0) {
-
-            container.hidden = true;
-
-            return;
-        }
-
-        container.append(
-            ...recentItems.map(cardBuilder)
-        );
-
-        container.hidden = false;
-    }
-
-    function renderError(container, message) {
-
-        if (!container) {
-            return;
-        }
-
-        const error = createElement(
-            "div",
-            "empty-state"
-        );
-
-        error.append(
-            createElement("p", "", message)
-        );
+        const error = createElement("div", "empty-state");
+        error.append(createElement("p", "", message));
 
         container.replaceChildren(error);
-
         container.hidden = false;
     }
 
     async function loadRecentDebates() {
-
         try {
-
-            const data = await fetchData(
-                "/api/debates?sort=recent&limit=3"
-            );
+            const data = await fetchData("/api/debates?sort=recent&limit=3");
 
             if (!Array.isArray(data.debates)) {
-
-                throw new Error(
-                    "Invalid debates response."
-                );
+                throw new Error("Invalid debates response.");
             }
 
-            renderCards(
-                recentDebates,
-                sortByCreation(data.debates),
-                createDebateCard
-            );
-
+            renderCards("recentDebates", sortRecent(data.debates), createDebateCard);
         } catch (error) {
-
-            console.error(
-                "Error loading recent debates:",
-                error
-            );
-
-            renderError(
-                recentDebates,
-                "Unable to load recent debates."
-            );
+            console.error("Error loading recent debates:", error);
+            renderError("recentDebates", "Unable to load recent debates.");
         }
     }
 
     async function loadRecentProposals() {
-
         try {
-
-            const data = await fetchData(
-                "/api/proposals"
-            );
+            const data = await fetchData("/api/proposals");
 
             if (!Array.isArray(data.proposals)) {
-
-                throw new Error(
-                    "Invalid proposals response."
-                );
+                throw new Error("Invalid proposals response.");
             }
 
-            const proposals = data.proposals;
+            proposalSections.forEach(section => {
+                const isOpen = section.result === "ongoing";
 
-            const votingProposals = proposals.filter(
-                proposal =>
-                    proposal.voting_open === true &&
-                    proposal.voting_result === "ongoing"
-            );
+                const proposals = data.proposals.filter(proposal =>
+                    proposal.voting_result === section.result &&
+                    proposal.voting_open === isOpen &&
+                    (isOpen || proposal.voting_deadline)
+                );
 
-            const approvedProposals = proposals.filter(
-                proposal =>
-                    proposal.voting_open === false &&
-                    proposal.voting_deadline &&
-                    proposal.voting_result === "approved"
-            );
+                const sorted = sortRecent(
+                    proposals,
+                    isOpen ? getCreationDate : getDeadline
+                );
 
-            const notPassedProposals = proposals.filter(
-                proposal =>
-                    proposal.voting_open === false &&
-                    proposal.voting_deadline &&
-                    proposal.voting_result === "not_approved"
-            );
-
-            renderCards(
-                recentVotingProposals,
-                sortByCreation(votingProposals),
-                createVotingCard
-            );
-
-            renderCards(
-                recentApprovedProposals,
-                sortByDeadline(approvedProposals),
-                createApprovedCard
-            );
-
-            renderCards(
-                recentNotPassedProposals,
-                sortByDeadline(notPassedProposals),
-                createNotPassedCard
-            );
-
+                renderCards(section.id, sorted, proposal =>
+                    createProposalCard(proposal, section)
+                );
+            });
         } catch (error) {
+            console.error("Error loading recent proposals:", error);
 
-            console.error(
-                "Error loading recent proposals:",
-                error
-            );
-
-            renderError(
-                recentVotingProposals,
-                "Unable to load voting proposals."
-            );
-
-            renderError(
-                recentApprovedProposals,
-                "Unable to load approved proposals."
-            );
-
-            renderError(
-                recentNotPassedProposals,
-                "Unable to load unsuccessful proposals."
+            proposalSections.forEach(section =>
+                renderError(section.id, section.error)
             );
         }
     }
 
     async function loadHomeActivity() {
-
-        if (loading) {
-            return;
-        }
+        if (loading) return;
 
         loading = true;
 
         try {
-
             await Promise.all([
                 loadRecentDebates(),
                 loadRecentProposals()
             ]);
-
         } finally {
-
             loading = false;
         }
     }
 
-    document.addEventListener(
-        "visibilitychange",
-        () => {
-
-            if (document.visibilityState === "visible") {
-                loadHomeActivity();
-            }
-        }
-    );
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") loadHomeActivity();
+    });
 
     window.addEventListener("pageshow", event => {
-
-        if (event.persisted) {
-            loadHomeActivity();
-        }
+        if (event.persisted) loadHomeActivity();
     });
 
     loadHomeActivity();
-
 })();
